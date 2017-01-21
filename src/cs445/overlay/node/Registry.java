@@ -1,5 +1,7 @@
 package cs445.overlay.node;
 
+import cs445.overlay.transport.TCPServerThread;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -10,7 +12,6 @@ import java.net.Socket;
 public class Registry {
 
     private static int portnum;
-    private static String hostname = "localhost";
     private static ServerSocket nodeRegistry;
 
     public void receiveRequest() {
@@ -52,29 +53,6 @@ public class Registry {
 
     public static void main(String[] args) {
         portnum = Integer.parseInt(args[0]);
-        try {
-            ServerSocket nodeRegistry = new ServerSocket(portnum);
-            Socket nodeSocket = nodeRegistry.accept();
-            PrintWriter out = new PrintWriter(nodeSocket.getOutputStream(), true);
-            BufferedReader in = new BufferedReader(
-                    new InputStreamReader(nodeSocket.getInputStream()));
-            System.out.println("Server running, waiting for input...");
-            {
-                String textFromClient;
-                String textToClient;
-                while((textFromClient = in.readLine()) !=null) {
-                    if(textFromClient.equals("1")) {
-                        textToClient = "#1";
-                        System.out.println("sending " + textToClient);
-                        out.println(textToClient);
-                    } else {
-                        System.out.println(nodeSocket.getOutputStream());
-                        out.println(textFromClient);
-                    }
-                }
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        TCPServerThread tcpServerThread = new TCPServerThread(portnum);
     }
 }

@@ -1,12 +1,14 @@
 package cs445.overlay.node;
 
+import cs445.overlay.transport.TCPServerThread;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
-import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class MessagingNode {
     private int sendTracker = 0;
@@ -14,28 +16,42 @@ public class MessagingNode {
     private int relayTracker = 0;
     private long sendSummation = 0;
     private long receiveSummation = 0;
-    private Socket nodeSocket;
-    private ServerSocket receivingSocket;
+    private int randomPort;
+    private int test;
+    private Socket registrySocket;
+    private TCPServerThread receivingSocket;
     private PrintWriter out;
     private BufferedReader in;
     private BufferedReader input;
 
     public MessagingNode(String host, int portNumber) throws IOException {
-        nodeSocket = new Socket(host, portNumber);
+        registrySocket = new Socket(host, portNumber);
         startCommunicationLinks();
-        changeNodeRegistration(1);
+        createServerSocket();
+        sendMessage(1);
+    }
+
+    private void createServerSocket() throws IOException {
+        chooseRandomPort();
+        receivingSocket = new TCPServerThread(randomPort);
+        test = receivingSocket.retrievePortNum();
+        System.out.println(test);
     }
 
     private void startCommunicationLinks() throws IOException {
-        out = new PrintWriter(nodeSocket.getOutputStream(), true);
+        out = new PrintWriter(registrySocket.getOutputStream(), true);
         in = new BufferedReader(
-                new InputStreamReader(nodeSocket.getInputStream()));
+                new InputStreamReader(registrySocket.getInputStream()));
         input = new BufferedReader(new InputStreamReader(System.in));
     }
 
-    public void changeNodeRegistration(int messageType) {
+    public void sendMessage(int messageType) {
         String ipAddress;
         int portNumber;
+    }
+
+    private void chooseRandomPort() {
+        randomPort = ThreadLocalRandom.current().nextInt(49152, 65535);
     }
 
     public void initiateConnection() {
@@ -59,20 +75,10 @@ public class MessagingNode {
     }
 
     public static void main(String[] args) {
+        String host = args[0];
+        int port = Integer.parseInt(args[1]);
         try {
-            Socket nodeSocket = new Socket("localhost", 2500);
-            PrintWriter out = new PrintWriter(nodeSocket.getOutputStream(), true);
-            BufferedReader in = new BufferedReader(
-                    new InputStreamReader(nodeSocket.getInputStream()));
-            BufferedReader stdIn = new BufferedReader(new InputStreamReader(System.in));
-
-            {
-                String userInput;
-                while ((userInput = stdIn.readLine()) != null) {
-                    out.println(userInput);
-                    System.out.println("server: " + in.readLine());
-                }
-            }
+            MessagingNode messagingNode = new MessagingNode(host, port);
         } catch (UnknownHostException e) {
             e.printStackTrace();
         } catch (IOException ioe) {

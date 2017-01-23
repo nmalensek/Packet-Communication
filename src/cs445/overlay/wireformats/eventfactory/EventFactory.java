@@ -1,5 +1,10 @@
 package cs445.overlay.wireformats.eventfactory;
 
+import cs445.overlay.node.Node;
+import cs445.overlay.wireformats.Event;
+
+import java.io.IOException;
+
 public class EventFactory {
 
     private static EventFactory instance = null;
@@ -13,5 +18,9 @@ public class EventFactory {
             instance = new EventFactory();
         }
         return instance;
+    }
+
+    public void newEvent(Node node, Event event) throws IOException {
+        node.onEvent(event);
     }
 }

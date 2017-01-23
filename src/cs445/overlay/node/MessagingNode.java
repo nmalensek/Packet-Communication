@@ -1,53 +1,53 @@
 package cs445.overlay.node;
 
+import cs445.overlay.transport.TCPReceiverThread;
+import cs445.overlay.transport.TCPSender;
 import cs445.overlay.transport.TCPServerThread;
+import cs445.overlay.wireformats.Event;
+import cs445.overlay.wireformats.Register;
+import cs445.overlay.wireformats.eventfactory.EventFactory;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.concurrent.ThreadLocalRandom;
 
-public class MessagingNode {
+public class MessagingNode implements Node {
     private int sendTracker = 0;
     private int receiveTracker = 0;
     private int relayTracker = 0;
     private long sendSummation = 0;
     private long receiveSummation = 0;
     private int randomPort;
-    private int test;
     private Socket registrySocket;
+    private Socket transmitSocket;
     private TCPServerThread receivingSocket;
-    private PrintWriter out;
-    private BufferedReader in;
-    private BufferedReader input;
+    private EventFactory eF;
+    private byte[] bytesToSend;
 
     public MessagingNode(String host, int portNumber) throws IOException {
         registrySocket = new Socket(host, portNumber);
-        startCommunicationLinks();
         createServerSocket();
-        sendMessage(1);
+//        Register register = new Register("127.0.0.1", randomPort);
+//        onEvent(register);
     }
 
     private void createServerSocket() throws IOException {
-        chooseRandomPort();
-        receivingSocket = new TCPServerThread(randomPort);
-        test = receivingSocket.retrievePortNum();
-        System.out.println(test);
+//        chooseRandomPort();
+//        receivingSocket = new TCPServerThread(4444);
+//        transmitSocket = receivingSocket.getNodeSocket();
+        Register register = new Register("127.0.0.1", 4444);
+        onEvent(register);
     }
 
-    private void startCommunicationLinks() throws IOException {
-        out = new PrintWriter(registrySocket.getOutputStream(), true);
-        in = new BufferedReader(
-                new InputStreamReader(registrySocket.getInputStream()));
-        input = new BufferedReader(new InputStreamReader(System.in));
+    public void onEvent(Event event) throws IOException {
+        bytesToSend = event.getBytes();
+        TCPSender sender = new TCPSender(registrySocket);
+        sender.sendData(bytesToSend);
     }
 
-    public void sendMessage(int messageType) {
-        String ipAddress;
-        int portNumber;
+    private void connectToNode(String host, int port) {
+
     }
 
     private void chooseRandomPort() {
@@ -62,8 +62,9 @@ public class MessagingNode {
 
     }
 
-    public void acceptMessage() {
-
+    public void acceptMessage() throws IOException {
+        TCPReceiverThread receiver = new TCPReceiverThread(transmitSocket);
+        receiver.run();
     }
 
     public void printShortestPath() {

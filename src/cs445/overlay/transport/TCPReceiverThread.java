@@ -1,5 +1,7 @@
 package cs445.overlay.transport;
 
+import cs445.overlay.wireformats.RegisterResponse;
+
 import java.io.DataInputStream;
 import java.io.IOException;
 import java.net.Socket;
@@ -23,6 +25,9 @@ public class TCPReceiverThread implements Runnable {
 
                 byte[] data = new byte[dataLength];
                 dataInputStream.readFully(data, 0, dataLength);
+                RegisterResponse rR = new RegisterResponse();
+                rR.receiveBytes(data);
+                rR.printData();
             } catch (SocketException se) {
                 System.out.println(se.getMessage());
                 break;

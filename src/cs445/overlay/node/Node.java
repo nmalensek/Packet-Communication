@@ -1,7 +1,10 @@
 package cs445.overlay.node;
 
-/**
- * Created by nicholas on 1/20/17.
- */
+import cs445.overlay.wireformats.Event;
+
+import java.io.IOException;
+
 public interface Node {
+
+    void onEvent(Event event) throws IOException;
 }

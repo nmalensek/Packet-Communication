@@ -6,5 +6,5 @@ import java.io.IOException;
 
 public interface Node {
 
-    void onEvent(Event event) throws IOException;
+    void onEvent(Event event, byte[] bytes) throws IOException;
 }

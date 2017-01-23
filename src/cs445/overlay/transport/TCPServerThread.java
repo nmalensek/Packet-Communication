@@ -13,7 +13,6 @@ public class TCPServerThread {
             ServerSocket serverSocket = new ServerSocket(portNum);
                 System.out.println("Server running, listening on port " + portNum + "...");
                 nodeSocket = serverSocket.accept();
-                System.out.println(nodeSocket + "successfully connected!");
         } catch (IOException e) {
             e.printStackTrace();
         }

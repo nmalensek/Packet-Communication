@@ -20,7 +20,7 @@ public class EventFactory {
         return instance;
     }
 
-    public void newEvent(Node node, Event event) throws IOException {
-        node.onEvent(event);
+    public void newEvent(Node node, Event event, byte[] bytes) throws IOException {
+        node.onEvent(event, bytes);
     }
 }

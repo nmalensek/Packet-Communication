@@ -16,31 +16,9 @@ public class Register implements Protocol, Event {
         this.portNumber = portNumber;
     }
 
-    public void receiveBytes(byte[] marshalledBytes) throws IOException {
-        ByteArrayInputStream byteArrayInputStream =
-                new ByteArrayInputStream(marshalledBytes);
-        DataInputStream dataInputStream =
-                new DataInputStream(new BufferedInputStream(byteArrayInputStream));
+    public int getType() { return messageType; }
 
-        messageType = dataInputStream.readInt();
-        portNumber = dataInputStream.readInt();
-
-        int identifierLength = dataInputStream.readInt();
-        byte[] identifierBytes = new byte[identifierLength];
-        dataInputStream.readFully(identifierBytes);
-
-        identifier = new String(identifierBytes);
-
-        tracker = dataInputStream.readInt();
-
-        byteArrayInputStream.close();
-        dataInputStream.close();
-    }
-
-    public int getType() {
-        return messageType;
-    }
-
+    //marshalls bytes
     public byte[] getBytes() throws IOException {
         byte[] marshalledBytes = null;
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();

@@ -1,20 +1,21 @@
 package cs445.overlay.wireformats;
 
-import java.io.BufferedInputStream;
-import java.io.ByteArrayInputStream;
-import java.io.DataInputStream;
-import java.io.IOException;
+import java.io.*;
 
-public class RegisterResponse {
+public class RegisterResponse implements Protocol, Event {
 
-    private int messageType;
+    private int messageType = REGISTER_RESPONSE;
     private String ipAddress;
     private int portNumber;
     private long timestamp;
     private String identifier;
     private int tracker;
 
-    public void receiveBytes(byte[] marshalledBytes) throws IOException {
+    public int getType() {
+        return messageType;
+    }
+
+    public void unmarshallBytes(byte[] marshalledBytes) throws IOException {
         ByteArrayInputStream byteArrayInputStream =
                 new ByteArrayInputStream(marshalledBytes);
         DataInputStream dataInputStream =
@@ -31,8 +32,36 @@ public class RegisterResponse {
 
         tracker = dataInputStream.readInt();
 
+        printData();
+
         byteArrayInputStream.close();
         dataInputStream.close();
+    }
+
+    //marshalls bytes
+    public byte[] getBytes() throws IOException {
+        byte[] marshalledBytes = null;
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        DataOutputStream dataOutputStream =
+                new DataOutputStream(new BufferedOutputStream(byteArrayOutputStream));
+
+        dataOutputStream.writeInt(messageType);
+        dataOutputStream.writeInt(portNumber);
+
+        byte[] identifierBytes = identifier.getBytes();
+        int elementLength = identifierBytes.length;
+        dataOutputStream.writeInt(elementLength);
+        dataOutputStream.write(identifierBytes);
+
+        dataOutputStream.writeInt(tracker);
+
+        dataOutputStream.flush();
+        marshalledBytes = byteArrayOutputStream.toByteArray();
+
+        byteArrayOutputStream.close();
+        dataOutputStream.close();
+
+        return marshalledBytes;
     }
 
     public void printData() {

@@ -33,14 +33,14 @@ public class MessagingNode implements Node {
     }
 
     private void createServerSocket() throws IOException {
-//        chooseRandomPort();
-//        receivingSocket = new TCPServerThread(4444);
-//        transmitSocket = receivingSocket.getNodeSocket();
+        chooseRandomPort();
         Register register = new Register("127.0.0.1", 4444);
-        onEvent(register);
+        onEvent(register, null);
+        receivingSocket = new TCPServerThread(4444);
+        transmitSocket = receivingSocket.getNodeSocket();
     }
 
-    public void onEvent(Event event) throws IOException {
+    public void onEvent(Event event, byte[] bytes) throws IOException {
         bytesToSend = event.getBytes();
         TCPSender sender = new TCPSender(registrySocket);
         sender.sendData(bytesToSend);
@@ -63,7 +63,7 @@ public class MessagingNode implements Node {
     }
 
     public void acceptMessage() throws IOException {
-        TCPReceiverThread receiver = new TCPReceiverThread(transmitSocket);
+        TCPReceiverThread receiver = new TCPReceiverThread(transmitSocket, this);
         receiver.run();
     }
 
@@ -78,8 +78,11 @@ public class MessagingNode implements Node {
     public static void main(String[] args) {
         String host = args[0];
         int port = Integer.parseInt(args[1]);
+
         try {
-            MessagingNode messagingNode = new MessagingNode(host, port);
+            while(true) {
+                MessagingNode messagingNode = new MessagingNode(host, port);
+            }
         } catch (UnknownHostException e) {
             e.printStackTrace();
         } catch (IOException ioe) {

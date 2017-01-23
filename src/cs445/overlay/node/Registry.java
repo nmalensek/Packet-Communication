@@ -1,29 +1,29 @@
 package cs445.overlay.node;
 
 import cs445.overlay.transport.TCPReceiverThread;
+import cs445.overlay.transport.TCPSender;
 import cs445.overlay.transport.TCPServerThread;
 import cs445.overlay.wireformats.Event;
-import cs445.overlay.wireformats.Register;
+import cs445.overlay.wireformats.RegisterResponse;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
 import java.net.ServerSocket;
-import java.net.Socket;
 import java.util.HashSet;
 import java.util.Set;
 
 public class Registry implements Node {
 
     private static int portnum;
+    private TCPSender sender;
+    private TCPReceiverThread receiverThread;
     private static ServerSocket nodeRegistry;
     private Set nodeSet = new HashSet();
 
     public Registry() throws IOException {
         TCPServerThread tcpServerThread = new TCPServerThread(portnum);
-        TCPReceiverThread tcpReceiverThread = new TCPReceiverThread(tcpServerThread.getNodeSocket());
-        tcpReceiverThread.run();
+        sender = new TCPSender(tcpServerThread.getNodeSocket());
+        receiverThread = new TCPReceiverThread(tcpServerThread.getNodeSocket(), this);
+        receiverThread.run();
     }
 
     public void receiveRequest() {
@@ -35,8 +35,12 @@ public class Registry implements Node {
         //registered nodes
     }
 
-    public void onEvent(Event event) {
+    public void onEvent(Event event, byte[] bytes) throws IOException {
+        if(event.getType() == 2) {
+            RegisterResponse registerResponse = new RegisterResponse();
+            registerResponse.unmarshallBytes(bytes);
 
+        }
     }
 
     public void assignLinkWeights() {

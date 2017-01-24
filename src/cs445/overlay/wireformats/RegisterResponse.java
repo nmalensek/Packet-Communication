@@ -10,9 +10,10 @@ public class RegisterResponse implements Protocol, Event {
     private long timestamp;
     private String identifier;
     private int tracker;
+    private int nodeCount;
 
-    public int getType() {
-        return messageType;
+    public RegisterResponse getType() {
+        return this;
     }
 
     public void unmarshallBytes(byte[] marshalledBytes) throws IOException {
@@ -46,7 +47,7 @@ public class RegisterResponse implements Protocol, Event {
                 new DataOutputStream(new BufferedOutputStream(byteArrayOutputStream));
 
         dataOutputStream.writeInt(messageType);
-        dataOutputStream.writeInt(portNumber);
+        dataOutputStream.writeByte(1);
 
         byte[] identifierBytes = identifier.getBytes();
         int elementLength = identifierBytes.length;
@@ -69,6 +70,15 @@ public class RegisterResponse implements Protocol, Event {
         System.out.println(portNumber);
         System.out.println(identifier);
         System.out.println(tracker);
+    }
+
+    public void setNodes(int nodeCount) {
+        this.nodeCount = nodeCount;
+        setIdentifier();
+    }
+
+    public void setIdentifier() {
+        identifier = "Nodes registered: " + nodeCount;
     }
 
 }

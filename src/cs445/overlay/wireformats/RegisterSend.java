@@ -2,7 +2,7 @@ package cs445.overlay.wireformats;
 
 import java.io.*;
 
-public class Register implements Protocol, Event {
+public class RegisterSend implements Protocol, Event<RegisterSend> {
 
     private int messageType = REGISTER_REQUEST;
     private String ipAddress;
@@ -11,12 +11,19 @@ public class Register implements Protocol, Event {
     private String identifier = "127.0.0.1";
     private int tracker = 1;
 
-    public Register(String ipAddress, int portNumber) {
-        this.ipAddress = ipAddress;
-        this.portNumber = portNumber;
+    public RegisterSend() {
     }
 
-    public int getType() { return messageType; }
+    public void setHostAndPort(String host, int port) {
+        this.ipAddress = host;
+        this.portNumber = port;
+    }
+
+    public int getMessageType() {
+        return messageType;
+    }
+
+    public RegisterSend getType() { return this; }
 
     //marshalls bytes
     public byte[] getBytes() throws IOException {

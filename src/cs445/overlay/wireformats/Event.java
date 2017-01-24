@@ -2,8 +2,8 @@ package cs445.overlay.wireformats;
 
 import java.io.IOException;
 
-public interface Event {
+public interface Event<T> {
 
-    int getType();
+    T getType();
     byte[] getBytes() throws IOException;
 }

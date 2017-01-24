@@ -2,7 +2,7 @@ package cs445.overlay.wireformats;
 
 import java.io.*;
 
-public class MessagingNodesList implements Protocol, Event {
+public class MessagingNodesList implements Protocol, Event<MessagingNodesList> {
 
     int messageType = MESSAGING_NODES_LIST;
     private long timestamp;
@@ -32,8 +32,8 @@ public class MessagingNodesList implements Protocol, Event {
         dataInputStream.close();
     }
 
-    public int getType() {
-        return messageType;
+    public MessagingNodesList getType() {
+        return this;
     }
 
     public byte[] getBytes() throws IOException {

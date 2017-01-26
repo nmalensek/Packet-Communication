@@ -36,7 +36,6 @@ public class TCPReceiverThread implements Runnable, Protocol {
                 byte[] data = new byte[dataLength];
                 dataInputStream.readFully(data, 0, dataLength);
 
-                RegisterReceive registerReceive = new RegisterReceive(data);
                 determineMessageType(data);
 
             } catch (SocketException se) {
@@ -50,7 +49,6 @@ public class TCPReceiverThread implements Runnable, Protocol {
     }
 
     public void determineMessageType(byte[] marshalledBytes) throws IOException {
-        Event event = null;
         ByteArrayInputStream byteArrayInputStream =
                 new ByteArrayInputStream(marshalledBytes);
         DataInputStream dataInputStream =
@@ -61,8 +59,8 @@ public class TCPReceiverThread implements Runnable, Protocol {
             case DEREGISTER_REQUEST:
                 //do something
             case REGISTER_REQUEST: messageType = REGISTER_REQUEST;
-                RegisterSend register = eventFactory.createRegisterSendEvent().getType();
-                eventFactory.newEvent(node, register);
+                Event<RegisterReceive> registerReceiveEvent = eventFactory.receiveRegisterEvent(marshalledBytes);
+                node.onEvent(registerReceiveEvent);
                 break;
             case REGISTER_RESPONSE: messageType = REGISTER_RESPONSE;
             //do something else

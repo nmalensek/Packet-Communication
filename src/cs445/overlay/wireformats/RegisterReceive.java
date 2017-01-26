@@ -26,9 +26,6 @@ public class RegisterReceive implements Protocol, Event<RegisterReceive> {
 
         tracker = dataInputStream.readInt();
 
-        printData();
-        RegisterResponse registerResponse = new RegisterResponse();
-
         byteArrayInputStream.close();
         dataInputStream.close();
     }
@@ -42,6 +39,9 @@ public class RegisterReceive implements Protocol, Event<RegisterReceive> {
 
         return marshalledBytes;
     }
+
+    public String getIdentifier() { return identifier; }
+    public int getPortNumber() { return portNumber; }
 
     public void printData() {
         System.out.println(messageType);

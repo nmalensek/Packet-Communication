@@ -27,21 +27,30 @@ public class MessagingNode implements Node {
 
     public MessagingNode(String host, int portNumber) throws IOException {
         registrySocket = new Socket(host, portNumber);
+        chooseRandomPort();
+        register();
         createServerSocket();
     }
 
     private void createServerSocket() throws IOException {
-        chooseRandomPort();
-        RegisterSend registerSend = eF.createRegisterSendEvent().getType();
-        registerSend.setHostAndPort("localhost", 4444);
-        onEvent(registerSend);
-        receivingSocket = new TCPServerThread(4444);
+        receivingSocket = new TCPServerThread(randomPort);
         transmitSocket = receivingSocket.getNodeSocket();
+    }
+
+    private void register() throws IOException {
+        RegisterSend registerSend = eF.createRegisterSendEvent().getType();
+        registerSend.setHostAndPort("localhost", randomPort);
+        onEvent(registerSend);
+    }
+
+    private void startListening() throws IOException {
+        TCPReceiverThread receiver = new TCPReceiverThread(transmitSocket, this);
+        receiver.run();
     }
 
     public void onEvent(Event event) throws IOException {
         bytesToSend = event.getBytes();
-        TCPSender sender = new TCPSender(registrySocket);
+        TCPSender sender = new TCPSender(registrySocket, this);
         sender.sendData(bytesToSend);
     }
 
@@ -62,8 +71,7 @@ public class MessagingNode implements Node {
     }
 
     public void acceptMessage() throws IOException {
-        TCPReceiverThread receiver = new TCPReceiverThread(transmitSocket, this);
-        receiver.run();
+
     }
 
     public void printShortestPath() {

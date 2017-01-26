@@ -10,8 +10,8 @@ public class TCPServerThread {
 
     public TCPServerThread(int portNum) {
         try {
-            ServerSocket serverSocket = new ServerSocket(portNum);
-                System.out.println("Server running, listening on port " + portNum + "...");
+                ServerSocket serverSocket = new ServerSocket(portNum);
+                System.out.println("Server running on port " + portNum + "...");
                 nodeSocket = serverSocket.accept();
         } catch (IOException e) {
             e.printStackTrace();

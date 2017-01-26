@@ -7,12 +7,8 @@ public class RegisterSend implements Protocol, Event<RegisterSend> {
     private int messageType = REGISTER_REQUEST;
     private String ipAddress;
     private int portNumber;
-    private long timestamp;
     private String identifier = "127.0.0.1";
     private int tracker = 1;
-
-    public RegisterSend() {
-    }
 
     public void setHostAndPort(String host, int port) {
         this.ipAddress = host;
@@ -32,7 +28,7 @@ public class RegisterSend implements Protocol, Event<RegisterSend> {
         DataOutputStream dataOutputStream =
                 new DataOutputStream(new BufferedOutputStream(byteArrayOutputStream));
 
-        dataOutputStream.writeInt(messageType);
+        dataOutputStream.writeInt(getMessageType());
         dataOutputStream.writeInt(portNumber);
 
         byte[] identifierBytes = identifier.getBytes();

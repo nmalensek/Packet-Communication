@@ -3,8 +3,9 @@ package cs445.overlay.node;
 import cs445.overlay.wireformats.Event;
 
 import java.io.IOException;
+import java.net.Socket;
 
 public interface Node {
 
-    void onEvent(Event event) throws IOException;
+    void onEvent(Event event, Socket destinationSocket) throws IOException;
 }

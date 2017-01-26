@@ -1,10 +1,7 @@
 package cs445.overlay.transport;
 
 import cs445.overlay.node.Node;
-import cs445.overlay.wireformats.Event;
-import cs445.overlay.wireformats.Protocol;
-import cs445.overlay.wireformats.RegisterReceive;
-import cs445.overlay.wireformats.RegisterSend;
+import cs445.overlay.wireformats.*;
 import cs445.overlay.wireformats.eventfactory.EventFactory;
 
 import java.io.BufferedInputStream;
@@ -14,22 +11,22 @@ import java.io.IOException;
 import java.net.Socket;
 import java.net.SocketException;
 
-public class TCPReceiverThread implements Runnable, Protocol {
+public class TCPReceiverThread extends Thread implements Protocol {
 
-    private Socket socket;
+    private Socket clientSocket;
     private DataInputStream dataInputStream;
     private Node node;
     private EventFactory eventFactory = EventFactory.getInstance();
 
-    public TCPReceiverThread(Socket socket, Node node) throws IOException {
-        this.socket = socket;
+    public TCPReceiverThread(Socket clientSocket, Node node) throws IOException {
+        this.clientSocket = clientSocket;
         this.node = node;
-        dataInputStream = new DataInputStream(socket.getInputStream());
+        dataInputStream = new DataInputStream(clientSocket.getInputStream());
     }
 
     public void run() {
         int dataLength;
-        while (socket != null) {
+        while (clientSocket != null) {
             try {
                 dataLength = dataInputStream.readInt();
 
@@ -58,25 +55,28 @@ public class TCPReceiverThread implements Runnable, Protocol {
         switch (messageType) {
             case DEREGISTER_REQUEST:
                 //do something
-            case REGISTER_REQUEST: messageType = REGISTER_REQUEST;
-                Event<RegisterReceive> registerReceiveEvent = eventFactory.receiveRegisterEvent(marshalledBytes);
-                node.onEvent(registerReceiveEvent);
+            case REGISTER_REQUEST:
+                Event<RegisterReceive> registerReceiveEvent =
+                        eventFactory.receiveRegReqEvent(marshalledBytes);
+                node.onEvent(registerReceiveEvent, clientSocket);
                 break;
-            case REGISTER_RESPONSE: messageType = REGISTER_RESPONSE;
-            //do something else
-            case MESSAGING_NODES_LIST: messageType = MESSAGING_NODES_LIST;
+            case REGISTER_RESPONSE:
+                Event<RegResponseReceive> registerResponseEvent =
+                        eventFactory.receiveRegisterResponseEvent(marshalledBytes);
+                node.onEvent(registerResponseEvent, clientSocket);
+            case MESSAGING_NODES_LIST:
                 //do something
-            case LINK_WEIGHTS: messageType = LINK_WEIGHTS;
+            case LINK_WEIGHTS:
                 //do something
-            case TASK_INITIATE: messageType = TASK_INITIATE;
+            case TASK_INITIATE:
                 //do something else
-            case SEND_MESSAGE: messageType = SEND_MESSAGE;
+            case SEND_MESSAGE:
                 //do something
-            case TASK_COMPLETE: messageType = TASK_COMPLETE;
+            case TASK_COMPLETE:
                 //do something
-            case PULL_TRAFFIC_SUMMARY: messageType = PULL_TRAFFIC_SUMMARY;
+            case PULL_TRAFFIC_SUMMARY:
                 //do something else
-            case TRAFFIC_SUMMARY: messageType = TRAFFIC_SUMMARY;
+            case TRAFFIC_SUMMARY:
                 //do something else
             default:
                 //error

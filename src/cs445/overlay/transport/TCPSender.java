@@ -19,6 +19,7 @@ public class TCPSender {
     }
 
     public void sendData(byte[] dataToSend) throws IOException {
+        System.out.println("doot");
         int dataLength = dataToSend.length;
         dataOutputStream.writeInt(dataLength);
         dataOutputStream.write(dataToSend, 0, dataLength);

@@ -1,10 +1,7 @@
 package cs445.overlay.wireformats.eventfactory;
 
 import cs445.overlay.node.Node;
-import cs445.overlay.wireformats.Event;
-import cs445.overlay.wireformats.RegisterReceive;
-import cs445.overlay.wireformats.RegisterResponse;
-import cs445.overlay.wireformats.RegisterSend;
+import cs445.overlay.wireformats.*;
 
 import java.io.IOException;
 
@@ -28,17 +25,20 @@ public final class EventFactory {
         return registerSend;
     }
 
+    public static final Event<RegisterReceive> receiveRegReqEvent(
+            byte[] marshalledBytes) throws IOException {
+        RegisterReceive registerReceive = new RegisterReceive(marshalledBytes);
+        return registerReceive;
+    }
+
     public static final Event<RegisterResponse> createRegisterResponseEvent() {
         RegisterResponse registerResponse = new RegisterResponse();
         return registerResponse;
     }
 
-    public static final Event<RegisterReceive> receiveRegisterEvent(byte[] marshalledBytes) throws IOException {
-        RegisterReceive registerReceive = new RegisterReceive(marshalledBytes);
-        return registerReceive;
-    }
-
-    public void newEvent(Node node, Event event) throws IOException {
-        node.onEvent(event);
+    public static final Event<RegResponseReceive> receiveRegisterResponseEvent(
+            byte[] marshalledBytes) throws IOException {
+        RegResponseReceive registerResponse = new RegResponseReceive(marshalledBytes);
+        return registerResponse;
     }
 }

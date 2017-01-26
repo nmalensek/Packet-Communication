@@ -4,6 +4,8 @@ import cs445.overlay.transport.TCPReceiverThread;
 import cs445.overlay.transport.TCPSender;
 import cs445.overlay.transport.TCPServerThread;
 import cs445.overlay.wireformats.Event;
+import cs445.overlay.wireformats.RegResponseReceive;
+import cs445.overlay.wireformats.RegisterResponse;
 import cs445.overlay.wireformats.RegisterSend;
 import cs445.overlay.wireformats.eventfactory.EventFactory;
 
@@ -43,17 +45,21 @@ public class MessagingNode implements Node {
     private void register() throws IOException {
         RegisterSend registerSend = eF.createRegisterSendEvent().getType();
         registerSend.setHostAndPort("localhost", randomPort);
-        onEvent(registerSend);
+        onEvent(registerSend, registrySocket);
     }
 
     private void createServerSocket() throws IOException {
         receivingSocket = new TCPServerThread(this, randomPort);
     }
 
-    public void onEvent(Event event) throws IOException {
-        bytesToSend = event.getBytes();
-        TCPSender sender = new TCPSender(registrySocket, this);
-        sender.sendData(bytesToSend);
+    public void onEvent(Event event, Socket destinationSocket) throws IOException {
+        if(event instanceof RegResponseReceive) {
+            ((RegResponseReceive) event).testPrint();
+        } else {
+            bytesToSend = event.getBytes();
+            TCPSender sender = new TCPSender(destinationSocket, this);
+            sender.sendData(bytesToSend);
+        }
     }
 
     private void connectToNode(String host, int port) {

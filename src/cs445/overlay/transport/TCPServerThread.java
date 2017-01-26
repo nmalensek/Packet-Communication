@@ -11,11 +11,11 @@ public class TCPServerThread {
 
     public TCPServerThread(Node node, int portNum) {
         try {
+            serverSocket = new ServerSocket(portNum);
+            System.out.println("Server running on port " + portNum + "...");
             while(true) {
-                serverSocket = new ServerSocket(portNum);
-                System.out.println("Server running on port " + portNum + "...");
                 tcpReceiverThread = new TCPReceiverThread(serverSocket.accept(), node);
-                tcpReceiverThread.run();
+                tcpReceiverThread.start();
             }
         } catch (IOException e) {
             e.printStackTrace();

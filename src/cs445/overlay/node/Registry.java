@@ -1,13 +1,11 @@
 package cs445.overlay.node;
 
-import cs445.overlay.transport.TCPReceiverThread;
 import cs445.overlay.transport.TCPSender;
 import cs445.overlay.transport.TCPServerThread;
 import cs445.overlay.wireformats.*;
 import cs445.overlay.wireformats.eventfactory.EventFactory;
 
 import java.io.IOException;
-import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.HashMap;
 import java.util.Map;
@@ -16,15 +14,14 @@ public class Registry implements Node {
 
     private static int portnum;
     private TCPSender replySender;
-    private Map<String, Integer> nodeMap = new HashMap<>();
+    private Map<Integer, String> nodeMap = new HashMap<>();
     private Event<Deregister> deregister;
     private Event<RegisterSend> registerSendEvent;
     private EventFactory eventFactory = EventFactory.getInstance();
-    private int numberOfNodes = 0;
-    private TCPServerThread registerServerThread;
+    private TCPServerThread registryServerThread;
 
     public Registry() throws IOException {
-        registerServerThread = new TCPServerThread(this, portnum);
+        registryServerThread = new TCPServerThread(this, portnum);
     }
 
     public void receiveRequest() {
@@ -36,21 +33,23 @@ public class Registry implements Node {
         //registered nodes
     }
 
-    public void onEvent(Event event) throws IOException {
+    public void onEvent(Event event, Socket destinationSocket) throws IOException {
         if(event instanceof RegisterReceive) {
             String host = ((RegisterReceive) event).getIdentifier();
             int port = ((RegisterReceive) event).getPortNumber();
-            nodeMap.put(host, port);
-
+            nodeMap.put(port, host);
+            replyToRegistration(destinationSocket);
+            System.out.println(host + port);
+        } else if(event instanceof RegResponseReceive) {
+            System.out.println("something's gone wrong");
         }
     }
 
-    public void createResponse() throws IOException {
+    public void replyToRegistration(Socket nodeThatRegistered) throws IOException {
         RegisterResponse registerResponse = eventFactory.createRegisterResponseEvent().getType();
-        registerResponse.setNodes(numberOfNodes);
-        Socket nodeSocket = new Socket("localhost", 4444);
-        TCPSender tcpSender = new TCPSender(nodeSocket, this);
-        tcpSender.sendData(registerResponse.getBytes());
+        registerResponse.setAdditionalInfo(nodeMap.size());
+        replySender = new TCPSender(nodeThatRegistered, this);
+        replySender.sendData(registerResponse.getBytes());
     }
 
     public void assignLinkWeights() {

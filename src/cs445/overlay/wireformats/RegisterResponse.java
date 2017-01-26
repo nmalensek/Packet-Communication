@@ -5,39 +5,34 @@ import java.io.*;
 public class RegisterResponse implements Protocol, Event {
 
     private int messageType = REGISTER_RESPONSE;
-    private String ipAddress;
-    private int portNumber;
-    private long timestamp;
-    private String identifier;
+    private String additionalInfo;
     private int tracker;
-    private int nodeCount;
+    private byte[] marshalledBytes;
 
     public RegisterResponse getType() {
         return this;
     }
-
-    public void unmarshallBytes(byte[] marshalledBytes) throws IOException {
-        ByteArrayInputStream byteArrayInputStream =
-                new ByteArrayInputStream(marshalledBytes);
-        DataInputStream dataInputStream =
-                new DataInputStream(new BufferedInputStream(byteArrayInputStream));
-
-        messageType = dataInputStream.readInt();
-        portNumber = dataInputStream.readInt();
-
-        int identifierLength = dataInputStream.readInt();
-        byte[] identifierBytes = new byte[identifierLength];
-        dataInputStream.readFully(identifierBytes);
-
-        identifier = new String(identifierBytes);
-
-        tracker = dataInputStream.readInt();
-
-        printData();
-
-        byteArrayInputStream.close();
-        dataInputStream.close();
-    }
+//
+//    public void unmarshallBytes(byte[] marshalledBytes) throws IOException {
+//        ByteArrayInputStream byteArrayInputStream =
+//                new ByteArrayInputStream(marshalledBytes);
+//        DataInputStream dataInputStream =
+//                new DataInputStream(new BufferedInputStream(byteArrayInputStream));
+//
+//        messageType = dataInputStream.readInt();
+//        int registrationStatus = dataInputStream.readByte();
+//
+//        int additionalInfoLength = dataInputStream.readInt();
+//        byte[] additionalInfoBytes = new byte[additionalInfoLength];
+//        dataInputStream.readFully(additionalInfoBytes);
+//
+//        additionalInfo = new String(additionalInfoBytes);
+//
+//        tracker = dataInputStream.readInt();
+//
+//        byteArrayInputStream.close();
+//        dataInputStream.close();
+//    }
 
     //marshalls bytes
     public byte[] getBytes() throws IOException {
@@ -47,14 +42,12 @@ public class RegisterResponse implements Protocol, Event {
                 new DataOutputStream(new BufferedOutputStream(byteArrayOutputStream));
 
         dataOutputStream.writeInt(messageType);
-        dataOutputStream.writeByte(1);
+        dataOutputStream.writeInt(1);
 
-        byte[] identifierBytes = identifier.getBytes();
+        byte[] identifierBytes = additionalInfo.getBytes();
         int elementLength = identifierBytes.length;
         dataOutputStream.writeInt(elementLength);
         dataOutputStream.write(identifierBytes);
-
-        dataOutputStream.writeInt(tracker);
 
         dataOutputStream.flush();
         marshalledBytes = byteArrayOutputStream.toByteArray();
@@ -65,20 +58,8 @@ public class RegisterResponse implements Protocol, Event {
         return marshalledBytes;
     }
 
-    public void printData() {
-        System.out.println(messageType);
-        System.out.println(portNumber);
-        System.out.println(identifier);
-        System.out.println(tracker);
-    }
-
-    public void setNodes(int nodeCount) {
-        this.nodeCount = nodeCount;
-        setIdentifier();
-    }
-
-    public void setIdentifier() {
-        identifier = "Nodes registered: " + nodeCount;
+    public void setAdditionalInfo(int nodeCount) {
+        additionalInfo = "Nodes registered: " + nodeCount;
     }
 
 }

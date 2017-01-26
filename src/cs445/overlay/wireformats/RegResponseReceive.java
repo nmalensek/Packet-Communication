@@ -9,6 +9,7 @@ import java.io.IOException;
 public class RegResponseReceive implements Protocol, Event{
     private int messageType;
     private String additionalInfo;
+    private byte registrationStatus;
 
     public RegResponseReceive(byte[] marshalledBytes) throws IOException {
         ByteArrayInputStream byteArrayInputStream =
@@ -17,7 +18,7 @@ public class RegResponseReceive implements Protocol, Event{
                 new DataInputStream(new BufferedInputStream(byteArrayInputStream));
 
         messageType = dataInputStream.readInt();
-        int registrationStatus = dataInputStream.readInt();
+        registrationStatus = dataInputStream.readByte();
 
         int additionalInfoLength = dataInputStream.readInt();
         byte[] additionalInfoBytes = new byte[additionalInfoLength];
@@ -25,14 +26,8 @@ public class RegResponseReceive implements Protocol, Event{
 
         additionalInfo = new String(additionalInfoBytes);
 
-        System.out.println("data read");
-
         byteArrayInputStream.close();
         dataInputStream.close();
-    }
-
-    public void testPrint() {
-        System.out.println("message received");
     }
 
     public Object getType() {
@@ -41,5 +36,9 @@ public class RegResponseReceive implements Protocol, Event{
 
     public byte[] getBytes() throws IOException {
         return new byte[0];
+    }
+
+    public void printMessage() {
+        System.out.println(registrationStatus);
     }
 }

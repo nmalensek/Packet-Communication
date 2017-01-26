@@ -7,7 +7,6 @@ public class RegisterReceive implements Protocol, Event<RegisterReceive> {
     private int messageType;
     private int portNumber;
     private String identifier;
-    private int tracker;
 
     public RegisterReceive(byte[] marshalledBytes) throws IOException {
         ByteArrayInputStream byteArrayInputStream =
@@ -23,8 +22,6 @@ public class RegisterReceive implements Protocol, Event<RegisterReceive> {
         dataInputStream.readFully(identifierBytes);
 
         identifier = new String(identifierBytes);
-
-        tracker = dataInputStream.readInt();
 
         byteArrayInputStream.close();
         dataInputStream.close();
@@ -42,12 +39,5 @@ public class RegisterReceive implements Protocol, Event<RegisterReceive> {
 
     public String getIdentifier() { return identifier; }
     public int getPortNumber() { return portNumber; }
-
-    public void printData() {
-        System.out.println(messageType);
-        System.out.println(portNumber);
-        System.out.println(identifier);
-        System.out.println(tracker);
-    }
 
 }

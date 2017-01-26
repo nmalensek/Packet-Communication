@@ -13,20 +13,20 @@ import java.net.SocketException;
 
 public class TCPReceiverThread extends Thread implements Protocol {
 
-    private Socket clientSocket;
+    private Socket communicationSocket;
     private DataInputStream dataInputStream;
     private Node node;
     private EventFactory eventFactory = EventFactory.getInstance();
 
-    public TCPReceiverThread(Socket clientSocket, Node node) throws IOException {
-        this.clientSocket = clientSocket;
+    public TCPReceiverThread(Socket communicationSocket, Node node) throws IOException {
+        this.communicationSocket = communicationSocket;
         this.node = node;
-        dataInputStream = new DataInputStream(clientSocket.getInputStream());
+        dataInputStream = new DataInputStream(communicationSocket.getInputStream());
     }
 
     public void run() {
         int dataLength;
-        while (clientSocket != null) {
+        while (communicationSocket != null) {
             try {
                 dataLength = dataInputStream.readInt();
 
@@ -58,12 +58,12 @@ public class TCPReceiverThread extends Thread implements Protocol {
             case REGISTER_REQUEST:
                 Event<RegisterReceive> registerReceiveEvent =
                         eventFactory.receiveRegReqEvent(marshalledBytes);
-                node.onEvent(registerReceiveEvent, clientSocket);
+                node.onEvent(registerReceiveEvent, communicationSocket);
                 break;
             case REGISTER_RESPONSE:
                 Event<RegResponseReceive> registerResponseEvent =
                         eventFactory.receiveRegisterResponseEvent(marshalledBytes);
-                node.onEvent(registerResponseEvent, clientSocket);
+                node.onEvent(registerResponseEvent, communicationSocket);
             case MESSAGING_NODES_LIST:
                 //do something
             case LINK_WEIGHTS:

@@ -6,33 +6,11 @@ public class RegisterResponse implements Protocol, Event {
 
     private int messageType = REGISTER_RESPONSE;
     private String additionalInfo;
-    private int tracker;
-    private byte[] marshalledBytes;
+    private byte successOrFailure;
 
     public RegisterResponse getType() {
         return this;
     }
-//
-//    public void unmarshallBytes(byte[] marshalledBytes) throws IOException {
-//        ByteArrayInputStream byteArrayInputStream =
-//                new ByteArrayInputStream(marshalledBytes);
-//        DataInputStream dataInputStream =
-//                new DataInputStream(new BufferedInputStream(byteArrayInputStream));
-//
-//        messageType = dataInputStream.readInt();
-//        int registrationStatus = dataInputStream.readByte();
-//
-//        int additionalInfoLength = dataInputStream.readInt();
-//        byte[] additionalInfoBytes = new byte[additionalInfoLength];
-//        dataInputStream.readFully(additionalInfoBytes);
-//
-//        additionalInfo = new String(additionalInfoBytes);
-//
-//        tracker = dataInputStream.readInt();
-//
-//        byteArrayInputStream.close();
-//        dataInputStream.close();
-//    }
 
     //marshalls bytes
     public byte[] getBytes() throws IOException {
@@ -42,7 +20,7 @@ public class RegisterResponse implements Protocol, Event {
                 new DataOutputStream(new BufferedOutputStream(byteArrayOutputStream));
 
         dataOutputStream.writeInt(messageType);
-        dataOutputStream.writeInt(1);
+        dataOutputStream.writeByte(successOrFailure);
 
         byte[] identifierBytes = additionalInfo.getBytes();
         int elementLength = identifierBytes.length;
@@ -61,5 +39,9 @@ public class RegisterResponse implements Protocol, Event {
     public void setAdditionalInfo(int nodeCount) {
         additionalInfo = "Nodes registered: " + nodeCount;
     }
+    public void printAdditionalInfo() {
+        System.out.println(additionalInfo);
+    }
+    public void setSuccessOrFailure(byte sOrF) { successOrFailure = sOrF; }
 
 }

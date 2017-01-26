@@ -39,7 +39,7 @@ public class MessagingNode implements Node {
     }
 
     private void chooseRandomPort() {
-        randomPort = ThreadLocalRandom.current().nextInt(49152, 65535);
+        randomPort = ThreadLocalRandom.current().nextInt(4444, 4450);
     }
 
     private void register() throws IOException {
@@ -53,11 +53,13 @@ public class MessagingNode implements Node {
     }
 
     public void onEvent(Event event, Socket destinationSocket) throws IOException {
-        if(event instanceof RegResponseReceive) {
-            ((RegResponseReceive) event).testPrint();
-        } else {
+        if (event instanceof RegResponseReceive) {
+            ((RegResponseReceive) event).printMessage();
+        } else if (event instanceof RegisterResponse) {
+
+        } else if (event instanceof RegisterSend) {
             bytesToSend = event.getBytes();
-            TCPSender sender = new TCPSender(destinationSocket, this);
+            TCPSender sender = new TCPSender(destinationSocket);
             sender.sendData(bytesToSend);
         }
     }
@@ -91,7 +93,7 @@ public class MessagingNode implements Node {
         int port = Integer.parseInt(args[1]);
 
         try {
-            while(true) {
+            while (true) {
                 MessagingNode messagingNode = new MessagingNode(host, port);
             }
         } catch (UnknownHostException e) {

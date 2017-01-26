@@ -14,11 +14,13 @@ public class Registry implements Node {
 
     private static int portnum;
     private TCPSender replySender;
-    private Map<Integer, String> nodeMap = new HashMap<>();
+    private Map<Integer, NodeRecord> nodeMap = new HashMap<>();
     private Event<Deregister> deregister;
     private Event<RegisterSend> registerSendEvent;
     private EventFactory eventFactory = EventFactory.getInstance();
     private TCPServerThread registryServerThread;
+    private byte SUCCESS = 1;
+    private byte FAILURE = 0;
 
     public Registry() throws IOException {
         registryServerThread = new TCPServerThread(this, portnum);
@@ -37,9 +39,10 @@ public class Registry implements Node {
         if(event instanceof RegisterReceive) {
             String host = ((RegisterReceive) event).getIdentifier();
             int port = ((RegisterReceive) event).getPortNumber();
-            nodeMap.put(port, host);
-            replyToRegistration(destinationSocket);
-            System.out.println(host + port);
+            Socket replySocket = new Socket(host, port);
+            NodeRecord newNode = new NodeRecord(host, port, replySocket);
+            nodeMap.put(port, newNode);
+            replyToRegistration(replySocket);
         } else if(event instanceof RegResponseReceive) {
             System.out.println("something's gone wrong");
         }
@@ -48,8 +51,10 @@ public class Registry implements Node {
     public void replyToRegistration(Socket nodeThatRegistered) throws IOException {
         RegisterResponse registerResponse = eventFactory.createRegisterResponseEvent().getType();
         registerResponse.setAdditionalInfo(nodeMap.size());
-        replySender = new TCPSender(nodeThatRegistered, this);
+        registerResponse.setSuccessOrFailure(SUCCESS);
+        replySender = new TCPSender(nodeThatRegistered);
         replySender.sendData(registerResponse.getBytes());
+        registerResponse.printAdditionalInfo();
     }
 
     public void assignLinkWeights() {

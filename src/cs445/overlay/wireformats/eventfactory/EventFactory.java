@@ -4,6 +4,7 @@ import cs445.overlay.node.Node;
 import cs445.overlay.wireformats.*;
 
 import java.io.IOException;
+import java.net.Socket;
 
 public final class EventFactory {
 
@@ -18,6 +19,11 @@ public final class EventFactory {
             instance = new EventFactory();
         }
         return instance;
+    }
+
+    public static final Socket openSocket(String host, int port) throws IOException {
+        Socket replySocket = new Socket(host, port);
+        return replySocket;
     }
 
     public static final Event<RegisterSend> createRegisterSendEvent() {

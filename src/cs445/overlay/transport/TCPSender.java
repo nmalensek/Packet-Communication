@@ -8,14 +8,14 @@ import java.net.Socket;
 
 public class TCPSender {
 
-    private Socket socket;
-    private Node node;
+    private Socket socketToSendTo;
+    private Node sendingNode;
     private DataOutputStream dataOutputStream;
 
-    public TCPSender(Socket socket, Node node) throws IOException {
-        this.socket = socket;
-        this.node = node;
-        dataOutputStream = new DataOutputStream(socket.getOutputStream());
+    public TCPSender(Socket socketToSendTo, Node sendingNode) throws IOException {
+        this.socketToSendTo = socketToSendTo;
+        this.sendingNode = sendingNode;
+        dataOutputStream = new DataOutputStream(socketToSendTo.getOutputStream());
     }
 
     public void sendData(byte[] dataToSend) throws IOException {

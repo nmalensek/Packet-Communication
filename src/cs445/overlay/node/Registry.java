@@ -10,27 +10,21 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 
 public class Registry implements Node {
 
     private static int portnum;
-    private TCPSender sender;
-    private TCPReceiverThread receiverThread;
-    private static ServerSocket nodeRegistry;
+    private TCPSender replySender;
     private Map<String, Integer> nodeMap = new HashMap<>();
     private Event<Deregister> deregister;
     private Event<RegisterSend> registerSendEvent;
     private EventFactory eventFactory = EventFactory.getInstance();
     private int numberOfNodes = 0;
+    private TCPServerThread registerServerThread;
 
     public Registry() throws IOException {
-        TCPServerThread tcpServerThread = new TCPServerThread(portnum);
-        sender = new TCPSender(tcpServerThread.getNodeSocket(), this);
-        receiverThread = new TCPReceiverThread(tcpServerThread.getNodeSocket(), this);
-        receiverThread.run();
+        registerServerThread = new TCPServerThread(this, portnum);
     }
 
     public void receiveRequest() {
@@ -47,7 +41,7 @@ public class Registry implements Node {
             String host = ((RegisterReceive) event).getIdentifier();
             int port = ((RegisterReceive) event).getPortNumber();
             nodeMap.put(host, port);
-            System.out.println(nodeMap.get(host));
+
         }
     }
 

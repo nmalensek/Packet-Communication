@@ -1,22 +1,24 @@
 package cs445.overlay.transport;
 
+import cs445.overlay.node.Node;
+
 import java.io.IOException;
 import java.net.ServerSocket;
-import java.net.Socket;
 
 public class TCPServerThread {
     private ServerSocket serverSocket;
-    private Socket nodeSocket;
+    private TCPReceiverThread tcpReceiverThread;
 
-    public TCPServerThread(int portNum) {
+    public TCPServerThread(Node node, int portNum) {
         try {
-                ServerSocket serverSocket = new ServerSocket(portNum);
+            while(true) {
+                serverSocket = new ServerSocket(portNum);
                 System.out.println("Server running on port " + portNum + "...");
-                nodeSocket = serverSocket.accept();
+                tcpReceiverThread = new TCPReceiverThread(serverSocket.accept(), node);
+                tcpReceiverThread.run();
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
-
-    public Socket getNodeSocket() { return nodeSocket; }
 }

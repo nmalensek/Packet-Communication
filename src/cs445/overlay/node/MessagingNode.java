@@ -18,23 +18,26 @@ public class MessagingNode implements Node {
     private int relayTracker = 0;
     private long sendSummation = 0;
     private long receiveSummation = 0;
+    private String registryHostName;
+    private int registryPort;
     private int randomPort;
     private Socket registrySocket;
-    private Socket transmitSocket;
+    private Socket clientSocket;
     private TCPServerThread receivingSocket;
     private EventFactory eF = EventFactory.getInstance();
     private byte[] bytesToSend;
 
-    public MessagingNode(String host, int portNumber) throws IOException {
-        registrySocket = new Socket(host, portNumber);
+    public MessagingNode(String registryHostName, int registryPort) throws IOException {
+        this.registryHostName = registryHostName;
+        this.registryPort = registryPort;
+        registrySocket = new Socket(registryHostName, registryPort);
         chooseRandomPort();
         register();
         createServerSocket();
     }
 
-    private void createServerSocket() throws IOException {
-        receivingSocket = new TCPServerThread(randomPort);
-        transmitSocket = receivingSocket.getNodeSocket();
+    private void chooseRandomPort() {
+        randomPort = ThreadLocalRandom.current().nextInt(49152, 65535);
     }
 
     private void register() throws IOException {
@@ -43,9 +46,8 @@ public class MessagingNode implements Node {
         onEvent(registerSend);
     }
 
-    private void startListening() throws IOException {
-        TCPReceiverThread receiver = new TCPReceiverThread(transmitSocket, this);
-        receiver.run();
+    private void createServerSocket() throws IOException {
+        receivingSocket = new TCPServerThread(this, randomPort);
     }
 
     public void onEvent(Event event) throws IOException {
@@ -56,10 +58,6 @@ public class MessagingNode implements Node {
 
     private void connectToNode(String host, int port) {
 
-    }
-
-    private void chooseRandomPort() {
-        randomPort = ThreadLocalRandom.current().nextInt(49152, 65535);
     }
 
     public void initiateConnection() {

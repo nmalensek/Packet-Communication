@@ -36,10 +36,10 @@ public class TCPReceiverThread extends Thread implements Protocol {
                 determineMessageType(data);
 
             } catch (SocketException se) {
-                System.out.println(se.getMessage());
+                se.printStackTrace();
                 break;
             } catch (IOException ioe) {
-                System.out.println(ioe.getMessage());
+                ioe.printStackTrace();
                 break;
             }
         }
@@ -52,6 +52,7 @@ public class TCPReceiverThread extends Thread implements Protocol {
                 new DataInputStream(new BufferedInputStream(byteArrayInputStream));
 
         int messageType = dataInputStream.readInt();
+
         switch (messageType) {
             case DEREGISTER_REQUEST:
                 //do something
@@ -64,6 +65,7 @@ public class TCPReceiverThread extends Thread implements Protocol {
                 Event<RegResponseReceive> registerResponseEvent =
                         eventFactory.receiveRegisterResponseEvent(marshalledBytes);
                 node.onEvent(registerResponseEvent, communicationSocket);
+                break;
             case MESSAGING_NODES_LIST:
                 //do something
             case LINK_WEIGHTS:

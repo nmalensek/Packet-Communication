@@ -14,9 +14,7 @@ public class Registry implements Node {
 
     private static int portnum;
     private TCPSender replySender;
-    private Map<Integer, NodeRecord> nodeMap = new HashMap<>();
-    private Event<Deregister> deregister;
-    private Event<RegisterSend> registerSendEvent;
+    private Map<Integer, String> nodeMap = new HashMap<>();
     private EventFactory eventFactory = EventFactory.getInstance();
     private TCPServerThread registryServerThread;
     private byte SUCCESS = 1;
@@ -26,35 +24,26 @@ public class Registry implements Node {
         registryServerThread = new TCPServerThread(this, portnum);
     }
 
-    public void receiveRequest() {
-        //check for registration ip address and node's ip address match and whether node's
-        //already registered. prints success or failure message
-        int messageType;
-        byte statusCode;
-        String additionalInfo; //says whether registration was successful and lists number
-        //registered nodes
-    }
-
     public void onEvent(Event event, Socket destinationSocket) throws IOException {
         if(event instanceof RegisterReceive) {
             String host = ((RegisterReceive) event).getIdentifier();
             int port = ((RegisterReceive) event).getPortNumber();
-            Socket replySocket = new Socket(host, port);
-            NodeRecord newNode = new NodeRecord(host, port, replySocket);
-            nodeMap.put(port, newNode);
-            replyToRegistration(replySocket);
-        } else if(event instanceof RegResponseReceive) {
-            System.out.println("something's gone wrong");
+            nodeMap.put(port, host);
+            receiveRequest(destinationSocket);
+            System.out.println(host + port);
         }
     }
 
-    public void replyToRegistration(Socket nodeThatRegistered) throws IOException {
+    public void receiveRequest(Socket nodeThatRegistered) throws IOException {
+        System.out.println("acknowledging registration...");
         RegisterResponse registerResponse = eventFactory.createRegisterResponseEvent().getType();
         registerResponse.setAdditionalInfo(nodeMap.size());
         registerResponse.setSuccessOrFailure(SUCCESS);
         replySender = new TCPSender(nodeThatRegistered);
         replySender.sendData(registerResponse.getBytes());
         registerResponse.printAdditionalInfo();
+        System.out.println("registration acknowledgement sent");
+        //TODO add failure conditions and failure message
     }
 
     public void assignLinkWeights() {

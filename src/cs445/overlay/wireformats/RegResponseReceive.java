@@ -12,6 +12,7 @@ public class RegResponseReceive implements Protocol, Event{
     private byte registrationStatus;
 
     public RegResponseReceive(byte[] marshalledBytes) throws IOException {
+        System.out.println("reading response...");
         ByteArrayInputStream byteArrayInputStream =
                 new ByteArrayInputStream(marshalledBytes);
         DataInputStream dataInputStream =

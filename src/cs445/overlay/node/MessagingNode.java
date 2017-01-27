@@ -24,7 +24,6 @@ public class MessagingNode implements Node {
     private int registryPort;
     private int randomPort;
     private Socket registrySocket;
-    private Socket clientSocket;
     private TCPServerThread receivingSocket;
     private EventFactory eF = EventFactory.getInstance();
     private byte[] bytesToSend;
@@ -39,7 +38,7 @@ public class MessagingNode implements Node {
     }
 
     private void chooseRandomPort() {
-        randomPort = ThreadLocalRandom.current().nextInt(4444, 4450);
+        randomPort = ThreadLocalRandom.current().nextInt(49152, 65535);
     }
 
     private void register() throws IOException {
@@ -55,6 +54,7 @@ public class MessagingNode implements Node {
     public void onEvent(Event event, Socket destinationSocket) throws IOException {
         if (event instanceof RegResponseReceive) {
             ((RegResponseReceive) event).printMessage();
+            System.out.println("read response");
         } else if (event instanceof RegisterResponse) {
 
         } else if (event instanceof RegisterSend) {

@@ -52,15 +52,16 @@ public class MessagingNode implements Node {
     }
 
     public void onEvent(Event event, Socket destinationSocket) throws IOException {
-        if (event instanceof RegResponseReceive) {
+        if (event instanceof RegisterSend) {
+            bytesToSend = event.getBytes();
+            TCPSender sender = new TCPSender(destinationSocket);
+            sender.sendData(bytesToSend);
+        } else if (event instanceof RegResponseReceive) {
+            System.out.println("got response");
             ((RegResponseReceive) event).printMessage();
             System.out.println("read response");
         } else if (event instanceof RegisterResponse) {
 
-        } else if (event instanceof RegisterSend) {
-            bytesToSend = event.getBytes();
-            TCPSender sender = new TCPSender(destinationSocket);
-            sender.sendData(bytesToSend);
         }
     }
 

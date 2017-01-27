@@ -83,5 +83,6 @@ public class TCPReceiverThread extends Thread implements Protocol {
             default:
                 //error
         }
+        dataInputStream.close();
     }
 }

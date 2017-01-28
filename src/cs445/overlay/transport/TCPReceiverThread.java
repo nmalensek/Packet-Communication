@@ -63,7 +63,7 @@ public class TCPReceiverThread extends Thread implements Protocol {
                 node.onEvent(registerReceiveEvent, communicationSocket);
                 break;
             case REGISTER_RESPONSE:
-                Event<RegResponseReceive> registerResponseEvent =
+                Event<ReceiveRegistryResponse> registerResponseEvent =
                         eventFactory.receiveRegisterResponseEvent(marshalledBytes);
                 node.onEvent(registerResponseEvent, communicationSocket);
                 break;

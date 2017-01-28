@@ -4,7 +4,7 @@ import cs445.overlay.transport.TCPReceiverThread;
 import cs445.overlay.transport.TCPSender;
 import cs445.overlay.transport.TCPServerThread;
 import cs445.overlay.wireformats.Event;
-import cs445.overlay.wireformats.RegResponseReceive;
+import cs445.overlay.wireformats.ReceiveRegistryResponse;
 import cs445.overlay.wireformats.RegisterResponse;
 import cs445.overlay.wireformats.RegisterSend;
 import cs445.overlay.wireformats.eventfactory.EventFactory;
@@ -61,8 +61,8 @@ public class MessagingNode implements Node {
             bytesToSend = event.getBytes();
             TCPSender sender = new TCPSender(destinationSocket);
             sender.sendData(bytesToSend);
-        } else if (event instanceof RegResponseReceive) {
-            ((RegResponseReceive) event).printMessage();
+        } else if (event instanceof ReceiveRegistryResponse) {
+            ((ReceiveRegistryResponse) event).printMessage();
         } else if (event instanceof RegisterResponse) {
 
         }

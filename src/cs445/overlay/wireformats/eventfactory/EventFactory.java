@@ -1,6 +1,5 @@
 package cs445.overlay.wireformats.eventfactory;
 
-import cs445.overlay.node.Node;
 import cs445.overlay.wireformats.*;
 
 import java.io.IOException;
@@ -42,9 +41,9 @@ public final class EventFactory {
         return registerResponse;
     }
 
-    public static final Event<RegResponseReceive> receiveRegisterResponseEvent(
+    public static final Event<ReceiveRegistryResponse> receiveRegisterResponseEvent(
             byte[] marshalledBytes) throws IOException {
-        RegResponseReceive registerResponse = new RegResponseReceive(marshalledBytes);
+        ReceiveRegistryResponse registerResponse = new ReceiveRegistryResponse(marshalledBytes);
         return registerResponse;
     }
 }

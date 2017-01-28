@@ -36,8 +36,8 @@ public class RegisterResponse implements Protocol, Event {
         return marshalledBytes;
     }
 
-    public void setAdditionalInfo(int nodeCount) {
-        additionalInfo = "Nodes registered: " + nodeCount;
+    public void setAdditionalInfo(String info) {
+        additionalInfo = info;
     }
     public void printAdditionalInfo() {
         System.out.println(additionalInfo);

@@ -6,12 +6,12 @@ import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
 import java.io.IOException;
 
-public class RegResponseReceive implements Protocol, Event{
+public class ReceiveRegistryResponse implements Protocol, Event{
     private int messageType;
     private String additionalInfo;
     private byte registrationStatus;
 
-    public RegResponseReceive(byte[] marshalledBytes) throws IOException {
+    public ReceiveRegistryResponse(byte[] marshalledBytes) throws IOException {
         ByteArrayInputStream byteArrayInputStream =
                 new ByteArrayInputStream(marshalledBytes);
         DataInputStream dataInputStream =

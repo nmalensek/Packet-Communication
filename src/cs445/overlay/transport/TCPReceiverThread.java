@@ -52,6 +52,7 @@ public class TCPReceiverThread extends Thread implements Protocol {
                 new DataInputStream(new BufferedInputStream(byteArrayInputStream));
 
         int messageType = dataInputStream.readInt();
+        dataInputStream.close();
 
         switch (messageType) {
             case DEREGISTER_REQUEST:
@@ -83,6 +84,5 @@ public class TCPReceiverThread extends Thread implements Protocol {
             default:
                 //error
         }
-        dataInputStream.close();
     }
 }

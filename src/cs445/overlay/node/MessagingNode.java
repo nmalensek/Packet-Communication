@@ -32,8 +32,13 @@ public class MessagingNode implements Node {
         this.registryHostName = registryHostName;
         this.registryPort = registryPort;
         registrySocket = new Socket(registryHostName, registryPort);
+    }
+
+    private void startUp() throws IOException {
+        TCPReceiverThread receiverThread = new TCPReceiverThread(registrySocket, this);
         chooseRandomPort();
         register();
+        receiverThread.start();
         createServerSocket();
     }
 
@@ -57,9 +62,7 @@ public class MessagingNode implements Node {
             TCPSender sender = new TCPSender(destinationSocket);
             sender.sendData(bytesToSend);
         } else if (event instanceof RegResponseReceive) {
-            System.out.println("got response");
             ((RegResponseReceive) event).printMessage();
-            System.out.println("read response");
         } else if (event instanceof RegisterResponse) {
 
         }
@@ -94,9 +97,8 @@ public class MessagingNode implements Node {
         int port = Integer.parseInt(args[1]);
 
         try {
-            while (true) {
                 MessagingNode messagingNode = new MessagingNode(host, port);
-            }
+                messagingNode.startUp();
         } catch (UnknownHostException e) {
             e.printStackTrace();
         } catch (IOException ioe) {

@@ -7,6 +7,7 @@ import cs445.overlay.wireformats.eventfactory.EventFactory;
 
 import java.io.IOException;
 import java.net.Socket;
+import java.net.SocketException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -17,6 +18,7 @@ public class Registry implements Node {
     private Map<Integer, String> nodeMap = new HashMap<>();
     private EventFactory eventFactory = EventFactory.getInstance();
     private TCPServerThread registryServerThread;
+    private int newestPort;
     private byte SUCCESS = 1;
     private byte FAILURE = 0;
 
@@ -35,15 +37,22 @@ public class Registry implements Node {
     }
 
     public void receiveRequest(Socket nodeThatRegistered) throws IOException {
-        System.out.println("acknowledging registration...");
-        RegisterResponse registerResponse = eventFactory.createRegisterResponseEvent().getType();
-        registerResponse.setAdditionalInfo(nodeMap.size());
-        registerResponse.setSuccessOrFailure(SUCCESS);
-        replySender = new TCPSender(nodeThatRegistered);
-        replySender.sendData(registerResponse.getBytes());
-        registerResponse.printAdditionalInfo();
-        System.out.println("registration acknowledgement sent");
-        //TODO add failure conditions and failure message
+        try {
+            System.out.println("acknowledging registration...");
+            RegisterResponse registerResponse = eventFactory.createRegisterResponseEvent().getType();
+            registerResponse.setAdditionalInfo(nodeMap.size());
+            registerResponse.setSuccessOrFailure(SUCCESS);
+            replySender = new TCPSender(nodeThatRegistered);
+            replySender.sendData(registerResponse.getBytes());
+            registerResponse.printAdditionalInfo();
+            System.out.println("registration acknowledgement sent");
+            receiveRequest(nodeThatRegistered);
+            //TODO add failure conditions and failure message
+        } catch (SocketException e) {
+            //remove node that just registered if it fails after sending its message
+            nodeMap.remove(newestPort);
+        }
+
     }
 
     public void assignLinkWeights() {

@@ -31,22 +31,18 @@ public class Registry implements Node {
             String host = ((RegisterReceive) event).getIdentifier();
             int port = ((RegisterReceive) event).getPortNumber();
             nodeMap.put(port, host);
+            newestPort = port;
             receiveRequest(destinationSocket);
-            System.out.println(host + port);
         }
     }
 
     public void receiveRequest(Socket nodeThatRegistered) throws IOException {
         try {
-            System.out.println("acknowledging registration...");
             RegisterResponse registerResponse = eventFactory.createRegisterResponseEvent().getType();
             registerResponse.setAdditionalInfo(nodeMap.size());
             registerResponse.setSuccessOrFailure(SUCCESS);
             replySender = new TCPSender(nodeThatRegistered);
             replySender.sendData(registerResponse.getBytes());
-            registerResponse.printAdditionalInfo();
-            System.out.println("registration acknowledgement sent");
-            receiveRequest(nodeThatRegistered);
             //TODO add failure conditions and failure message
         } catch (SocketException e) {
             //remove node that just registered if it fails after sending its message

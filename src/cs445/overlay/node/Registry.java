@@ -2,6 +2,7 @@ package cs445.overlay.node;
 
 import cs445.overlay.transport.TCPSender;
 import cs445.overlay.transport.TCPServerThread;
+import cs445.overlay.util.RegistrationReceiver;
 import cs445.overlay.wireformats.*;
 import cs445.overlay.wireformats.eventfactory.EventFactory;
 
@@ -28,59 +29,9 @@ public class Registry implements Node {
 
     public void onEvent(Event event, Socket destinationSocket) throws IOException {
         if (event instanceof RegisterReceive) {
-            String host = ((RegisterReceive) event).getIdentifier();
-            int port = ((RegisterReceive) event).getPortNumber();
-            newestPort = port;
-            NodeRecord nodeRecord = new NodeRecord(host, port, destinationSocket);
-            if (duplicateConnection(nodeRecord)) {
-                processRegistration(destinationSocket, false,
-                        "node already exists at that address.", FAILURE);
-                nodeRecord = null;
-            } else {
-                nodeMap.put(nodeRecord, port);
-                try {
-                    processRegistration(destinationSocket, true, null, SUCCESS);
-                } catch (SocketException e) {
-                    //remove node that just registered if it fails after sending its message
-                    System.out.println("Unable to contact node, removing from registered nodes...");
-                    nodeMap.remove(nodeRecord);
-                    System.out.println("Node removed.");
-                }
-            }
-        }
-    }
-
-    private void registrationFailure(Socket nodeConnection) {
-
-    }
-
-    public void processRegistration(Socket nodeThatRegistered, boolean isSuccessfulConnection,
-                                    String error, byte successOrFailure) throws IOException, SocketException {
-            RegisterResponse registerResponse = eventFactory.createRegisterResponseEvent().getType();
-            registerResponse.setAdditionalInfo(registerResponseAdditionalInfo(isSuccessfulConnection, error));
-            registerResponse.setSuccessOrFailure(successOrFailure);
-            replySender = new TCPSender(nodeThatRegistered);
-            replySender.sendData(registerResponse.getBytes());
-    }
-
-    private boolean duplicateConnection(NodeRecord nodeRecord) {
-        int portCheck = nodeRecord.getPort();
-        String hostCheck = nodeRecord.getHost();
-        boolean isDuplicate = false;
-            for (NodeRecord key : nodeMap.keySet()) {
-                if(key.getPort() == portCheck && key.getHost().equals(hostCheck)) {
-                    isDuplicate = true;
-                    break;
-                }
-            }
-        return isDuplicate;
-    }
-
-    private String registerResponseAdditionalInfo(boolean successfulConnection, String errorMessage) {
-        if (successfulConnection) {
-            return "Nodes registered: " + nodeMap.size();
-        } else {
-            return "Registration unsuccessful, error message: " + errorMessage;
+            RegistrationReceiver receiver = new RegistrationReceiver(
+                    ((RegisterReceive) event), nodeMap, destinationSocket);
+            receiver.checkRegistration();
         }
     }
 

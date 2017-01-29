@@ -10,6 +10,7 @@ import cs445.overlay.wireformats.RegisterSend;
 import cs445.overlay.wireformats.eventfactory.EventFactory;
 
 import java.io.IOException;
+import java.net.Inet4Address;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.concurrent.ThreadLocalRandom;
@@ -48,7 +49,7 @@ public class MessagingNode implements Node {
 
     private void register() throws IOException {
         RegisterSend registerSend = eF.createRegisterSendEvent().getType();
-        registerSend.setHostAndPort("localhost", randomPort);
+        registerSend.setHostAndPort(registrySocket.getLocalAddress().toString(), randomPort);
         onEvent(registerSend, registrySocket);
     }
 

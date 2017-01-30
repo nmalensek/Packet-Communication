@@ -1,0 +1,109 @@
+package cs455.overlay.node;
+
+import cs455.overlay.transport.TCPReceiverThread;
+import cs455.overlay.transport.TCPSender;
+import cs455.overlay.transport.TCPServerThread;
+import cs455.overlay.wireformats.Event;
+import cs455.overlay.wireformats.nodemessages.ReceiveRegistryResponse;
+import cs455.overlay.wireformats.registrymessages.RespondToRegisterRequest;
+import cs455.overlay.wireformats.nodemessages.SendRegister;
+import cs455.overlay.wireformats.eventfactory.EventFactory;
+
+import java.io.IOException;
+import java.net.Socket;
+import java.net.UnknownHostException;
+import java.util.concurrent.ThreadLocalRandom;
+
+public class MessagingNode implements Node {
+    private int sendTracker = 0;
+    private int receiveTracker = 0;
+    private int relayTracker = 0;
+    private long sendSummation = 0;
+    private long receiveSummation = 0;
+    private String registryHostName;
+    private int registryPort;
+    private int randomPort;
+    private Socket registrySocket;
+    private TCPServerThread receivingSocket;
+    private EventFactory eF = EventFactory.getInstance();
+    private byte[] bytesToSend;
+
+    public MessagingNode(String registryHostName, int registryPort) throws IOException {
+        this.registryHostName = registryHostName;
+        this.registryPort = registryPort;
+        registrySocket = new Socket(registryHostName, registryPort);
+    }
+
+    private void startUp() throws IOException {
+        TCPReceiverThread receiverThread = new TCPReceiverThread(registrySocket, this);
+        chooseRandomPort();
+        register();
+        receiverThread.start();
+        createServerSocket();
+    }
+
+    private void chooseRandomPort() {
+        randomPort = ThreadLocalRandom.current().nextInt(49152, 65535);
+    }
+
+    private void register() throws IOException {
+        SendRegister sendRegister = eF.createRegisterSendEvent().getType();
+        sendRegister.setHostAndPort(registrySocket.getLocalAddress().toString(), randomPort);
+        onEvent(sendRegister, registrySocket);
+    }
+
+    private void createServerSocket() throws IOException {
+        receivingSocket = new TCPServerThread(this, randomPort);
+    }
+
+    public void onEvent(Event event, Socket destinationSocket) throws IOException {
+        if (event instanceof SendRegister) {
+            bytesToSend = event.getBytes();
+            TCPSender sender = new TCPSender(destinationSocket);
+            sender.sendData(bytesToSend);
+        } else if (event instanceof ReceiveRegistryResponse) {
+            ((ReceiveRegistryResponse) event).printMessage();
+        } else if (event instanceof RespondToRegisterRequest) {
+
+        }
+    }
+
+    private void connectToNode(String host, int port) {
+
+    }
+
+    public void initiateConnection() {
+        int numberOfConnections;
+    }
+
+    public void acceptLinkWeights() {
+
+    }
+
+    public void acceptMessage() throws IOException {
+
+    }
+
+    public void printShortestPath() {
+
+    }
+
+    public void exitOverlay() {
+
+    }
+
+    public static void main(String[] args) {
+        String host = args[0];
+        int port = Integer.parseInt(args[1]);
+
+        try {
+                MessagingNode messagingNode = new MessagingNode(host, port);
+                messagingNode.startUp();
+        } catch (UnknownHostException e) {
+            e.printStackTrace();
+        } catch (IOException ioe) {
+            ioe.printStackTrace();
+        }
+    }
+
+}

@@ -36,9 +36,9 @@ public class DeregistrationReceiver {
     }
 
     public void checkDeRegistration() throws IOException {
-        if (wasRegistered(deregisteringHost, deregisteringPort)) {
+        if (wasNotRegistered(deregisteringHost, deregisteringPort)) {
             sendDeregistrationResponse(destinationSocket,
-                    "Unable to deregister, node was never registered!", false, FAILURE);
+                    "Unable to deregister, node is not registered!", false, FAILURE);
         } else if(!deregisteringHost.equals(destinationSocket.getInetAddress().toString())) {
             sendDeregistrationResponse(destinationSocket,
                     "Unable to deregister, IP in message does not match sender\'s IP.", false, FAILURE);
@@ -62,19 +62,19 @@ public class DeregistrationReceiver {
         for (NodeRecord node : nodeList) {
             if (node.getHost().equals(host) && node.getPort() == port) {
                 nodeList.remove(node);
-                destinationSocket.close();
+                break;
             }
         }
     }
 
-    private boolean wasRegistered(String host, int port) {
-        boolean wasRegistered = false;
+    private boolean wasNotRegistered(String host, int port) {
+        boolean wasNotRegistered = true;
         for (NodeRecord node : nodeList) {
             if (node.getHost().equals(host) && node.getPort() == port) {
-                wasRegistered = true;
+                wasNotRegistered = false;
                 break;
             }
         }
-        return wasRegistered;
+        return wasNotRegistered;
     }
 }

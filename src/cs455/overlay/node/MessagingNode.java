@@ -5,6 +5,7 @@ import cs455.overlay.transport.TCPSender;
 import cs455.overlay.transport.TCPServerThread;
 import cs455.overlay.wireformats.Event;
 import cs455.overlay.wireformats.nodemessages.Deregister;
+import cs455.overlay.wireformats.nodemessages.ReceiveDeregisterResponse;
 import cs455.overlay.wireformats.nodemessages.ReceiveRegistryResponse;
 import cs455.overlay.wireformats.nodemessages.SendRegister;
 import cs455.overlay.wireformats.eventfactory.EventFactory;
@@ -27,6 +28,7 @@ public class MessagingNode implements Node {
     private TCPSender registrySender;
     private TCPServerThread receivingSocket;
     private EventFactory eF = EventFactory.getInstance();
+    private byte[] message;
 
     public MessagingNode(String registryHostName, int registryPort) throws IOException {
         this.registryHostName = registryHostName;
@@ -40,7 +42,7 @@ public class MessagingNode implements Node {
         chooseRandomPort();
         register();
         receiverThread.start();
-        createServerSocket();
+//        createServerSocket();
     }
 
     private void chooseRandomPort() {
@@ -50,13 +52,15 @@ public class MessagingNode implements Node {
     private void register() throws IOException {
         SendRegister sendRegister = eF.createRegisterSendEvent().getType();
         sendRegister.setHostAndPort(registrySocket.getLocalAddress().toString(), randomPort);
-        onEvent(sendRegister, registrySocket);
+        message = sendRegister.getBytes();
+        registrySender.sendData(message);
     }
 
     private void deregister() throws IOException {
         Deregister deregister = eF.createDeregistrationEvent().getType();
         deregister.setHostAndPort(registrySocket.getLocalAddress().toString(), randomPort);
-        onEvent(deregister, registrySocket);
+        message = deregister.getBytes();
+        registrySender.sendData(message);
     }
 
     private void createServerSocket() throws IOException {
@@ -64,15 +68,10 @@ public class MessagingNode implements Node {
     }
 
     public void onEvent(Event event, Socket destinationSocket) throws IOException {
-        if (event instanceof SendRegister) {
-            byte[] registerMessage = event.getBytes();
-            registrySender.sendData(registerMessage);
-        } else if (event instanceof ReceiveRegistryResponse) {
+        if (event instanceof ReceiveRegistryResponse) {
             ((ReceiveRegistryResponse) event).printMessage();
-        } else if (event instanceof Deregister) {
-            byte[] deregisterMessage = event.getBytes();
-            TCPSender sender = new TCPSender(destinationSocket);
-            sender.sendData(deregisterMessage);
+        } else if (event instanceof ReceiveDeregisterResponse) {
+            ((ReceiveDeregisterResponse) event).printMessage();
         }
     }
 
@@ -105,8 +104,8 @@ public class MessagingNode implements Node {
         int port = Integer.parseInt(args[1]);
 
         try {
-                MessagingNode messagingNode = new MessagingNode(host, port);
-                messagingNode.startUp();
+            MessagingNode messagingNode = new MessagingNode(host, port);
+            messagingNode.startUp();
         } catch (UnknownHostException e) {
             e.printStackTrace();
         } catch (IOException ioe) {

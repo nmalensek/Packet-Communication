@@ -82,7 +82,7 @@ public class RegistrationReceiver {
 
     private String registerResponseAdditionalInfo(boolean successfulConnection, String errorMessage) {
         if (successfulConnection) {
-            return "Nodes registered: " + nodeList.size();
+            return "Registration successful. Nodes registered: " + nodeList.size();
         } else {
             return "Registration unsuccessful, error message: " + errorMessage;
         }

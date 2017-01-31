@@ -64,6 +64,7 @@ public class TCPReceiverThread extends Thread implements Protocol {
                 Event<ReceiveDeregisterRequest> receiveDeregisterRequestEvent =
                         eventFactory.receiveDeregistrationEvent(marshalledBytes);
                 node.onEvent(receiveDeregisterRequestEvent, communicationSocket);
+                break;
             case REGISTER_REQUEST:
                 Event<ReceiveRegisterRequest> registerReceiveEvent =
                         eventFactory.receiveRegisterEvent(marshalledBytes);
@@ -93,7 +94,7 @@ public class TCPReceiverThread extends Thread implements Protocol {
                 Event<ReceiveDeregisterResponse> deregisterResponseEvent =
                         eventFactory.receiveDeregisterResponse(marshalledBytes);
                 node.onEvent(deregisterResponseEvent, communicationSocket);
-
+                break;
             default:
                 //error
         }

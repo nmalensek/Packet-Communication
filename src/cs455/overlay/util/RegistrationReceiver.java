@@ -69,12 +69,10 @@ public class RegistrationReceiver {
         replySender.sendData(respondToRegisterRequest.getBytes());
     }
 
-    private boolean duplicateConnection(NodeRecord nodeRecord) {
-        int portCheck = nodeRecord.getPort();
-        String hostCheck = nodeRecord.getHost();
+    private boolean duplicateConnection(NodeRecord newNodeRecord) {
         boolean isDuplicate = false;
         for (NodeRecord node : nodeList) {
-            if (node.getPort() == portCheck && node.getHost().equals(hostCheck)) {
+            if (node.equals(newNodeRecord)) {
                 isDuplicate = true;
                 break;
             }

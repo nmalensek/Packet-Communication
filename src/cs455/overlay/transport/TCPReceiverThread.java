@@ -4,7 +4,9 @@ import cs455.overlay.node.Node;
 import cs455.overlay.wireformats.Event;
 import cs455.overlay.wireformats.Protocol;
 import cs455.overlay.wireformats.eventfactory.EventFactory;
+import cs455.overlay.wireformats.nodemessages.ReceiveDeregisterResponse;
 import cs455.overlay.wireformats.nodemessages.ReceiveRegistryResponse;
+import cs455.overlay.wireformats.registrymessages.ReceiveDeregisterRequest;
 import cs455.overlay.wireformats.registrymessages.ReceiveRegisterRequest;
 
 import java.io.BufferedInputStream;
@@ -59,10 +61,12 @@ public class TCPReceiverThread extends Thread implements Protocol {
 
         switch (messageType) {
             case DEREGISTER_REQUEST:
-                //do something
+                Event<ReceiveDeregisterRequest> receiveDeregisterRequestEvent =
+                        eventFactory.receiveDeregistrationEvent(marshalledBytes);
+                node.onEvent(receiveDeregisterRequestEvent, communicationSocket);
             case REGISTER_REQUEST:
                 Event<ReceiveRegisterRequest> registerReceiveEvent =
-                        eventFactory.receiveRegReqEvent(marshalledBytes);
+                        eventFactory.receiveRegisterEvent(marshalledBytes);
                 node.onEvent(registerReceiveEvent, communicationSocket);
                 break;
             case REGISTER_RESPONSE:
@@ -84,6 +88,12 @@ public class TCPReceiverThread extends Thread implements Protocol {
                 //do something else
             case TRAFFIC_SUMMARY:
                 //do something else
+                break;
+            case DEREGISTER_RESPONSE:
+                Event<ReceiveDeregisterResponse> deregisterResponseEvent =
+                        eventFactory.receiveDeregisterResponse(marshalledBytes);
+                node.onEvent(deregisterResponseEvent, communicationSocket);
+
             default:
                 //error
         }

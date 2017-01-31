@@ -1,8 +1,12 @@
 package cs455.overlay.wireformats.eventfactory;
 
 import cs455.overlay.wireformats.Event;
+import cs455.overlay.wireformats.nodemessages.Deregister;
+import cs455.overlay.wireformats.nodemessages.ReceiveDeregisterResponse;
 import cs455.overlay.wireformats.nodemessages.ReceiveRegistryResponse;
 import cs455.overlay.wireformats.nodemessages.SendRegister;
+import cs455.overlay.wireformats.registrymessages.DeregistrationResponse;
+import cs455.overlay.wireformats.registrymessages.ReceiveDeregisterRequest;
 import cs455.overlay.wireformats.registrymessages.ReceiveRegisterRequest;
 import cs455.overlay.wireformats.registrymessages.RespondToRegisterRequest;
 
@@ -34,7 +38,7 @@ public final class EventFactory {
         return sendRegister;
     }
 
-    public static final Event<ReceiveRegisterRequest> receiveRegReqEvent(
+    public static final Event<ReceiveRegisterRequest> receiveRegisterEvent(
             byte[] marshalledBytes) throws IOException {
         ReceiveRegisterRequest receiveRegisterRequest = new ReceiveRegisterRequest(marshalledBytes);
         return receiveRegisterRequest;
@@ -49,5 +53,28 @@ public final class EventFactory {
             byte[] marshalledBytes) throws IOException {
         ReceiveRegistryResponse registerResponse = new ReceiveRegistryResponse(marshalledBytes);
         return registerResponse;
+    }
+
+    public static final Event<Deregister> createDeregistrationEvent() {
+        Deregister sendDeregister = new Deregister();
+        return sendDeregister;
+    }
+
+    public static final Event<ReceiveDeregisterRequest> receiveDeregistrationEvent(
+            byte[] marshalledBytes) throws IOException {
+        ReceiveDeregisterRequest receiveDeregisterRequest =
+                new ReceiveDeregisterRequest(marshalledBytes);
+        return receiveDeregisterRequest;
+    }
+
+    public static final Event<DeregistrationResponse> sendDeregistrationResponse() {
+        DeregistrationResponse deregistrationResponse = new DeregistrationResponse();
+        return deregistrationResponse;
+    }
+
+    public static final Event<ReceiveDeregisterResponse> receiveDeregisterResponse(
+            byte[] marshalledBytes) throws IOException {
+        ReceiveDeregisterResponse deregisterResponse = new ReceiveDeregisterResponse(marshalledBytes);
+        return deregisterResponse;
     }
 }

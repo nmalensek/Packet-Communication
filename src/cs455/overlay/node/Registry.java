@@ -1,7 +1,9 @@
 package cs455.overlay.node;
 
 import cs455.overlay.transport.TCPServerThread;
+import cs455.overlay.util.DeregistrationReceiver;
 import cs455.overlay.util.RegistrationReceiver;
+import cs455.overlay.wireformats.registrymessages.ReceiveDeregisterRequest;
 import cs455.overlay.wireformats.registrymessages.ReceiveRegisterRequest;
 import cs455.overlay.wireformats.Event;
 
@@ -10,6 +12,7 @@ import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class Registry implements Node {
 
@@ -25,6 +28,10 @@ public class Registry implements Node {
             RegistrationReceiver receiver = new RegistrationReceiver(
                     ((ReceiveRegisterRequest) event), nodeList, destinationSocket);
             receiver.checkRegistration();
+        } else if (event instanceof ReceiveDeregisterRequest) {
+            DeregistrationReceiver deregistrationReceiver = new DeregistrationReceiver(
+                    ((ReceiveDeregisterRequest) event), nodeList, destinationSocket);
+            deregistrationReceiver.checkDeRegistration();
         }
     }
 
@@ -54,17 +61,23 @@ public class Registry implements Node {
         currentNode.incrementConnections();
         currentNode.decrementNeededConnections();
 
-        nextNode.decrementNeededConnections();
         nextNode.incrementConnections();
+        nextNode.decrementNeededConnections();
     }
 
     private void connectToRandomNodes() {
         for (ListIterator<NodeRecord> nodeListIterator = nodeList.listIterator(); nodeListIterator.hasNext(); ) {
             NodeRecord currentNode = nodeListIterator.next();
-            while (currentNode.getConnectionsNeeded() > 0) {
-                //connect randomly to other nodes
-                //if randomElement.getHost and .getPort = currentNode or already exist in node's list,
-                //don't add and pick again
+            while (currentNode.getConnectionsNeededToInitiate() > 0) {
+                int randomConnection = ThreadLocalRandom.current().nextInt(0, nodeList.size()-1);
+                NodeRecord randomNode = nodeList.get(randomConnection);
+
+                if(currentNode.equals(randomNode) || currentNode.getNodesToConnectToList().contains(randomNode)) {
+                    //do not add and pick again
+                } else {
+                    currentNode.addNodeToConnectTo(randomNode);
+                    updateConnections(currentNode, randomNode);
+                }
             }
         }
     }

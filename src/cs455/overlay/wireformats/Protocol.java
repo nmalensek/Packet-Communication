@@ -12,5 +12,6 @@ public interface Protocol {
     int TASK_COMPLETE = 7;
     int PULL_TRAFFIC_SUMMARY = 8;
     int TRAFFIC_SUMMARY = 9;
+    int DEREGISTER_RESPONSE = 10;
 
 }

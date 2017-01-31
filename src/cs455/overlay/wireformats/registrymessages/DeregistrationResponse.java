@@ -3,15 +3,17 @@ package cs455.overlay.wireformats.registrymessages;
 import cs455.overlay.wireformats.Event;
 import cs455.overlay.wireformats.Protocol;
 
-import java.io.*;
+import java.io.BufferedOutputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
 
-public class RespondToRegisterRequest implements Protocol, Event {
-
-    private int messageType = REGISTER_RESPONSE;
+public class DeregistrationResponse implements Protocol, Event {
+    private int messageType = DEREGISTER_RESPONSE;
     private byte successOrFailure;
     private String additionalInfo;
 
-    public RespondToRegisterRequest getType() {
+    public DeregistrationResponse getType() {
         return this;
     }
 
@@ -46,5 +48,4 @@ public class RespondToRegisterRequest implements Protocol, Event {
         System.out.println(additionalInfo);
     }
     public void setSuccessOrFailure(byte sOrF) { successOrFailure = sOrF; }
-
 }

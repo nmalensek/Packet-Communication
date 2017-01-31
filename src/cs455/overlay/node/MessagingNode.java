@@ -4,8 +4,8 @@ import cs455.overlay.transport.TCPReceiverThread;
 import cs455.overlay.transport.TCPSender;
 import cs455.overlay.transport.TCPServerThread;
 import cs455.overlay.wireformats.Event;
+import cs455.overlay.wireformats.nodemessages.Deregister;
 import cs455.overlay.wireformats.nodemessages.ReceiveRegistryResponse;
-import cs455.overlay.wireformats.registrymessages.RespondToRegisterRequest;
 import cs455.overlay.wireformats.nodemessages.SendRegister;
 import cs455.overlay.wireformats.eventfactory.EventFactory;
 
@@ -24,14 +24,15 @@ public class MessagingNode implements Node {
     private int registryPort;
     private int randomPort;
     private Socket registrySocket;
+    private TCPSender registrySender;
     private TCPServerThread receivingSocket;
     private EventFactory eF = EventFactory.getInstance();
-    private byte[] bytesToSend;
 
     public MessagingNode(String registryHostName, int registryPort) throws IOException {
         this.registryHostName = registryHostName;
         this.registryPort = registryPort;
         registrySocket = new Socket(registryHostName, registryPort);
+        registrySender = new TCPSender(registrySocket);
     }
 
     private void startUp() throws IOException {
@@ -52,19 +53,26 @@ public class MessagingNode implements Node {
         onEvent(sendRegister, registrySocket);
     }
 
+    private void deregister() throws IOException {
+        Deregister deregister = eF.createDeregistrationEvent().getType();
+        deregister.setHostAndPort(registrySocket.getLocalAddress().toString(), randomPort);
+        onEvent(deregister, registrySocket);
+    }
+
     private void createServerSocket() throws IOException {
         receivingSocket = new TCPServerThread(this, randomPort);
     }
 
     public void onEvent(Event event, Socket destinationSocket) throws IOException {
         if (event instanceof SendRegister) {
-            bytesToSend = event.getBytes();
-            TCPSender sender = new TCPSender(destinationSocket);
-            sender.sendData(bytesToSend);
+            byte[] registerMessage = event.getBytes();
+            registrySender.sendData(registerMessage);
         } else if (event instanceof ReceiveRegistryResponse) {
             ((ReceiveRegistryResponse) event).printMessage();
-        } else if (event instanceof RespondToRegisterRequest) {
-
+        } else if (event instanceof Deregister) {
+            byte[] deregisterMessage = event.getBytes();
+            TCPSender sender = new TCPSender(destinationSocket);
+            sender.sendData(deregisterMessage);
         }
     }
 

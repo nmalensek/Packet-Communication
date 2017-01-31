@@ -35,11 +35,31 @@ public class NodeRecord {
 
     public int getNumberOfConnections() { return numberOfNodeConnections; }
 
-    public int getConnectionsNeeded() { return  numberOfConnectionsNodeNeedsToInitiate; }
+    public int getConnectionsNeededToInitiate() { return  numberOfConnectionsNodeNeedsToInitiate; }
 
     public void decrementNeededConnections() { --numberOfConnectionsNodeNeedsToInitiate; }
 
     public void addNodeToConnectTo(NodeRecord node) { nodesToConnectTo.add(node); }
 
     public int getLengthOfNodeList() { return nodesToConnectTo.size(); }
+
+    public List getNodesToConnectToList() { return nodesToConnectTo; }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        NodeRecord that = (NodeRecord) o;
+
+        if (port != that.port) return false;
+        return host != null ? host.equals(that.host) : that.host == null;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = host != null ? host.hashCode() : 0;
+        result = 31 * result + port;
+        return result;
+    }
 }

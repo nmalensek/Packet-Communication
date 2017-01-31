@@ -4,7 +4,6 @@ import cs455.overlay.node.NodeRecord;
 
 import java.net.Socket;
 import java.util.*;
-import java.util.concurrent.ThreadLocalRandom;
 
 public class NodeRecordTest {
 
@@ -12,7 +11,7 @@ public class NodeRecordTest {
     private Integer[] intList = {2, 5, 8, 11};
     private NodeRecord[] testNodes = {
             new NodeRecord("localhost", 1234, testSocket),
-            new NodeRecord("localhost", 2345, testSocket),
+            new NodeRecord("localhost", 1234, testSocket),
             new NodeRecord("localhost", 3456, testSocket),
             new NodeRecord("localhost", 3446, testSocket),
             new NodeRecord("localhost", 3474, testSocket),
@@ -74,19 +73,25 @@ public class NodeRecordTest {
 
                 currentRecord.addNodeToConnectTo(nextRecord);
                 updateConnections(currentRecord, nextRecord);
-                System.out.println(currentRecord.getNumberOfConnections() + ":" + currentRecord.getConnectionsNeeded() +
-                        " | "+ nextRecord.getNumberOfConnections() + ":" + nextRecord.getConnectionsNeeded());
+                System.out.println(currentRecord.getNumberOfConnections() + ":" + currentRecord.getConnectionsNeededToInitiate() +
+                        " | "+ nextRecord.getNumberOfConnections() + ":" + nextRecord.getConnectionsNeededToInitiate());
             } catch (IndexOutOfBoundsException e) {
                 NodeRecord firstRecord = testNodeRecords.get(0);
                 NodeRecord lastRecord = testNodeRecords.get(testNodeRecords.size()-1);
                 lastRecord.addNodeToConnectTo(firstRecord);
                 updateConnections(lastRecord, firstRecord);
-                System.out.println(lastRecord.getNumberOfConnections() + ":" + lastRecord.getConnectionsNeeded() +
-                        " | "+ firstRecord.getNumberOfConnections() + ":" + firstRecord.getConnectionsNeeded());
+                System.out.println(lastRecord.getNumberOfConnections() + ":" + lastRecord.getConnectionsNeededToInitiate() +
+                        " | "+ firstRecord.getNumberOfConnections() + ":" + firstRecord.getConnectionsNeededToInitiate());
             }
         }
     }
 
+    private void testEquals() {
+        System.out.println(testNodes[0].equals(testNodes[1]));
+        System.out.println("Expected: true");
+        System.out.println(testNodes[0].equals(testNodes[4]));
+        System.out.println("Expected: false");
+    }
     private void setRandomInts() {
 
     }
@@ -96,6 +101,7 @@ public class NodeRecordTest {
 //        nodeRecordTest.testElementRetrieve();
 //        nodeRecordTest.addTestNodes();
 //        nodeRecordTest.testNodeRecordModify();
-        nodeRecordTest.setRandomInts();
+//        nodeRecordTest.setRandomInts();
+        nodeRecordTest.testEquals();
     }
 }

@@ -10,7 +10,9 @@ import cs455.overlay.wireformats.nodemessages.ReceiveRegistryResponse;
 import cs455.overlay.wireformats.nodemessages.SendRegister;
 import cs455.overlay.wireformats.eventfactory.EventFactory;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.concurrent.ThreadLocalRandom;
@@ -29,6 +31,7 @@ public class MessagingNode implements Node {
     private TCPServerThread receivingSocket;
     private EventFactory eF = EventFactory.getInstance();
     private byte[] message;
+    private String command;
 
     public MessagingNode(String registryHostName, int registryPort) throws IOException {
         this.registryHostName = registryHostName;
@@ -42,7 +45,8 @@ public class MessagingNode implements Node {
         chooseRandomPort();
         register();
         receiverThread.start();
-//        createServerSocket();
+        createServerSocket();
+        listenForTextInput();
     }
 
     private void chooseRandomPort() {
@@ -65,6 +69,7 @@ public class MessagingNode implements Node {
 
     private void createServerSocket() throws IOException {
         receivingSocket = new TCPServerThread(this, randomPort);
+        receivingSocket.start();
     }
 
     public void onEvent(Event event, Socket destinationSocket) throws IOException {
@@ -73,6 +78,14 @@ public class MessagingNode implements Node {
         } else if (event instanceof ReceiveDeregisterResponse) {
             ((ReceiveDeregisterResponse) event).printMessage();
         }
+    }
+
+    private void listenForTextInput() throws IOException {
+//        while((command = stdIn.readLine()) !=null) {
+//            if(command.equals("deregister")) {
+//                deregister();
+//            }
+//        }
     }
 
     private void connectToNode(String host, int port) {

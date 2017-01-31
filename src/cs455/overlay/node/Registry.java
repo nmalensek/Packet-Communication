@@ -3,6 +3,7 @@ package cs455.overlay.node;
 import cs455.overlay.transport.TCPServerThread;
 import cs455.overlay.util.DeregistrationReceiver;
 import cs455.overlay.util.RegistrationReceiver;
+import cs455.overlay.util.TextInputThread;
 import cs455.overlay.wireformats.registrymessages.ReceiveDeregisterRequest;
 import cs455.overlay.wireformats.registrymessages.ReceiveRegisterRequest;
 import cs455.overlay.wireformats.Event;
@@ -21,6 +22,9 @@ public class Registry implements Node {
 
     public void startServer() {
         TCPServerThread registryServerThread = new TCPServerThread(this, portNum);
+        registryServerThread.start();
+//        TextInputThread textInputThread = new TextInputThread(this);
+//        textInputThread.start();
     }
 
     public void onEvent(Event event, Socket destinationSocket) throws IOException {

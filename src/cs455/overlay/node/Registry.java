@@ -23,8 +23,8 @@ public class Registry implements Node {
     public void startServer() {
         TCPServerThread registryServerThread = new TCPServerThread(this, portNum);
         registryServerThread.start();
-//        TextInputThread textInputThread = new TextInputThread(this);
-//        textInputThread.start();
+        TextInputThread textInputThread = new TextInputThread(this);
+        textInputThread.start();
     }
 
     public void onEvent(Event event, Socket destinationSocket) throws IOException {
@@ -38,9 +38,38 @@ public class Registry implements Node {
             deregistrationReceiver.checkDeRegistration();
         }
     }
+//TODO add catch for non-number entries, 0 entries and # < #nodes for setup-overlay
+    public void processText(String command) throws IOException {
+        String line = command;
+        int number = 0;
+        String textCommand;
+        String[] delimiter = line.split("\\s");
+        if (delimiter.length == 2) {
+            textCommand = delimiter[0];
+            number = Integer.parseInt(delimiter[1]);
+        } else {
+            textCommand = delimiter[0];
+        }
+        switch (textCommand) {
+            case "list-messaging-nodes":
+                listMessagingNodes();
+                break;
+            case "setup-overlay":
+                System.out.println(textCommand + " " + number);
+                break;
+            default:
+                System.out.println("Not a valid command.");
+        }
+    }
 
     public void listMessagingNodes() {
-        connectToNodesInSequence();
+        for (NodeRecord node : nodeList) {
+            String nodeInformation = "";
+            nodeInformation += node.getHost();
+            nodeInformation += ":";
+            nodeInformation += node.getPort();
+            System.out.println(nodeInformation);
+        }
     }
 
     public void connectToNodesInSequence() {

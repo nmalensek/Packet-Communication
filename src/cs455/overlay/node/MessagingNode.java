@@ -3,6 +3,7 @@ package cs455.overlay.node;
 import cs455.overlay.transport.TCPReceiverThread;
 import cs455.overlay.transport.TCPSender;
 import cs455.overlay.transport.TCPServerThread;
+import cs455.overlay.util.TextInputThread;
 import cs455.overlay.wireformats.Event;
 import cs455.overlay.wireformats.nodemessages.Deregister;
 import cs455.overlay.wireformats.nodemessages.ReceiveDeregisterResponse;
@@ -10,9 +11,7 @@ import cs455.overlay.wireformats.nodemessages.ReceiveRegistryResponse;
 import cs455.overlay.wireformats.nodemessages.SendRegister;
 import cs455.overlay.wireformats.eventfactory.EventFactory;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.concurrent.ThreadLocalRandom;
@@ -41,11 +40,11 @@ public class MessagingNode implements Node {
     }
 
     private void startUp() throws IOException {
-        TCPReceiverThread receiverThread = new TCPReceiverThread(registrySocket, this);
         chooseRandomPort();
-        register();
+        TCPReceiverThread receiverThread = new TCPReceiverThread(registrySocket, this);
         receiverThread.start();
-        createServerSocket();
+        register();
+        createServerThread();
         listenForTextInput();
     }
 
@@ -67,7 +66,7 @@ public class MessagingNode implements Node {
         registrySender.sendData(message);
     }
 
-    private void createServerSocket() throws IOException {
+    private void createServerThread() throws IOException {
         receivingSocket = new TCPServerThread(this, randomPort);
         receivingSocket.start();
     }
@@ -80,12 +79,22 @@ public class MessagingNode implements Node {
         }
     }
 
+    public void processText(String command) throws IOException {
+        switch (command) {
+            case "print-shortest-path":
+                printShortestPath();
+                break;
+            case "exit-overlay":
+                deregister();
+                break;
+            default:
+                System.out.println("Not a valid command.");
+        }
+    }
+
     private void listenForTextInput() throws IOException {
-//        while((command = stdIn.readLine()) !=null) {
-//            if(command.equals("deregister")) {
-//                deregister();
-//            }
-//        }
+        TextInputThread textInputThread = new TextInputThread(this);
+        textInputThread.start();
     }
 
     private void connectToNode(String host, int port) {

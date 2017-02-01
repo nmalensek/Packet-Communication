@@ -13,17 +13,9 @@ public class TextInputThread extends Thread {
 
     public void run() {
         Scanner userInput = new Scanner(System.in);
-        while (userInput.hasNext()) {
-            String command = userInput.next();
-            System.out.println(command);
+        while (userInput.hasNextLine()) {
+            String command = userInput.nextLine();
+            node.processText(command);
         }
-    }
-
-    public static String userInput() {
-        Scanner input = new Scanner(System.in);
-        String command;
-
-        command = input.next();
-        return command;
     }
 }

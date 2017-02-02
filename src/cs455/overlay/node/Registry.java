@@ -2,6 +2,7 @@ package cs455.overlay.node;
 
 import cs455.overlay.transport.TCPServerThread;
 import cs455.overlay.util.DeregistrationReceiver;
+import cs455.overlay.util.OverlayCreator;
 import cs455.overlay.util.RegistrationReceiver;
 import cs455.overlay.util.TextInputThread;
 import cs455.overlay.wireformats.registrymessages.ReceiveDeregisterRequest;
@@ -18,6 +19,7 @@ public class Registry implements Node {
 
     private static int portNum;
     private Map<String, NodeRecord> nodeMap = new ConcurrentHashMap<>();
+    private int connectionRequirement;
 
     public void startServer() {
         TCPServerThread registryServerThread = new TCPServerThread(this, portNum);
@@ -37,7 +39,8 @@ public class Registry implements Node {
             deregistrationReceiver.checkDeRegistration();
         }
     }
-//TODO add catch for non-number entries, 0 entries and # < #nodes for setup-overlay
+
+    //TODO add catch for non-number entries, 0 entries
     public void processText(String command) throws IOException {
         String line = command;
         int numberPortion = 0;
@@ -54,9 +57,8 @@ public class Registry implements Node {
                 listMessagingNodes();
                 break;
             case "setup-overlay":
-                System.out.println(textPortion + " " + numberPortion);
-                connectToNodesInSequence();
-                connectToRandomNodes();
+                connectionRequirement = numberPortion;
+                verifyConnectionRequirement();
                 break;
             default:
                 System.out.println("Not a valid command.");
@@ -69,63 +71,17 @@ public class Registry implements Node {
         }
     }
 
-    private List<String> putKeysInList() {
-        List<String> stringList = new LinkedList<>();
-        for (String node : nodeMap.keySet()) {
-            stringList.add(node);
-        }
-        return stringList;
-    }
-
-    public void connectToNodesInSequence() {
-        List<String> sequentialList = new LinkedList<>(putKeysInList());
-        for (ListIterator<String> recordListIterator = sequentialList.listIterator(); recordListIterator.hasNext(); ) {
-            try {
-                String currentRecord = recordListIterator.next();
-                int currentPosition = sequentialList.indexOf(currentRecord);
-                String nextRecord = sequentialList.get(currentPosition + 1);
-
-                NodeRecord currentNode = nodeMap.get(currentRecord);
-                NodeRecord nextNode = nodeMap.get(nextRecord);
-                currentNode.addNodeToConnectTo(nextNode);
-                updateConnections(currentNode, nextNode);
-            } catch (IndexOutOfBoundsException e) {
-                NodeRecord firstNode = nodeMap.get(sequentialList.get(0));
-                NodeRecord lastNode = nodeMap.get(sequentialList.get(sequentialList.size()-1));
-                lastNode.addNodeToConnectTo(firstNode);
-                updateConnections(lastNode, firstNode);
-            }
+    private void verifyConnectionRequirement() {
+        if(nodeMap.size() < connectionRequirement) {
+            System.out.println("Not enough nodes to fulfill connection requirement, please re-enter.");
+        } else {
+            setupOverlay();
         }
     }
 
-    private void connectToRandomNodes() {
-        List<String> randomList = new LinkedList<>(putKeysInList());
-        for (ListIterator<String> randomListIterator = randomList.listIterator(); randomListIterator.hasNext(); ) {
-            String currentRecord = randomListIterator.next();
-            NodeRecord currentNode = nodeMap.get(currentRecord);
-            while (currentNode.getConnectionsNeededToInitiate() > 0) {
-                int randomConnection = ThreadLocalRandom.current().nextInt(0, nodeMap.size());
-                String randomKey = randomList.get(randomConnection);
-                NodeRecord randomNode = nodeMap.get(randomKey);
-
-                if(currentNode.equals(randomNode) || currentNode.getNodesToConnectToList().contains(randomNode)
-                        || randomNode.getNodesToConnectToList().contains(currentNode) || randomNode.getNumberOfConnections() == 4) {
-                    //do not add and pick again
-                } else {
-                    currentNode.addNodeToConnectTo(randomNode);
-                    updateConnections(currentNode, randomNode);
-                }
-            }
-            currentNode.printNodesList();
-        }
-    }
-
-    private void updateConnections(NodeRecord currentNode, NodeRecord nextNode) {
-        currentNode.incrementConnections();
-        currentNode.decrementConnectionsToInitiate();
-
-        nextNode.incrementConnections();
-        nextNode.decrementConnectionsToInitiate();
+    public void setupOverlay() {
+        OverlayCreator overlayCreator = new OverlayCreator(connectionRequirement, nodeMap);
+        overlayCreator.createOverlay();
     }
 
     public void assignLinkWeights() {
@@ -137,10 +93,6 @@ public class Registry implements Node {
     }
 
     public void listWeights() {
-
-    }
-
-    public void setupOverlay() {
 
     }
 

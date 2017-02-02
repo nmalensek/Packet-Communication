@@ -7,10 +7,11 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ThreadLocalRandom;
 
-public class OverlayConstructorTest {
+public class OverlayCreatorTest {
 
     private Socket testSocket = new Socket();
     private Map<String, NodeRecord> nodeMap = new ConcurrentHashMap<>();
+    private int requiredConnections = 4;
 
     private NodeRecord[] testNodes = {
             new NodeRecord("localhost", 1234, testSocket),
@@ -28,6 +29,12 @@ public class OverlayConstructorTest {
     public void addTestNodes() {
         for(NodeRecord record : testNodes) {
             nodeMap.put(record.getHost() + ":" + record.getPort(), record);
+        }
+    }
+
+    private void setNodeConnectionRequirement() {
+        for (NodeRecord node : nodeMap.values()) {
+            node.setNumberOfConnectionsNodeNeedsToInitiate(requiredConnections);
         }
     }
 
@@ -71,7 +78,8 @@ public class OverlayConstructorTest {
                 NodeRecord randomNode = nodeMap.get(randomKey);
 
                 if(currentNode.equals(randomNode) || currentNode.getNodesToConnectToList().contains(randomNode)
-                        || randomNode.getNodesToConnectToList().contains(currentNode) || randomNode.getNumberOfConnections() == 4) {
+                        || randomNode.getNodesToConnectToList().contains(currentNode)
+                        || randomNode.getNumberOfConnections() == requiredConnections) {
                     //do not add and pick again
                 } else {
                     currentNode.addNodeToConnectTo(randomNode);
@@ -98,13 +106,14 @@ public class OverlayConstructorTest {
 
     private void testOverlayConstruction() {
         addTestNodes();
+        setNodeConnectionRequirement();
         connectToNodesInSequence();
         printSequentialConnections();
         connectToRandomNodes();
     }
 
     public static void main(String[] args) {
-        OverlayConstructorTest overlayConstructorTest = new OverlayConstructorTest();
-        overlayConstructorTest.testOverlayConstruction();
+        OverlayCreatorTest overlayCreatorTest = new OverlayCreatorTest();
+        overlayCreatorTest.testOverlayConstruction();
     }
 }

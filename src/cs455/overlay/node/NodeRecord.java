@@ -10,7 +10,7 @@ public class NodeRecord {
     private int port;
     private Socket communicationSocket;
     private int numberOfNodeConnections;
-    private int numberOfConnectionsNodeNeedsToInitiate = 4;
+    private int numberOfConnectionsNodeNeedsToInitiate;
     private List<NodeRecord> nodesToConnectTo = new ArrayList<>();
 
     public NodeRecord(String host, int port, Socket communicationSocket) {
@@ -34,6 +34,10 @@ public class NodeRecord {
     public int getNumberOfConnections() { return numberOfNodeConnections; }
 
     public int getConnectionsNeededToInitiate() { return  numberOfConnectionsNodeNeedsToInitiate; }
+
+    public void setNumberOfConnectionsNodeNeedsToInitiate(int numberOfConnectionsNodeNeedsToInitiate) {
+        this.numberOfConnectionsNodeNeedsToInitiate = numberOfConnectionsNodeNeedsToInitiate;
+    }
 
     public void decrementConnectionsToInitiate() { --numberOfConnectionsNodeNeedsToInitiate; }
 

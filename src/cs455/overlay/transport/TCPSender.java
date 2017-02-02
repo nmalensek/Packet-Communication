@@ -14,7 +14,7 @@ public class TCPSender {
         dataOutputStream = new DataOutputStream(socketToSendTo.getOutputStream());
     }
 
-    public void sendData(byte[] dataToSend) throws IOException {
+    public synchronized void sendData(byte[] dataToSend) throws IOException {
         int dataLength = dataToSend.length;
         dataOutputStream.writeInt(dataLength);
         dataOutputStream.write(dataToSend, 0, dataLength);

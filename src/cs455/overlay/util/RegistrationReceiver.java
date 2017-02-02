@@ -10,36 +10,36 @@ import cs455.overlay.wireformats.eventfactory.EventFactory;
 import java.io.IOException;
 import java.net.Socket;
 import java.net.SocketException;
-import java.util.List;
+import java.util.Map;
 
 public class RegistrationReceiver {
     private Event<ReceiveRegisterRequest> event;
-    private List<NodeRecord> nodeList;
+    private Map<String, NodeRecord> nodeMap;
     private Socket destinationSocket;
     private String host;
     private int port;
-    private int newestPort;
     private NodeRecord nodeRecord;
     private EventFactory eventFactory = EventFactory.getInstance();
     private TCPSender replySender;
     private byte SUCCESS = 1;
     private byte FAILURE = 0;
+    private String key;
 
     public RegistrationReceiver(Event<ReceiveRegisterRequest> event,
-                                List<NodeRecord> nodeList,
+                                Map<String, NodeRecord> nodeMap,
                                 Socket destinationSocket) {
         this.event = event;
-        this.nodeList = nodeList;
+        this.nodeMap = nodeMap;
         this.destinationSocket = destinationSocket;
 
         host = ((ReceiveRegisterRequest) event).getIdentifier();
         port = ((ReceiveRegisterRequest) event).getPortNumber();
-        newestPort = port;
+        key = host + ":" + port;
         nodeRecord = new NodeRecord(host, port, destinationSocket);
     }
 
     public void checkRegistration() throws IOException {
-        if (duplicateConnection(nodeRecord)) {
+        if (nodeMap.containsKey(key)) {
             processRegistration(destinationSocket, false,
                     "node already exists at that address.", FAILURE);
             nodeRecord = null;
@@ -48,13 +48,13 @@ public class RegistrationReceiver {
                     "IP in message does not match sender\'s IP.", FAILURE);
             nodeRecord = null;
         } else {
-            nodeList.add(nodeRecord);
+            nodeMap.put(key, nodeRecord);
             try {
                 processRegistration(destinationSocket, true, null, SUCCESS);
             } catch (SocketException e) {
                 //remove node that just registered if it fails after sending its message
                 System.out.println("Unable to contact node, removing from registered nodes...");
-                nodeList.remove(nodeRecord);
+                nodeMap.remove(key);
                 System.out.println("Node removed.");
             }
         }
@@ -69,20 +69,9 @@ public class RegistrationReceiver {
         replySender.sendData(respondToRegisterRequest.getBytes());
     }
 
-    private boolean duplicateConnection(NodeRecord newNodeRecord) {
-        boolean isDuplicate = false;
-        for (NodeRecord node : nodeList) {
-            if (node.equals(newNodeRecord)) {
-                isDuplicate = true;
-                break;
-            }
-        }
-        return isDuplicate;
-    }
-
     private String registerResponseAdditionalInfo(boolean successfulConnection, String errorMessage) {
         if (successfulConnection) {
-            return "Registration successful. Nodes registered: " + nodeList.size();
+            return "Registration successful. Nodes registered: " + nodeMap.size();
         } else {
             return "Registration unsuccessful, error message: " + errorMessage;
         }

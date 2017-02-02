@@ -2,7 +2,9 @@ package cs455.tests;
 
 import cs455.overlay.node.NodeRecord;
 
+import java.net.Inet4Address;
 import java.net.Socket;
+import java.net.UnknownHostException;
 import java.util.*;
 
 public class NodeRecordTest {
@@ -86,6 +88,14 @@ public class NodeRecordTest {
         }
     }
 
+    //TODO check that this is the proper way to check IP addresses, implementing it this way for now
+    private void testPrint() throws UnknownHostException {
+        String host = Inet4Address.getLocalHost().toString();
+        String[] line = host.split("/");
+        String ipAddress = line[1];
+        System.out.println(ipAddress);
+    }
+
     private void testEquals() {
         System.out.println(testNodes[0].equals(testNodes[1]));
         System.out.println("Expected: true");
@@ -102,6 +112,6 @@ public class NodeRecordTest {
 //        nodeRecordTest.addTestNodes();
 //        nodeRecordTest.testNodeRecordModify();
 //        nodeRecordTest.setRandomInts();
-        nodeRecordTest.testEquals();
+//        nodeRecordTest.testEquals();
     }
 }

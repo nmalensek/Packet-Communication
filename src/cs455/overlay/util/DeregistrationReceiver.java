@@ -10,33 +10,34 @@ import cs455.overlay.wireformats.registrymessages.ReceiveDeregisterRequest;
 import java.io.IOException;
 import java.net.Socket;
 import java.util.List;
+import java.util.Map;
 
 public class DeregistrationReceiver {
     private Event<ReceiveDeregisterRequest> event;
-    private List<NodeRecord> nodeList;
+    private Map<String, NodeRecord> nodeMap;
     private Socket destinationSocket;
     private String deregisteringHost;
     private int deregisteringPort;
-    private int newestPort;
-    private NodeRecord nodeRecord;
+    private String key;
     private EventFactory eventFactory = EventFactory.getInstance();
     private TCPSender replySender;
     private byte SUCCESS = 1;
     private byte FAILURE = 0;
 
     public DeregistrationReceiver(Event<ReceiveDeregisterRequest> event,
-                                List<NodeRecord> nodeList,
+                                Map<String, NodeRecord> nodeMap,
                                 Socket destinationSocket) {
         this.event = event;
-        this.nodeList = nodeList;
+        this.nodeMap = nodeMap;
         this.destinationSocket = destinationSocket;
 
         deregisteringHost = ((ReceiveDeregisterRequest) event).getIdentifier();
         deregisteringPort = ((ReceiveDeregisterRequest) event).getPortNumber();
+        key = deregisteringHost + ":" + deregisteringPort;
     }
 
     public void checkDeRegistration() throws IOException {
-        if (wasNotRegistered(deregisteringHost, deregisteringPort)) {
+        if (!nodeMap.containsKey(key)) {
             sendDeregistrationResponse(destinationSocket,
                     "Unable to deregister, node is not registered!", false, FAILURE);
         } else if(!deregisteringHost.equals(destinationSocket.getInetAddress().toString())) {
@@ -45,7 +46,7 @@ public class DeregistrationReceiver {
         } else {
             sendDeregistrationResponse(destinationSocket, "Deregistration successful!",
                     true, SUCCESS);
-            completeDeregistration(deregisteringHost, deregisteringPort);
+            nodeMap.remove(key);
         }
     }
 
@@ -56,25 +57,5 @@ public class DeregistrationReceiver {
         deregistrationResponse.setAdditionalInfo(error);
         replySender = new TCPSender(deregisteringNode);
         replySender.sendData(deregistrationResponse.getBytes());
-    }
-
-    private void completeDeregistration(String host, int port) throws IOException {
-        for (NodeRecord node : nodeList) {
-            if (node.getHost().equals(host) && node.getPort() == port) {
-                nodeList.remove(node);
-                break;
-            }
-        }
-    }
-
-    private boolean wasNotRegistered(String host, int port) {
-        boolean wasNotRegistered = true;
-        for (NodeRecord node : nodeList) {
-            if (node.getHost().equals(host) && node.getPort() == port) {
-                wasNotRegistered = false;
-                break;
-            }
-        }
-        return wasNotRegistered;
     }
 }

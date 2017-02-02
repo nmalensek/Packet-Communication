@@ -23,9 +23,7 @@ public class NodeRecord {
         return host;
     }
 
-    public int getPort() {
-        return port;
-    }
+    public int getPort() { return port; }
 
     public Socket getCommunicationSocket() {
         return communicationSocket;
@@ -41,9 +39,21 @@ public class NodeRecord {
 
     public void addNodeToConnectTo(NodeRecord node) { nodesToConnectTo.add(node); }
 
-    public int getLengthOfNodeList() { return nodesToConnectTo.size(); }
-
     public List getNodesToConnectToList() { return nodesToConnectTo; }
+
+    public void printListSize() {
+        System.out.println(nodesToConnectTo.size());
+    }
+
+    public void printNodesList() {
+        String ports = getPort() + "::";
+        for (NodeRecord nodeRecord : nodesToConnectTo) {
+            ports += nodeRecord.getPort();
+            ports += ":";
+        }
+        System.out.println(ports);
+        printListSize();
+    }
 
     @Override
     public boolean equals(Object o) {

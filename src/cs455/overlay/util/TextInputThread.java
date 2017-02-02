@@ -2,6 +2,7 @@ package cs455.overlay.util;
 
 import cs455.overlay.node.Node;
 
+import java.io.IOException;
 import java.util.Scanner;
 
 public class TextInputThread extends Thread {
@@ -15,7 +16,11 @@ public class TextInputThread extends Thread {
         Scanner userInput = new Scanner(System.in);
         while (userInput.hasNextLine()) {
             String command = userInput.nextLine();
-            node.processText(command);
+            try {
+                node.processText(command);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 }

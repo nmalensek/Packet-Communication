@@ -35,7 +35,7 @@ public class NodeRecord {
 
     public int getConnectionsNeededToInitiate() { return  numberOfConnectionsNodeNeedsToInitiate; }
 
-    public void decrementNeededConnections() { --numberOfConnectionsNodeNeedsToInitiate; }
+    public void decrementConnectionsToInitiate() { --numberOfConnectionsNodeNeedsToInitiate; }
 
     public void addNodeToConnectTo(NodeRecord node) { nodesToConnectTo.add(node); }
 
@@ -52,7 +52,6 @@ public class NodeRecord {
             ports += ":";
         }
         System.out.println(ports);
-        printListSize();
     }
 
     @Override

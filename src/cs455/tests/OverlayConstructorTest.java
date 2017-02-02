@@ -1,71 +1,33 @@
-package cs455.overlay.node;
+package cs455.tests;
 
-import cs455.overlay.transport.TCPServerThread;
-import cs455.overlay.util.DeregistrationReceiver;
-import cs455.overlay.util.RegistrationReceiver;
-import cs455.overlay.util.TextInputThread;
-import cs455.overlay.wireformats.registrymessages.ReceiveDeregisterRequest;
-import cs455.overlay.wireformats.registrymessages.ReceiveRegisterRequest;
-import cs455.overlay.wireformats.Event;
+import cs455.overlay.node.NodeRecord;
 
-import java.io.IOException;
 import java.net.Socket;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ThreadLocalRandom;
 
-public class Registry implements Node {
+public class OverlayConstructorTest {
 
-    private static int portNum;
+    private Socket testSocket = new Socket();
     private Map<String, NodeRecord> nodeMap = new ConcurrentHashMap<>();
 
-    public void startServer() {
-        TCPServerThread registryServerThread = new TCPServerThread(this, portNum);
-        registryServerThread.start();
-        TextInputThread textInputThread = new TextInputThread(this);
-        textInputThread.start();
-    }
+    private NodeRecord[] testNodes = {
+            new NodeRecord("localhost", 1234, testSocket),
+            new NodeRecord("localhost", 3456, testSocket),
+            new NodeRecord("localhost", 3446, testSocket),
+            new NodeRecord("localhost", 3474, testSocket),
+            new NodeRecord("localhost", 2534, testSocket),
+            new NodeRecord("localhost", 1678, testSocket),
+            new NodeRecord("localhost", 3567, testSocket),
+            new NodeRecord("localhost", 4536, testSocket),
+            new NodeRecord("localhost", 7445, testSocket),
+            new NodeRecord("localhost", 4578, testSocket),
+    };
 
-    public void onEvent(Event event, Socket destinationSocket) throws IOException {
-        if (event instanceof ReceiveRegisterRequest) {
-            RegistrationReceiver receiver = new RegistrationReceiver(
-                    ((ReceiveRegisterRequest) event), nodeMap, destinationSocket);
-            receiver.checkRegistration();
-        } else if (event instanceof ReceiveDeregisterRequest) {
-            DeregistrationReceiver deregistrationReceiver = new DeregistrationReceiver(
-                    ((ReceiveDeregisterRequest) event), nodeMap, destinationSocket);
-            deregistrationReceiver.checkDeRegistration();
-        }
-    }
-//TODO add catch for non-number entries, 0 entries and # < #nodes for setup-overlay
-    public void processText(String command) throws IOException {
-        String line = command;
-        int numberPortion = 0;
-        String textPortion;
-        String[] delimiter = line.split("\\s");
-        if (delimiter.length == 2) {
-            textPortion = delimiter[0];
-            numberPortion = Integer.parseInt(delimiter[1]);
-        } else {
-            textPortion = delimiter[0];
-        }
-        switch (textPortion) {
-            case "list-messaging-nodes":
-                listMessagingNodes();
-                break;
-            case "setup-overlay":
-                System.out.println(textPortion + " " + numberPortion);
-                connectToNodesInSequence();
-                connectToRandomNodes();
-                break;
-            default:
-                System.out.println("Not a valid command.");
-        }
-    }
-
-    public void listMessagingNodes() {
-        for (String node : nodeMap.keySet()) {
-            System.out.println(node);
+    public void addTestNodes() {
+        for(NodeRecord record : testNodes) {
+            nodeMap.put(record.getHost() + ":" + record.getPort(), record);
         }
     }
 
@@ -128,33 +90,21 @@ public class Registry implements Node {
         nextNode.decrementConnectionsToInitiate();
     }
 
-    public void assignLinkWeights() {
-
+    private void printSequentialConnections() {
+        for(NodeRecord node : nodeMap.values()) {
+            node.printNodesList();
+        }
     }
 
-    public void initiateTask() {
-
+    private void testOverlayConstruction() {
+        addTestNodes();
+        connectToNodesInSequence();
+        printSequentialConnections();
+        connectToRandomNodes();
     }
 
-    public void listWeights() {
-
-    }
-
-    public void setupOverlay() {
-
-    }
-
-    public void sendOverlayLinkWeights() {
-
-    }
-
-    public void start() {
-
-    }
-
-    public static void main(String[] args) throws IOException {
-        portNum = Integer.parseInt(args[0]);
-        Registry registry = new Registry();
-        registry.startServer();
+    public static void main(String[] args) {
+        OverlayConstructorTest overlayConstructorTest = new OverlayConstructorTest();
+        overlayConstructorTest.testOverlayConstruction();
     }
 }

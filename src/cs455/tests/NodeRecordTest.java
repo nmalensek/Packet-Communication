@@ -13,7 +13,6 @@ public class NodeRecordTest {
     private Integer[] intList = {2, 5, 8, 11};
     private NodeRecord[] testNodes = {
             new NodeRecord("localhost", 1234, testSocket),
-            new NodeRecord("localhost", 1234, testSocket),
             new NodeRecord("localhost", 3456, testSocket),
             new NodeRecord("localhost", 3446, testSocket),
             new NodeRecord("localhost", 3474, testSocket),
@@ -60,9 +59,9 @@ public class NodeRecordTest {
 
     private void updateConnections(NodeRecord currentNode, NodeRecord nextNode) {
         currentNode.incrementConnections();
-        currentNode.decrementNeededConnections();
+        currentNode.decrementConnectionsToInitiate();
 
-        nextNode.decrementNeededConnections();
+        nextNode.decrementConnectionsToInitiate();
         nextNode.incrementConnections();
     }
 

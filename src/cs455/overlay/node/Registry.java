@@ -1,19 +1,18 @@
 package cs455.overlay.node;
 
 import cs455.overlay.transport.TCPServerThread;
-import cs455.overlay.util.DeregistrationReceiver;
+import cs455.overlay.wireformats.registrymessages.receiving.DeregistrationReceiver;
 import cs455.overlay.util.OverlayCreator;
-import cs455.overlay.util.RegistrationReceiver;
+import cs455.overlay.wireformats.registrymessages.receiving.RegistrationReceiver;
 import cs455.overlay.util.TextInputThread;
-import cs455.overlay.wireformats.registrymessages.ReceiveDeregisterRequest;
-import cs455.overlay.wireformats.registrymessages.ReceiveRegisterRequest;
+import cs455.overlay.wireformats.registrymessages.receiving.ReceiveDeregisterRequest;
+import cs455.overlay.wireformats.registrymessages.receiving.ReceiveRegisterRequest;
 import cs455.overlay.wireformats.Event;
 
 import java.io.IOException;
 import java.net.Socket;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ThreadLocalRandom;
 
 public class Registry implements Node {
 
@@ -40,7 +39,6 @@ public class Registry implements Node {
         }
     }
 
-    //TODO add catch for non-number entries, 0 entries
     public void processText(String command) throws IOException {
         String line = command;
         int numberPortion = 0;
@@ -48,7 +46,7 @@ public class Registry implements Node {
         String[] delimiter = line.split("\\s");
         if (delimiter.length == 2) {
             textPortion = delimiter[0];
-            numberPortion = Integer.parseInt(delimiter[1]);
+            numberPortion = wasANumberEntered(delimiter[1]);
         } else {
             textPortion = delimiter[0];
         }
@@ -70,7 +68,7 @@ public class Registry implements Node {
             System.out.println(node);
         }
     }
-
+    //TODO check for 2 nodes (can only have 1 connection) and 1 node
     private void verifyConnectionRequirement() {
         if(nodeMap.size() < connectionRequirement) {
             System.out.println("Not enough nodes to fulfill connection requirement, please re-enter.");
@@ -82,6 +80,22 @@ public class Registry implements Node {
     public void setupOverlay() {
         OverlayCreator overlayCreator = new OverlayCreator(connectionRequirement, nodeMap);
         overlayCreator.createOverlay();
+    }
+
+    private int wasANumberEntered(String stringToCheck) {
+        try {
+            return Integer.parseInt(stringToCheck);
+        } catch (NumberFormatException e) {
+            System.out.println("Not a number, please re-enter.");
+            return 0;
+        }
+    }
+
+    private void sendMessagingNodesList() {
+        for (NodeRecord node : nodeMap.values()) {
+
+            node.getCommunicationSocket();
+        }
     }
 
     public void assignLinkWeights() {

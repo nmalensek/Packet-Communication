@@ -2,6 +2,7 @@ package cs455.tests;
 
 import cs455.overlay.node.NodeRecord;
 
+import java.io.IOException;
 import java.net.Socket;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -12,6 +13,9 @@ public class OverlayCreatorTest {
     private Socket testSocket = new Socket();
     private Map<String, NodeRecord> nodeMap = new ConcurrentHashMap<>();
     private int requiredConnections = 4;
+
+    public OverlayCreatorTest() throws IOException {
+    }
 
     private NodeRecord[] testNodes = {
             new NodeRecord("localhost", 1234, testSocket),
@@ -112,7 +116,7 @@ public class OverlayCreatorTest {
         connectToRandomNodes();
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
         OverlayCreatorTest overlayCreatorTest = new OverlayCreatorTest();
         overlayCreatorTest.testOverlayConstruction();
     }

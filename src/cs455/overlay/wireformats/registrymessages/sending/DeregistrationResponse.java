@@ -1,4 +1,4 @@
-package cs455.overlay.wireformats.registrymessages;
+package cs455.overlay.wireformats.registrymessages.sending;
 
 import cs455.overlay.wireformats.Event;
 import cs455.overlay.wireformats.Protocol;

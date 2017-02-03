@@ -5,10 +5,10 @@ import cs455.overlay.wireformats.nodemessages.Deregister;
 import cs455.overlay.wireformats.nodemessages.ReceiveDeregisterResponse;
 import cs455.overlay.wireformats.nodemessages.ReceiveRegistryResponse;
 import cs455.overlay.wireformats.nodemessages.SendRegister;
-import cs455.overlay.wireformats.registrymessages.DeregistrationResponse;
-import cs455.overlay.wireformats.registrymessages.ReceiveDeregisterRequest;
-import cs455.overlay.wireformats.registrymessages.ReceiveRegisterRequest;
-import cs455.overlay.wireformats.registrymessages.RespondToRegisterRequest;
+import cs455.overlay.wireformats.registrymessages.sending.DeregistrationResponse;
+import cs455.overlay.wireformats.registrymessages.receiving.ReceiveDeregisterRequest;
+import cs455.overlay.wireformats.registrymessages.receiving.ReceiveRegisterRequest;
+import cs455.overlay.wireformats.registrymessages.sending.RespondToRegisterRequest;
 
 import java.io.IOException;
 import java.net.Socket;

@@ -1,6 +1,9 @@
 package cs455.overlay.node;
 
 
+import cs455.overlay.transport.TCPSender;
+
+import java.io.IOException;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
@@ -11,12 +14,16 @@ public class NodeRecord {
     private Socket communicationSocket;
     private int numberOfNodeConnections;
     private int numberOfConnectionsNodeNeedsToInitiate;
+    private String nodeID;
     private List<NodeRecord> nodesToConnectTo = new ArrayList<>();
+    private TCPSender sender;
 
-    public NodeRecord(String host, int port, Socket communicationSocket) {
+    public NodeRecord(String host, int port, Socket communicationSocket) throws IOException {
         this.host = host;
         this.port = port;
+        this.nodeID = host + ":" + port;
         this.communicationSocket = communicationSocket;
+        this.sender = new TCPSender(communicationSocket);
     }
 
     public String getHost() {
@@ -24,6 +31,8 @@ public class NodeRecord {
     }
 
     public int getPort() { return port; }
+
+    public String getNodeID() { return nodeID; }
 
     public Socket getCommunicationSocket() {
         return communicationSocket;
@@ -48,6 +57,8 @@ public class NodeRecord {
     public void printListSize() {
         System.out.println(nodesToConnectTo.size());
     }
+
+    public TCPSender getSender() { return this.sender; }
 
     public void printNodesList() {
         String ports = getPort() + "::";

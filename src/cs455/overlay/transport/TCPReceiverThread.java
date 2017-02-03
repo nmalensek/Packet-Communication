@@ -6,8 +6,8 @@ import cs455.overlay.wireformats.Protocol;
 import cs455.overlay.wireformats.eventfactory.EventFactory;
 import cs455.overlay.wireformats.nodemessages.ReceiveDeregisterResponse;
 import cs455.overlay.wireformats.nodemessages.ReceiveRegistryResponse;
-import cs455.overlay.wireformats.registrymessages.ReceiveDeregisterRequest;
-import cs455.overlay.wireformats.registrymessages.ReceiveRegisterRequest;
+import cs455.overlay.wireformats.registrymessages.receiving.ReceiveDeregisterRequest;
+import cs455.overlay.wireformats.registrymessages.receiving.ReceiveRegisterRequest;
 
 import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;

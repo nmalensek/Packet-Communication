@@ -1,15 +1,13 @@
-package cs455.overlay.util;
+package cs455.overlay.wireformats.registrymessages.receiving;
 
 import cs455.overlay.node.NodeRecord;
 import cs455.overlay.transport.TCPSender;
 import cs455.overlay.wireformats.Event;
 import cs455.overlay.wireformats.eventfactory.EventFactory;
-import cs455.overlay.wireformats.registrymessages.DeregistrationResponse;
-import cs455.overlay.wireformats.registrymessages.ReceiveDeregisterRequest;
+import cs455.overlay.wireformats.registrymessages.sending.DeregistrationResponse;
 
 import java.io.IOException;
 import java.net.Socket;
-import java.util.List;
 import java.util.Map;
 
 public class DeregistrationReceiver {

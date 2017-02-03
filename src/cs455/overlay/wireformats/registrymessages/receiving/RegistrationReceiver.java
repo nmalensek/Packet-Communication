@@ -1,10 +1,9 @@
-package cs455.overlay.util;
+package cs455.overlay.wireformats.registrymessages.receiving;
 
 import cs455.overlay.node.NodeRecord;
 import cs455.overlay.transport.TCPSender;
 import cs455.overlay.wireformats.Event;
-import cs455.overlay.wireformats.registrymessages.ReceiveRegisterRequest;
-import cs455.overlay.wireformats.registrymessages.RespondToRegisterRequest;
+import cs455.overlay.wireformats.registrymessages.sending.RespondToRegisterRequest;
 import cs455.overlay.wireformats.eventfactory.EventFactory;
 
 import java.io.IOException;
@@ -27,7 +26,7 @@ public class RegistrationReceiver {
 
     public RegistrationReceiver(Event<ReceiveRegisterRequest> event,
                                 Map<String, NodeRecord> nodeMap,
-                                Socket destinationSocket) {
+                                Socket destinationSocket) throws IOException {
         this.event = event;
         this.nodeMap = nodeMap;
         this.destinationSocket = destinationSocket;
@@ -65,7 +64,7 @@ public class RegistrationReceiver {
         RespondToRegisterRequest respondToRegisterRequest = eventFactory.createRegisterResponseEvent().getType();
         respondToRegisterRequest.setAdditionalInfo(registerResponseAdditionalInfo(isSuccessfulConnection, error));
         respondToRegisterRequest.setSuccessOrFailure(successOrFailure);
-        replySender = new TCPSender(nodeThatRegistered);
+        TCPSender replySender = nodeRecord.getSender();
         replySender.sendData(respondToRegisterRequest.getBytes());
     }
 

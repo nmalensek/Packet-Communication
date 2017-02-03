@@ -1,20 +1,17 @@
-package cs455.overlay.wireformats.registrymessages;
+package cs455.overlay.wireformats.registrymessages.receiving;
 
 import cs455.overlay.wireformats.Event;
 import cs455.overlay.wireformats.Protocol;
 
-import java.io.BufferedInputStream;
-import java.io.ByteArrayInputStream;
-import java.io.DataInputStream;
-import java.io.IOException;
+import java.io.*;
 
-public class ReceiveDeregisterRequest implements Protocol, Event<ReceiveDeregisterRequest> {
+public class ReceiveRegisterRequest implements Protocol, Event<ReceiveRegisterRequest> {
 
     private int messageType;
     private int portNumber;
     private String identifier;
 
-    public ReceiveDeregisterRequest(byte[] marshalledBytes) throws IOException {
+    public ReceiveRegisterRequest(byte[] marshalledBytes) throws IOException {
         ByteArrayInputStream byteArrayInputStream =
                 new ByteArrayInputStream(marshalledBytes);
         DataInputStream dataInputStream =
@@ -33,7 +30,7 @@ public class ReceiveDeregisterRequest implements Protocol, Event<ReceiveDeregist
         dataInputStream.close();
     }
 
-    public ReceiveDeregisterRequest getType() {
+    public ReceiveRegisterRequest getType() {
         return this;
     }
 

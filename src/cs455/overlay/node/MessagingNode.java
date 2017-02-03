@@ -5,15 +5,14 @@ import cs455.overlay.transport.TCPSender;
 import cs455.overlay.transport.TCPServerThread;
 import cs455.overlay.util.TextInputThread;
 import cs455.overlay.wireformats.Event;
-import cs455.overlay.wireformats.nodemessages.Deregister;
-import cs455.overlay.wireformats.nodemessages.ReceiveDeregisterResponse;
-import cs455.overlay.wireformats.nodemessages.ReceiveRegistryResponse;
-import cs455.overlay.wireformats.nodemessages.SendRegister;
+import cs455.overlay.wireformats.nodemessages.*;
 import cs455.overlay.wireformats.eventfactory.EventFactory;
 
 import java.io.IOException;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class MessagingNode implements Node {
@@ -22,6 +21,7 @@ public class MessagingNode implements Node {
     private int relayTracker = 0;
     private long sendSummation = 0;
     private long receiveSummation = 0;
+    private int numberOfConnections = 0;
     private String registryHostName;
     private int registryPort;
     private int randomPort;
@@ -31,6 +31,7 @@ public class MessagingNode implements Node {
     private EventFactory eF = EventFactory.getInstance();
     private byte[] message;
     private String command;
+    private Map<String, String> nodesToConnectTo = new HashMap<>();
 
     public MessagingNode(String registryHostName, int registryPort) throws IOException {
         this.registryHostName = registryHostName;
@@ -76,6 +77,16 @@ public class MessagingNode implements Node {
             ((ReceiveRegistryResponse) event).printMessage();
         } else if (event instanceof ReceiveDeregisterResponse) {
             ((ReceiveDeregisterResponse) event).printMessage();
+        } else if (event instanceof ReceiveMessagingNodesList) {
+           splitNodeIDs (((ReceiveMessagingNodesList) event).getNodesToConnectTo());
+        }
+    }
+
+    //TODO finish implementing (connect, store TCPsender/Receiver, and maybe port?)
+    private void splitNodeIDs(String stringToSplit) {
+        String[] splitString = stringToSplit.split("\\n");
+        for(String nodeID : splitString) {
+            nodesToConnectTo.put(nodeID, nodeID);
         }
     }
 
@@ -97,6 +108,10 @@ public class MessagingNode implements Node {
         textInputThread.start();
     }
 
+    private void incrementConnectionCount() {
+        numberOfConnections++;
+    }
+
     private void connectToNode(String host, int port) {
 
     }
@@ -114,10 +129,6 @@ public class MessagingNode implements Node {
     }
 
     public void printShortestPath() {
-
-    }
-
-    public void exitOverlay() {
 
     }
 

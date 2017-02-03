@@ -1,10 +1,7 @@
 package cs455.overlay.wireformats.eventfactory;
 
 import cs455.overlay.wireformats.Event;
-import cs455.overlay.wireformats.nodemessages.Deregister;
-import cs455.overlay.wireformats.nodemessages.ReceiveDeregisterResponse;
-import cs455.overlay.wireformats.nodemessages.ReceiveRegistryResponse;
-import cs455.overlay.wireformats.nodemessages.SendRegister;
+import cs455.overlay.wireformats.nodemessages.*;
 import cs455.overlay.wireformats.registrymessages.sending.DeregistrationResponse;
 import cs455.overlay.wireformats.registrymessages.receiving.ReceiveDeregisterRequest;
 import cs455.overlay.wireformats.registrymessages.receiving.ReceiveRegisterRequest;
@@ -76,5 +73,12 @@ public final class EventFactory {
             byte[] marshalledBytes) throws IOException {
         ReceiveDeregisterResponse deregisterResponse = new ReceiveDeregisterResponse(marshalledBytes);
         return deregisterResponse;
+    }
+
+    public static final Event<ReceiveMessagingNodesList> receiveMessagingNodesList(
+            byte[] marshalledBytes) throws IOException {
+        ReceiveMessagingNodesList receiveMessagingNodesList = new ReceiveMessagingNodesList();
+        receiveMessagingNodesList.receiveBytes(marshalledBytes);
+        return receiveMessagingNodesList;
     }
 }

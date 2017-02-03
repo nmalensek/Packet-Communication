@@ -8,6 +8,7 @@ import cs455.overlay.util.TextInputThread;
 import cs455.overlay.wireformats.registrymessages.receiving.ReceiveDeregisterRequest;
 import cs455.overlay.wireformats.registrymessages.receiving.ReceiveRegisterRequest;
 import cs455.overlay.wireformats.Event;
+import cs455.overlay.wireformats.registrymessages.sending.MessagingNodesList;
 
 import java.io.IOException;
 import java.net.Socket;
@@ -91,10 +92,12 @@ public class Registry implements Node {
         }
     }
 
-    private void sendMessagingNodesList() {
+    private void sendMessagingNodesList() throws IOException {
+        MessagingNodesList messagingNodesList = new MessagingNodesList();
         for (NodeRecord node : nodeMap.values()) {
-
-            node.getCommunicationSocket();
+            messagingNodesList.setNumberOfPeerMessagingNodes(node.getConnectionsNeededToInitiate());
+            messagingNodesList.setMessagingNodes(node.getNodesToConnectToList());
+            node.getSender().sendData(messagingNodesList.getBytes());
         }
     }
 

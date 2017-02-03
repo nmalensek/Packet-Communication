@@ -2,6 +2,7 @@ package cs455.tests;
 
 import cs455.overlay.node.NodeRecord;
 
+import java.io.IOException;
 import java.net.Inet4Address;
 import java.net.Socket;
 import java.net.UnknownHostException;
@@ -26,6 +27,9 @@ public class NodeRecordTest {
 
     private Set<Integer> randomInts = new HashSet<>();
     private List<NodeRecord> testNodeRecords = new ArrayList<>();
+
+    public NodeRecordTest() throws IOException {
+    }
 
     public void testElementRetrieve() {
         List<Integer> testList = new ArrayList<>();
@@ -105,7 +109,7 @@ public class NodeRecordTest {
 
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
         NodeRecordTest nodeRecordTest = new NodeRecordTest();
 //        nodeRecordTest.testElementRetrieve();
 //        nodeRecordTest.addTestNodes();

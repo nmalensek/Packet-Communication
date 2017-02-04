@@ -1,6 +1,7 @@
 package cs455.tests;
 
 import cs455.overlay.node.NodeRecord;
+import cs455.overlay.transport.TCPReceiverThread;
 
 import java.io.IOException;
 import java.net.Inet4Address;
@@ -24,6 +25,8 @@ public class NodeRecordTest {
             new NodeRecord("localhost", 7445, testSocket),
             new NodeRecord("localhost", 4578, testSocket),
     };
+
+    private static String splitterTest = "host1:1234\nhost2:2345\nhost3:4567\nhost4:1111";
 
     private Set<Integer> randomInts = new HashSet<>();
     private List<NodeRecord> testNodeRecords = new ArrayList<>();
@@ -109,6 +112,16 @@ public class NodeRecordTest {
 
     }
 
+    private void splitNodeIDs(String stringToSplit) throws IOException {
+        String[] splitString = stringToSplit.split("\\n");
+        for(String nodeID : splitString) {
+            String[] splitID = nodeID.split(":");
+            String host = splitID[0];
+            int port = Integer.parseInt(splitID[1]);
+            System.out.println(host + " -- " + port);
+        }
+    }
+
     public static void main(String[] args) throws IOException {
         NodeRecordTest nodeRecordTest = new NodeRecordTest();
 //        nodeRecordTest.testElementRetrieve();
@@ -116,5 +129,6 @@ public class NodeRecordTest {
 //        nodeRecordTest.testNodeRecordModify();
 //        nodeRecordTest.setRandomInts();
 //        nodeRecordTest.testEquals();
+        nodeRecordTest.splitNodeIDs(splitterTest);
     }
 }

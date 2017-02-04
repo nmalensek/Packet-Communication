@@ -31,7 +31,7 @@ public class MessagingNode implements Node {
     private EventFactory eF = EventFactory.getInstance();
     private byte[] message;
     private String command;
-    private Map<String, String> nodesToConnectTo = new HashMap<>();
+    private Map<String, NodeRecord> nodeConnections = new HashMap<>();
 
     public MessagingNode(String registryHostName, int registryPort) throws IOException {
         this.registryHostName = registryHostName;
@@ -77,16 +77,24 @@ public class MessagingNode implements Node {
             ((ReceiveRegistryResponse) event).printMessage();
         } else if (event instanceof ReceiveDeregisterResponse) {
             ((ReceiveDeregisterResponse) event).printMessage();
+            registrySocket.close();
         } else if (event instanceof ReceiveMessagingNodesList) {
            splitNodeIDs (((ReceiveMessagingNodesList) event).getNodesToConnectTo());
         }
     }
 
     //TODO finish implementing (connect, store TCPsender/Receiver, and maybe port?)
-    private void splitNodeIDs(String stringToSplit) {
+    private void splitNodeIDs(String stringToSplit) throws IOException {
         String[] splitString = stringToSplit.split("\\n");
         for(String nodeID : splitString) {
-            nodesToConnectTo.put(nodeID, nodeID);
+            String[] splitID = nodeID.split(":");
+            String host = splitID[0];
+            int port = Integer.parseInt(splitID[1]);
+            Socket nodeSocket = new Socket(host, port);
+            NodeRecord newNodeRecord = new NodeRecord(host, port, nodeSocket);
+            TCPReceiverThread receiverThread = new TCPReceiverThread(nodeSocket, this);
+            newNodeRecord.setReceiver(receiverThread);
+            nodeConnections.put(nodeID, newNodeRecord);
         }
     }
 

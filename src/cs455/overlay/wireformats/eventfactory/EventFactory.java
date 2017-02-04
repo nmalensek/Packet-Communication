@@ -81,4 +81,16 @@ public final class EventFactory {
         receiveMessagingNodesList.receiveBytes(marshalledBytes);
         return receiveMessagingNodesList;
     }
+
+    public static final Event<NodeConnection> sendNodeConnection() {
+        NodeConnection sendNodeConnection = new NodeConnection();
+        return sendNodeConnection;
+    }
+
+    public static final Event<NodeConnection> receiveNodeConnection(
+            byte[] marshalledBytes) throws IOException {
+        NodeConnection receiveNodeConnection = new NodeConnection();
+        receiveNodeConnection.receiveBytes(marshalledBytes);
+        return receiveNodeConnection;
+    }
 }

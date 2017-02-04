@@ -4,6 +4,7 @@ import cs455.overlay.node.Node;
 import cs455.overlay.wireformats.Event;
 import cs455.overlay.wireformats.Protocol;
 import cs455.overlay.wireformats.eventfactory.EventFactory;
+import cs455.overlay.wireformats.nodemessages.NodeConnection;
 import cs455.overlay.wireformats.nodemessages.ReceiveDeregisterResponse;
 import cs455.overlay.wireformats.nodemessages.ReceiveMessagingNodesList;
 import cs455.overlay.wireformats.nodemessages.ReceiveRegistryResponse;
@@ -98,6 +99,11 @@ public class TCPReceiverThread extends Thread implements Protocol {
                 Event<ReceiveDeregisterResponse> deregisterResponseEvent =
                         eventFactory.receiveDeregisterResponse(marshalledBytes);
                 node.onEvent(deregisterResponseEvent, communicationSocket);
+                break;
+            case NODE_CONNECTION:
+                Event<NodeConnection> receiveNodeConnectionEvent =
+                        eventFactory.receiveNodeConnection(marshalledBytes);
+                node.onEvent(receiveNodeConnectionEvent, communicationSocket);
                 break;
             default:
                 //error

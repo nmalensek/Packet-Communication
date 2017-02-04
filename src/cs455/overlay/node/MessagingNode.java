@@ -11,8 +11,8 @@ import cs455.overlay.wireformats.eventfactory.EventFactory;
 import java.io.IOException;
 import java.net.Socket;
 import java.net.UnknownHostException;
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class MessagingNode implements Node {
@@ -30,8 +30,7 @@ public class MessagingNode implements Node {
     private TCPServerThread receivingSocket;
     private EventFactory eF = EventFactory.getInstance();
     private byte[] message;
-    private String command;
-    private Map<String, NodeRecord> nodeConnections = new HashMap<>();
+    private Map<String, NodeRecord> nodeConnections = new ConcurrentHashMap<>();
 
     public MessagingNode(String registryHostName, int registryPort) throws IOException {
         this.registryHostName = registryHostName;
@@ -79,23 +78,35 @@ public class MessagingNode implements Node {
             ((ReceiveDeregisterResponse) event).printMessage();
             registrySocket.close();
         } else if (event instanceof ReceiveMessagingNodesList) {
-           splitNodeIDs (((ReceiveMessagingNodesList) event).getNodesToConnectTo());
+           splitNodeIDLines(((ReceiveMessagingNodesList) event).getNodesToConnectTo());
+        } else if (event instanceof NodeConnection) {
+            splitNodeIDs(((NodeConnection) event).getNodeID());
         }
     }
 
-    //TODO finish implementing (connect, store TCPsender/Receiver, and maybe port?)
-    private void splitNodeIDs(String stringToSplit) throws IOException {
-        String[] splitString = stringToSplit.split("\\n");
-        for(String nodeID : splitString) {
-            String[] splitID = nodeID.split(":");
-            String host = splitID[0];
-            int port = Integer.parseInt(splitID[1]);
-            Socket nodeSocket = new Socket(host, port);
-            NodeRecord newNodeRecord = new NodeRecord(host, port, nodeSocket);
-            TCPReceiverThread receiverThread = new TCPReceiverThread(nodeSocket, this);
-            newNodeRecord.setReceiver(receiverThread);
-            nodeConnections.put(nodeID, newNodeRecord);
+    //split by newlines
+    private void splitNodeIDLines(String stringToSplit) throws IOException {
+        String[] splitByNewLine = stringToSplit.split("\\n");
+        for(String nodeID : splitByNewLine) {
+            splitNodeIDs(nodeID);
         }
+    }
+
+    //split by colon, then store new connection details
+    private void splitNodeIDs(String nodeIDLine) throws IOException {
+        String[] splitIDApart = nodeIDLine.split(":");
+        String host = splitIDApart[0];
+        int port = Integer.parseInt(splitIDApart[1]);
+        cacheConnection(host, port, nodeIDLine);
+    }
+
+    //allows nodes to message each other
+    private void cacheConnection(String host, int port, String nodeID) throws IOException {
+        Socket nodeSocket = new Socket(host, port);
+        NodeRecord newNodeRecord = new NodeRecord(host, port, nodeSocket);
+        TCPReceiverThread receiverThread = new TCPReceiverThread(nodeSocket, this);
+        newNodeRecord.setReceiver(receiverThread);
+        nodeConnections.put(nodeID, newNodeRecord);
     }
 
     public void processText(String command) throws IOException {

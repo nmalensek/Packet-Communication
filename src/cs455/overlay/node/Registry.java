@@ -58,6 +58,8 @@ public class Registry implements Node {
             case "setup-overlay":
                 connectionRequirement = numberPortion;
                 verifyConnectionRequirement();
+                setupOverlay();
+                sendMessagingNodesList();
                 break;
             default:
                 System.out.println("Not a valid command.");
@@ -73,8 +75,6 @@ public class Registry implements Node {
     private void verifyConnectionRequirement() {
         if(nodeMap.size() < connectionRequirement) {
             System.out.println("Not enough nodes to fulfill connection requirement, please re-enter.");
-        } else {
-            setupOverlay();
         }
     }
 

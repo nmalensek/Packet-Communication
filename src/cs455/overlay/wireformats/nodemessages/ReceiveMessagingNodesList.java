@@ -16,7 +16,7 @@ public class ReceiveMessagingNodesList implements Protocol, Event<ReceiveMessagi
 
     public ReceiveMessagingNodesList getType() { return this; }
 
-    public void receiveBytes(byte[] marshalledBytes) throws IOException {
+    public ReceiveMessagingNodesList(byte[] marshalledBytes) throws IOException {
         ByteArrayInputStream byteArrayInputStream =
                 new ByteArrayInputStream(marshalledBytes);
         DataInputStream dataInputStream =

@@ -9,6 +9,7 @@ import cs455.overlay.wireformats.nodemessages.*;
 import cs455.overlay.wireformats.eventfactory.EventFactory;
 
 import java.io.IOException;
+import java.net.Inet4Address;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.Map;
@@ -54,7 +55,7 @@ public class MessagingNode implements Node {
 
     private void register() throws IOException {
         SendRegister sendRegister = eF.createRegisterSendEvent().getType();
-        sendRegister.setHostAndPort(registrySocket.getLocalAddress().toString(), randomPort);
+        sendRegister.setHostAndPort(Inet4Address.getLocalHost().getHostAddress(), randomPort);
         message = sendRegister.getBytes();
         registrySender.sendData(message);
     }
@@ -78,35 +79,51 @@ public class MessagingNode implements Node {
             ((ReceiveDeregisterResponse) event).printMessage();
             registrySocket.close();
         } else if (event instanceof ReceiveMessagingNodesList) {
-           splitNodeIDLines(((ReceiveMessagingNodesList) event).getNodesToConnectTo());
+            System.out.println("messaging nodes list received");
+           processMessagingNodesList(((ReceiveMessagingNodesList) event).getNodesToConnectTo());
+            System.out.println("finished processing messaging nodes list");
         } else if (event instanceof NodeConnection) {
-            splitNodeIDs(((NodeConnection) event).getNodeID());
+            processNewConnection(((NodeConnection) event).getNodeID()); //TODO test that this is working properly!
         }
     }
 
-    //split by newlines
-    private void splitNodeIDLines(String stringToSplit) throws IOException {
+    private void processMessagingNodesList(String stringToSplit) throws IOException {
         String[] splitByNewLine = stringToSplit.split("\\n");
         for(String nodeID : splitByNewLine) {
-            splitNodeIDs(nodeID);
+            String[] splitIDApart = nodeID.split(":");
+            String host = splitIDApart[0];
+            int port = Integer.parseInt(splitIDApart[1]);
+            NodeRecord nodeToInform = cacheConnection(host, port, nodeID);
+            tellOtherNodeAboutConnection(nodeToInform);
         }
+        System.out.println("Connected to " + nodeConnections.size() + " nodes");
     }
 
-    //split by colon, then store new connection details
-    private void splitNodeIDs(String nodeIDLine) throws IOException {
+    //splits apart id, stores connection, and ignores returned NodeRecord
+    private void processNewConnection(String nodeIDLine) throws IOException {
         String[] splitIDApart = nodeIDLine.split(":");
         String host = splitIDApart[0];
         int port = Integer.parseInt(splitIDApart[1]);
         cacheConnection(host, port, nodeIDLine);
     }
 
-    //allows nodes to message each other
-    private void cacheConnection(String host, int port, String nodeID) throws IOException {
+    private NodeRecord cacheConnection(String host, int port, String nodeID) throws IOException {
         Socket nodeSocket = new Socket(host, port);
         NodeRecord newNodeRecord = new NodeRecord(host, port, nodeSocket);
         TCPReceiverThread receiverThread = new TCPReceiverThread(nodeSocket, this);
         newNodeRecord.setReceiver(receiverThread);
         nodeConnections.put(nodeID, newNodeRecord);
+        System.out.println(nodeID);
+        return newNodeRecord;
+    }
+
+    private void tellOtherNodeAboutConnection(NodeRecord nodeConnectingTo) throws IOException {
+        NodeConnection nodeConnection = eF.sendNodeConnection().getType();
+        String thisNodeHost = Inet4Address.getLocalHost().getHostAddress();
+        int thisNodePort = randomPort;
+        String thisNodeID = thisNodeHost + ":" + Integer.toString(thisNodePort);
+        nodeConnection.setNodeID(thisNodeID);
+        nodeConnectingTo.getSender().sendData(nodeConnection.getBytes());
     }
 
     public void processText(String command) throws IOException {
@@ -127,8 +144,8 @@ public class MessagingNode implements Node {
         textInputThread.start();
     }
 
-    private void incrementConnectionCount() {
-        numberOfConnections++;
+    private void getConnectionCount() {
+        nodeConnections.size();
     }
 
     private void connectToNode(String host, int port) {

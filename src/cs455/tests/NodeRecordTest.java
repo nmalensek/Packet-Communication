@@ -96,7 +96,8 @@ public class NodeRecordTest {
 
     //TODO check that this is the proper way to check IP addresses, implementing it this way for now
     private void testPrint() throws UnknownHostException {
-        String host = Inet4Address.getLocalHost().toString();
+        String host = Inet4Address.getLocalHost().getHostAddress();
+        System.out.println(host);
         String[] line = host.split("/");
         String ipAddress = line[1];
         System.out.println(ipAddress);
@@ -129,6 +130,7 @@ public class NodeRecordTest {
 //        nodeRecordTest.testNodeRecordModify();
 //        nodeRecordTest.setRandomInts();
 //        nodeRecordTest.testEquals();
-        nodeRecordTest.splitNodeIDs(splitterTest);
+//        nodeRecordTest.splitNodeIDs(splitterTest);
+//        nodeRecordTest.testPrint();
     }
 }

@@ -42,7 +42,7 @@ public class RegistrationReceiver {
             processRegistration(destinationSocket, false,
                     "node already exists at that address.", FAILURE);
             nodeRecord = null;
-        } else if(!host.equals(destinationSocket.getInetAddress().toString())) {
+        } else if(!host.equals(destinationSocket.getInetAddress().getHostAddress())) {
             processRegistration(destinationSocket, false,
                     "IP in message does not match sender\'s IP.", FAILURE);
             nodeRecord = null;

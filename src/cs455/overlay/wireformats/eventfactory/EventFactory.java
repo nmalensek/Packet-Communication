@@ -77,8 +77,7 @@ public final class EventFactory {
 
     public static final Event<ReceiveMessagingNodesList> receiveMessagingNodesList(
             byte[] marshalledBytes) throws IOException {
-        ReceiveMessagingNodesList receiveMessagingNodesList = new ReceiveMessagingNodesList();
-        receiveMessagingNodesList.receiveBytes(marshalledBytes);
+        ReceiveMessagingNodesList receiveMessagingNodesList = new ReceiveMessagingNodesList(marshalledBytes);
         return receiveMessagingNodesList;
     }
 

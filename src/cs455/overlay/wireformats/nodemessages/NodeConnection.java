@@ -18,6 +18,10 @@ public class NodeConnection implements Protocol, Event<NodeConnection> {
 
     public int getMessageType() { return messageType; }
 
+    public void printHello() {
+        System.out.println("Hello from " + getNodeID());
+    }
+
     public NodeConnection getType() { return this; }
 
     //marshalls bytes

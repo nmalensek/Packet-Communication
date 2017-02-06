@@ -13,6 +13,7 @@ public class NodeRecordTest {
 
     private Socket testSocket = new Socket();
     private Integer[] intList = {2, 5, 8, 11};
+
     private NodeRecord[] testNodes = {
             new NodeRecord("localhost", 1234, testSocket),
             new NodeRecord("localhost", 3456, testSocket),

@@ -14,6 +14,10 @@ public class ReceiveMessagingNodesList implements Protocol, Event<ReceiveMessagi
     private String nodesToConnectTo;
     //messaging node info (hostname:portnum)
 
+    public void listConnections() {
+        System.out.println(getNodesToConnectTo());
+    }
+
     public ReceiveMessagingNodesList getType() { return this; }
 
     public ReceiveMessagingNodesList(byte[] marshalledBytes) throws IOException {

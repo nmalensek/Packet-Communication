@@ -45,8 +45,8 @@ public class MessagingNodesList implements Protocol, Event {
     }
 
     public void setMessagingNodes(List<NodeRecord> nodesToConnectTo) {
+        messagingNodes = "";
         for (NodeRecord node : nodesToConnectTo) {
-            messagingNodes = "";
             messagingNodes += node.getNodeID();
             messagingNodes += "\n";
         }

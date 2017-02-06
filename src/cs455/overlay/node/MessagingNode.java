@@ -12,8 +12,8 @@ import java.io.IOException;
 import java.net.Inet4Address;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class MessagingNode implements Node {
@@ -31,7 +31,7 @@ public class MessagingNode implements Node {
     private TCPServerThread receivingSocket;
     private EventFactory eF = EventFactory.getInstance();
     private byte[] message;
-    private Map<String, NodeRecord> nodeConnections = new ConcurrentHashMap<>();
+    private Map<String, NodeRecord> nodeConnections = new HashMap<>();
 
     public MessagingNode(String registryHostName, int registryPort) throws IOException {
         this.registryHostName = registryHostName;
@@ -79,11 +79,11 @@ public class MessagingNode implements Node {
             ((ReceiveDeregisterResponse) event).printMessage();
             registrySocket.close();
         } else if (event instanceof ReceiveMessagingNodesList) {
-            System.out.println("messaging nodes list received");
            processMessagingNodesList(((ReceiveMessagingNodesList) event).getNodesToConnectTo());
-            System.out.println("finished processing messaging nodes list");
         } else if (event instanceof NodeConnection) {
-            processNewConnection(((NodeConnection) event).getNodeID()); //TODO test that this is working properly!
+            processNewConnection(((NodeConnection) event).getNodeID());
+            System.out.println("All connections established. Number of connections: " //TODO Fix, prints after every connection
+                    + nodeConnections.size());
         }
     }
 
@@ -96,7 +96,6 @@ public class MessagingNode implements Node {
             NodeRecord nodeToInform = cacheConnection(host, port, nodeID);
             tellOtherNodeAboutConnection(nodeToInform);
         }
-        System.out.println("Connected to " + nodeConnections.size() + " nodes");
     }
 
     //splits apart id, stores connection, and ignores returned NodeRecord
@@ -113,7 +112,6 @@ public class MessagingNode implements Node {
         TCPReceiverThread receiverThread = new TCPReceiverThread(nodeSocket, this);
         newNodeRecord.setReceiver(receiverThread);
         nodeConnections.put(nodeID, newNodeRecord);
-        System.out.println(nodeID);
         return newNodeRecord;
     }
 
@@ -134,6 +132,9 @@ public class MessagingNode implements Node {
             case "exit-overlay":
                 deregister();
                 break;
+            case "list-connections":
+                printConnections();
+                break;
             default:
                 System.out.println("Not a valid command.");
         }
@@ -142,6 +143,16 @@ public class MessagingNode implements Node {
     private void listenForTextInput() throws IOException {
         TextInputThread textInputThread = new TextInputThread(this);
         textInputThread.start();
+    }
+
+    private void printConnections() {
+        if(nodeConnections.size() == 0) {
+            System.out.println("No connections available, is the overlay set up?");
+        } else{
+            for (String s : nodeConnections.keySet()) {
+                System.out.println(s);
+            }
+        }
     }
 
     private void getConnectionCount() {

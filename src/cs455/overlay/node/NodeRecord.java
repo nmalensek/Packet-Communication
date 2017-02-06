@@ -28,6 +28,10 @@ public class NodeRecord {
         this.sender = new TCPSender(communicationSocket);
     }
 
+    public void resetNumberOfConnections() {
+        numberOfNodeConnections = 0;
+    }
+
     public String getHost() {
         return host;
     }
@@ -76,7 +80,7 @@ public class NodeRecord {
             ports += nodeRecord.getPort();
             ports += ":";
         }
-        System.out.println(ports);
+        System.out.println(ports + numberOfNodeConnections);
     }
 
     @Override

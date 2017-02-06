@@ -1,21 +1,24 @@
-package cs455.overlay.node;
+package cs455.tests;
 
+import cs455.overlay.node.Node;
+import cs455.overlay.node.NodeRecord;
 import cs455.overlay.transport.TCPServerThread;
-import cs455.overlay.wireformats.registrymessages.receiving.DeregistrationReceiver;
 import cs455.overlay.util.OverlayCreator;
-import cs455.overlay.wireformats.registrymessages.receiving.RegistrationReceiver;
 import cs455.overlay.util.TextInputThread;
+import cs455.overlay.wireformats.Event;
+import cs455.overlay.wireformats.registrymessages.receiving.DeregistrationReceiver;
 import cs455.overlay.wireformats.registrymessages.receiving.ReceiveDeregisterRequest;
 import cs455.overlay.wireformats.registrymessages.receiving.ReceiveRegisterRequest;
-import cs455.overlay.wireformats.Event;
+import cs455.overlay.wireformats.registrymessages.receiving.RegistrationReceiver;
 import cs455.overlay.wireformats.registrymessages.sending.MessagingNodesList;
 
 import java.io.IOException;
 import java.net.Socket;
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.HashMap;
+import java.util.Map;
 
-public class Registry implements Node {
+
+public class TestRegistry implements Node {
 
     private static int portNum;
     private Map<String, NodeRecord> nodeMap = new HashMap<>();
@@ -71,9 +74,10 @@ public class Registry implements Node {
             System.out.println(node);
         }
     }
+
     //TODO check for 2 nodes (can only have 1 connection) and 1 node
     private void verifyConnectionRequirement() {
-        if(nodeMap.size() < connectionRequirement) {
+        if (nodeMap.size() < connectionRequirement) {
             System.out.println("Not enough nodes to fulfill connection requirement, please re-enter.");
         }
     }
@@ -123,7 +127,7 @@ public class Registry implements Node {
 
     public static void main(String[] args) throws IOException {
         portNum = Integer.parseInt(args[0]);
-        Registry registry = new Registry();
-        registry.startServer();
+        TestRegistry testRegistry = new TestRegistry();
+        testRegistry.startServer();
     }
 }

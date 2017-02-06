@@ -61,6 +61,7 @@ public class OverlayCreator {
         }
     }
 
+    //TODO if have time, re-implement by taking a list, shuffling the list, and connecting to pre-defined elements in list
     private void connectToRandomNodes(List<String> randomList) {
         wasSuccessful = true;
         attempts = 0;

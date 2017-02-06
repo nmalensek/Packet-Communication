@@ -58,7 +58,7 @@ public class NodeRecord {
 
     public void addNodeToConnectTo(NodeRecord node) { nodesToConnectTo.add(node); }
 
-    public List getNodesToConnectToList() { return nodesToConnectTo; }
+    public List<NodeRecord> getNodesToConnectToList() { return nodesToConnectTo; }
 
     public void printListSize() {
         System.out.println(nodesToConnectTo.size());
@@ -99,5 +99,10 @@ public class NodeRecord {
         int result = host != null ? host.hashCode() : 0;
         result = 31 * result + port;
         return result;
+    }
+
+    @Override
+    public String toString() {
+        return this.getNodeID();
     }
 }

@@ -98,7 +98,7 @@ public class MessagingNode implements Node {
         }
     }
 
-    //splits apart id, stores connection, and ignores returned NodeRecord
+    //splits apart id, stores connection, and ignores returned Vertex
     private void processNewConnection(String nodeIDLine) throws IOException {
         String[] splitIDApart = nodeIDLine.split(":");
         String host = splitIDApart[0];

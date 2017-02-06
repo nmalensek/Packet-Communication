@@ -1,5 +1,6 @@
 package cs455.overlay.node;
 
+import cs455.overlay.dijkstra.Edge;
 import cs455.overlay.transport.TCPServerThread;
 import cs455.overlay.wireformats.registrymessages.receiving.DeregistrationReceiver;
 import cs455.overlay.util.OverlayCreator;
@@ -13,13 +14,13 @@ import cs455.overlay.wireformats.registrymessages.sending.MessagingNodesList;
 import java.io.IOException;
 import java.net.Socket;
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 
 public class Registry implements Node {
 
     private static int portNum;
     private Map<String, NodeRecord> nodeMap = new HashMap<>();
     private int connectionRequirement;
+    private List<Edge> links;
 
     public void startServer() {
         TCPServerThread registryServerThread = new TCPServerThread(this, portNum);
@@ -94,15 +95,31 @@ public class Registry implements Node {
 
     private void sendMessagingNodesList() throws IOException {
         MessagingNodesList messagingNodesList = new MessagingNodesList();
-        for (NodeRecord node : nodeMap.values()) {
+        for (cs455.overlay.node.NodeRecord node : nodeMap.values()) {
             messagingNodesList.setNumberOfPeerMessagingNodes(node.getConnectionsNeededToInitiate());
             messagingNodesList.setMessagingNodes(node.getNodesToConnectToList());
             node.getSender().sendData(messagingNodesList.getBytes());
         }
     }
 
-    public void assignLinkWeights() {
+    private void mapVertices() {
+//        nodes = new ArrayList<>();
+//        for (cs455.overlay.node.NodeRecord node : nodeMap.values()) {
+//            nodes.add(location);
+//        }
+    }
 
+    private void mapLinks() {
+//        links = new ArrayList<>();
+//        for (cs455.overlay.node.NodeRecord node : nodeMap.values()) {
+//            for(cs455.overlay.node.NodeRecord nodeRecord : node.getNodesToConnectToList()) {
+//
+//            }
+//            Edge edge = new Edge()
+//        }
+    }
+
+    public void assignLinkWeights() {
     }
 
     public void initiateTask() {

@@ -1,6 +1,6 @@
 package cs455.overlay.wireformats.registrymessages.sending;
 
-import cs455.overlay.node.NodeRecord;
+import cs455.overlay.dijkstra.Edge;
 import cs455.overlay.wireformats.Event;
 import cs455.overlay.wireformats.Protocol;
 
@@ -10,13 +10,14 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.List;
 
-public class MessagingNodesList implements Protocol, Event<MessagingNodesList> {
+public class LinkWeightsSend implements Protocol, Event<LinkWeightsSend> {
 
-    private int messageType = MESSAGING_NODES_LIST;
-    private int numberOfPeerMessagingNodes; //number of connections node should initiate. then print total connections once done.
-    private String messagingNodes;
+    private int messageType = LINK_WEIGHTS;
+    private int numberOfLinks;
+    private String linkInfo;
+    //link info - hostnameA:portnumA hostnameB:portnumB weight
 
-    public MessagingNodesList getType() {
+    public LinkWeightsSend getType() {
         return this;
     }
 
@@ -28,9 +29,9 @@ public class MessagingNodesList implements Protocol, Event<MessagingNodesList> {
                 new DataOutputStream(new BufferedOutputStream(byteArrayOutputStream));
 
         dataOutputStream.writeInt(messageType);
-        dataOutputStream.writeInt(numberOfPeerMessagingNodes);
+        dataOutputStream.writeInt(numberOfLinks);
 
-        byte[] identifierBytes = messagingNodes.getBytes();
+        byte[] identifierBytes = linkInfo.getBytes();
         int elementLength = identifierBytes.length;
         dataOutputStream.writeInt(elementLength);
         dataOutputStream.write(identifierBytes);
@@ -44,15 +45,19 @@ public class MessagingNodesList implements Protocol, Event<MessagingNodesList> {
         return marshalledBytes;
     }
 
-    public void setMessagingNodes(List<NodeRecord> nodesToConnectTo) {
-        messagingNodes = "";
-        for (NodeRecord node : nodesToConnectTo) {
-            messagingNodes += node.getNodeID();
-            messagingNodes += "\n";
+    public void setMessagingNodes(List<Edge> linkList) {
+        linkInfo = "";
+        for (Edge edge : linkList) {
+            linkInfo += edge.getSource().getNodeID();
+            linkInfo += " ";
+            linkInfo += edge.getDestination().getNodeID();
+            linkInfo += " ";
+            linkInfo += edge.getWeight();
+            linkInfo += "\n";
         }
     }
 
-    public void setNumberOfPeerMessagingNodes(int nodes) {
-        numberOfPeerMessagingNodes = nodes;
+    public void setNumberOfLinks(int numberOfLinks) {
+        this.numberOfLinks = numberOfLinks;
     }
 }

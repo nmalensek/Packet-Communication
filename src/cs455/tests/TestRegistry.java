@@ -7,8 +7,8 @@ import cs455.overlay.util.OverlayCreator;
 import cs455.overlay.util.TextInputThread;
 import cs455.overlay.wireformats.Event;
 import cs455.overlay.wireformats.registrymessages.receiving.DeregistrationReceiver;
-import cs455.overlay.wireformats.registrymessages.receiving.ReceiveDeregisterRequest;
-import cs455.overlay.wireformats.registrymessages.receiving.ReceiveRegisterRequest;
+import cs455.overlay.wireformats.registrymessages.receiving.DeregisterRequestReceive;
+import cs455.overlay.wireformats.registrymessages.receiving.RegisterRequestReceive;
 import cs455.overlay.wireformats.registrymessages.receiving.RegistrationReceiver;
 import cs455.overlay.wireformats.registrymessages.sending.MessagingNodesList;
 
@@ -32,13 +32,13 @@ public class TestRegistry implements Node {
     }
 
     public void onEvent(Event event, Socket destinationSocket) throws IOException {
-        if (event instanceof ReceiveRegisterRequest) {
+        if (event instanceof RegisterRequestReceive) {
             RegistrationReceiver receiver = new RegistrationReceiver(
-                    ((ReceiveRegisterRequest) event), nodeMap, destinationSocket);
+                    ((RegisterRequestReceive) event), nodeMap, destinationSocket);
             receiver.checkRegistration();
-        } else if (event instanceof ReceiveDeregisterRequest) {
+        } else if (event instanceof DeregisterRequestReceive) {
             DeregistrationReceiver deregistrationReceiver = new DeregistrationReceiver(
-                    ((ReceiveDeregisterRequest) event), nodeMap, destinationSocket);
+                    ((DeregisterRequestReceive) event), nodeMap, destinationSocket);
             deregistrationReceiver.checkDeRegistration();
         }
     }

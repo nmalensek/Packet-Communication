@@ -3,7 +3,7 @@ package cs455.overlay.wireformats.registrymessages.receiving;
 import cs455.overlay.node.NodeRecord;
 import cs455.overlay.transport.TCPSender;
 import cs455.overlay.wireformats.Event;
-import cs455.overlay.wireformats.registrymessages.sending.RespondToRegisterRequest;
+import cs455.overlay.wireformats.registrymessages.sending.RegisterRequestResponse;
 import cs455.overlay.wireformats.eventfactory.EventFactory;
 
 import java.io.IOException;
@@ -12,7 +12,7 @@ import java.net.SocketException;
 import java.util.Map;
 
 public class RegistrationReceiver {
-    private Event<ReceiveRegisterRequest> event;
+    private Event<RegisterRequestReceive> event;
     private Map<String, NodeRecord> nodeMap;
     private Socket destinationSocket;
     private String host;
@@ -24,15 +24,15 @@ public class RegistrationReceiver {
     private byte FAILURE = 0;
     private String key;
 
-    public RegistrationReceiver(Event<ReceiveRegisterRequest> event,
+    public RegistrationReceiver(Event<RegisterRequestReceive> event,
                                 Map<String, NodeRecord> nodeMap,
                                 Socket destinationSocket) throws IOException {
         this.event = event;
         this.nodeMap = nodeMap;
         this.destinationSocket = destinationSocket;
 
-        host = ((ReceiveRegisterRequest) event).getIdentifier();
-        port = ((ReceiveRegisterRequest) event).getPortNumber();
+        host = ((RegisterRequestReceive) event).getIdentifier();
+        port = ((RegisterRequestReceive) event).getPortNumber();
         key = host + ":" + port;
         nodeRecord = new NodeRecord(host, port, destinationSocket);
     }
@@ -61,11 +61,11 @@ public class RegistrationReceiver {
 
     public void processRegistration(Socket nodeThatRegistered, boolean isSuccessfulConnection,
                                     String error, byte successOrFailure) throws IOException, SocketException {
-        RespondToRegisterRequest respondToRegisterRequest = eventFactory.createRegisterResponseEvent().getType();
-        respondToRegisterRequest.setAdditionalInfo(registerResponseAdditionalInfo(isSuccessfulConnection, error));
-        respondToRegisterRequest.setSuccessOrFailure(successOrFailure);
+        RegisterRequestResponse registerRequestResponse = eventFactory.createRegisterResponseEvent().getType();
+        registerRequestResponse.setAdditionalInfo(registerResponseAdditionalInfo(isSuccessfulConnection, error));
+        registerRequestResponse.setSuccessOrFailure(successOrFailure);
         TCPSender replySender = nodeRecord.getSender();
-        replySender.sendData(respondToRegisterRequest.getBytes());
+        replySender.sendData(registerRequestResponse.getBytes());
     }
 
     private String registerResponseAdditionalInfo(boolean successfulConnection, String errorMessage) {

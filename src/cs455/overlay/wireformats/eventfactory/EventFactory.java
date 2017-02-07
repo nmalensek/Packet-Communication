@@ -2,10 +2,15 @@ package cs455.overlay.wireformats.eventfactory;
 
 import cs455.overlay.wireformats.Event;
 import cs455.overlay.wireformats.nodemessages.*;
+import cs455.overlay.wireformats.nodemessages.Receiving.DeregisterResponseReceive;
+import cs455.overlay.wireformats.nodemessages.Receiving.MessagingNodesListReceive;
+import cs455.overlay.wireformats.nodemessages.Receiving.RegistryResponseReceive;
+import cs455.overlay.wireformats.nodemessages.Sending.Deregister;
+import cs455.overlay.wireformats.nodemessages.Sending.SendRegister;
 import cs455.overlay.wireformats.registrymessages.sending.DeregistrationResponse;
-import cs455.overlay.wireformats.registrymessages.receiving.ReceiveDeregisterRequest;
-import cs455.overlay.wireformats.registrymessages.receiving.ReceiveRegisterRequest;
-import cs455.overlay.wireformats.registrymessages.sending.RespondToRegisterRequest;
+import cs455.overlay.wireformats.registrymessages.receiving.DeregisterRequestReceive;
+import cs455.overlay.wireformats.registrymessages.receiving.RegisterRequestReceive;
+import cs455.overlay.wireformats.registrymessages.sending.RegisterRequestResponse;
 
 import java.io.IOException;
 import java.net.Socket;
@@ -35,20 +40,20 @@ public final class EventFactory {
         return sendRegister;
     }
 
-    public static final Event<ReceiveRegisterRequest> receiveRegisterEvent(
+    public static final Event<RegisterRequestReceive> receiveRegisterEvent(
             byte[] marshalledBytes) throws IOException {
-        ReceiveRegisterRequest receiveRegisterRequest = new ReceiveRegisterRequest(marshalledBytes);
-        return receiveRegisterRequest;
+        RegisterRequestReceive registerRequestReceive = new RegisterRequestReceive(marshalledBytes);
+        return registerRequestReceive;
     }
 
-    public static final Event<RespondToRegisterRequest> createRegisterResponseEvent() {
-        RespondToRegisterRequest respondToRegisterRequest = new RespondToRegisterRequest();
-        return respondToRegisterRequest;
+    public static final Event<RegisterRequestResponse> createRegisterResponseEvent() {
+        RegisterRequestResponse registerRequestResponse = new RegisterRequestResponse();
+        return registerRequestResponse;
     }
 
-    public static final Event<ReceiveRegistryResponse> receiveRegisterResponseEvent(
+    public static final Event<RegistryResponseReceive> receiveRegisterResponseEvent(
             byte[] marshalledBytes) throws IOException {
-        ReceiveRegistryResponse registerResponse = new ReceiveRegistryResponse(marshalledBytes);
+        RegistryResponseReceive registerResponse = new RegistryResponseReceive(marshalledBytes);
         return registerResponse;
     }
 
@@ -57,11 +62,11 @@ public final class EventFactory {
         return sendDeregister;
     }
 
-    public static final Event<ReceiveDeregisterRequest> receiveDeregistrationEvent(
+    public static final Event<DeregisterRequestReceive> receiveDeregistrationEvent(
             byte[] marshalledBytes) throws IOException {
-        ReceiveDeregisterRequest receiveDeregisterRequest =
-                new ReceiveDeregisterRequest(marshalledBytes);
-        return receiveDeregisterRequest;
+        DeregisterRequestReceive deregisterRequestReceive =
+                new DeregisterRequestReceive(marshalledBytes);
+        return deregisterRequestReceive;
     }
 
     public static final Event<DeregistrationResponse> sendDeregistrationResponse() {
@@ -69,16 +74,16 @@ public final class EventFactory {
         return deregistrationResponse;
     }
 
-    public static final Event<ReceiveDeregisterResponse> receiveDeregisterResponse(
+    public static final Event<DeregisterResponseReceive> receiveDeregisterResponse(
             byte[] marshalledBytes) throws IOException {
-        ReceiveDeregisterResponse deregisterResponse = new ReceiveDeregisterResponse(marshalledBytes);
+        DeregisterResponseReceive deregisterResponse = new DeregisterResponseReceive(marshalledBytes);
         return deregisterResponse;
     }
 
-    public static final Event<ReceiveMessagingNodesList> receiveMessagingNodesList(
+    public static final Event<MessagingNodesListReceive> receiveMessagingNodesList(
             byte[] marshalledBytes) throws IOException {
-        ReceiveMessagingNodesList receiveMessagingNodesList = new ReceiveMessagingNodesList(marshalledBytes);
-        return receiveMessagingNodesList;
+        MessagingNodesListReceive messagingNodesListReceive = new MessagingNodesListReceive(marshalledBytes);
+        return messagingNodesListReceive;
     }
 
     public static final Event<NodeConnection> sendNodeConnection() {

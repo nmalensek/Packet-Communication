@@ -5,13 +5,13 @@ import cs455.overlay.wireformats.Protocol;
 
 import java.io.*;
 
-public class ReceiveRegisterRequest implements Protocol, Event<ReceiveRegisterRequest> {
+public class RegisterRequestReceive implements Protocol, Event<RegisterRequestReceive> {
 
     private int messageType;
     private int portNumber;
     private String identifier;
 
-    public ReceiveRegisterRequest(byte[] marshalledBytes) throws IOException {
+    public RegisterRequestReceive(byte[] marshalledBytes) throws IOException {
         ByteArrayInputStream byteArrayInputStream =
                 new ByteArrayInputStream(marshalledBytes);
         DataInputStream dataInputStream =
@@ -30,7 +30,7 @@ public class ReceiveRegisterRequest implements Protocol, Event<ReceiveRegisterRe
         dataInputStream.close();
     }
 
-    public ReceiveRegisterRequest getType() {
+    public RegisterRequestReceive getType() {
         return this;
     }
 

@@ -8,13 +8,13 @@ import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
 import java.io.IOException;
 
-public class ReceiveDeregisterRequest implements Protocol, Event<ReceiveDeregisterRequest> {
+public class DeregisterRequestReceive implements Protocol, Event<DeregisterRequestReceive> {
 
     private int messageType;
     private int portNumber;
     private String identifier;
 
-    public ReceiveDeregisterRequest(byte[] marshalledBytes) throws IOException {
+    public DeregisterRequestReceive(byte[] marshalledBytes) throws IOException {
         ByteArrayInputStream byteArrayInputStream =
                 new ByteArrayInputStream(marshalledBytes);
         DataInputStream dataInputStream =
@@ -33,7 +33,7 @@ public class ReceiveDeregisterRequest implements Protocol, Event<ReceiveDeregist
         dataInputStream.close();
     }
 
-    public ReceiveDeregisterRequest getType() {
+    public DeregisterRequestReceive getType() {
         return this;
     }
 

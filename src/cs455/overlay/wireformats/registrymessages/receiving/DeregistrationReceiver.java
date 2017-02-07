@@ -11,7 +11,7 @@ import java.net.Socket;
 import java.util.Map;
 
 public class DeregistrationReceiver {
-    private Event<ReceiveDeregisterRequest> event;
+    private Event<DeregisterRequestReceive> event;
     private Map<String, NodeRecord> nodeMap;
     private Socket destinationSocket;
     private String deregisteringHost;
@@ -22,15 +22,15 @@ public class DeregistrationReceiver {
     private byte SUCCESS = 1;
     private byte FAILURE = 0;
 
-    public DeregistrationReceiver(Event<ReceiveDeregisterRequest> event,
+    public DeregistrationReceiver(Event<DeregisterRequestReceive> event,
                                 Map<String, NodeRecord> nodeMap,
                                 Socket destinationSocket) {
         this.event = event;
         this.nodeMap = nodeMap;
         this.destinationSocket = destinationSocket;
 
-        deregisteringHost = ((ReceiveDeregisterRequest) event).getIdentifier();
-        deregisteringPort = ((ReceiveDeregisterRequest) event).getPortNumber();
+        deregisteringHost = ((DeregisterRequestReceive) event).getIdentifier();
+        deregisteringPort = ((DeregisterRequestReceive) event).getPortNumber();
         key = deregisteringHost + ":" + deregisteringPort;
     }
 

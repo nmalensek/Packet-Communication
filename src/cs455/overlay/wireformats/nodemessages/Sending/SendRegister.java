@@ -1,4 +1,4 @@
-package cs455.overlay.wireformats.nodemessages;
+package cs455.overlay.wireformats.nodemessages.Sending;
 
 import cs455.overlay.wireformats.Event;
 import cs455.overlay.wireformats.Protocol;

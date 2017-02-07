@@ -5,11 +5,11 @@ import cs455.overlay.wireformats.Event;
 import cs455.overlay.wireformats.Protocol;
 import cs455.overlay.wireformats.eventfactory.EventFactory;
 import cs455.overlay.wireformats.nodemessages.NodeConnection;
-import cs455.overlay.wireformats.nodemessages.ReceiveDeregisterResponse;
-import cs455.overlay.wireformats.nodemessages.ReceiveMessagingNodesList;
-import cs455.overlay.wireformats.nodemessages.ReceiveRegistryResponse;
-import cs455.overlay.wireformats.registrymessages.receiving.ReceiveDeregisterRequest;
-import cs455.overlay.wireformats.registrymessages.receiving.ReceiveRegisterRequest;
+import cs455.overlay.wireformats.nodemessages.Receiving.DeregisterResponseReceive;
+import cs455.overlay.wireformats.nodemessages.Receiving.MessagingNodesListReceive;
+import cs455.overlay.wireformats.nodemessages.Receiving.RegistryResponseReceive;
+import cs455.overlay.wireformats.registrymessages.receiving.DeregisterRequestReceive;
+import cs455.overlay.wireformats.registrymessages.receiving.RegisterRequestReceive;
 
 import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
@@ -63,22 +63,22 @@ public class TCPReceiverThread extends Thread implements Protocol {
 
         switch (messageType) {
             case DEREGISTER_REQUEST:
-                Event<ReceiveDeregisterRequest> receiveDeregisterRequestEvent =
+                Event<DeregisterRequestReceive> receiveDeregisterRequestEvent =
                         eventFactory.receiveDeregistrationEvent(marshalledBytes);
                 node.onEvent(receiveDeregisterRequestEvent, communicationSocket);
                 break;
             case REGISTER_REQUEST:
-                Event<ReceiveRegisterRequest> registerReceiveEvent =
+                Event<RegisterRequestReceive> registerReceiveEvent =
                         eventFactory.receiveRegisterEvent(marshalledBytes);
                 node.onEvent(registerReceiveEvent, communicationSocket);
                 break;
             case REGISTER_RESPONSE:
-                Event<ReceiveRegistryResponse> registerResponseEvent =
+                Event<RegistryResponseReceive> registerResponseEvent =
                         eventFactory.receiveRegisterResponseEvent(marshalledBytes);
                 node.onEvent(registerResponseEvent, communicationSocket);
                 break;
             case MESSAGING_NODES_LIST:
-                Event<ReceiveMessagingNodesList> receiveMessagingNodesListEvent =
+                Event<MessagingNodesListReceive> receiveMessagingNodesListEvent =
                         eventFactory.receiveMessagingNodesList(marshalledBytes);
                 node.onEvent(receiveMessagingNodesListEvent, communicationSocket);
                 break;
@@ -96,7 +96,7 @@ public class TCPReceiverThread extends Thread implements Protocol {
                 //do something else
                 break;
             case DEREGISTER_RESPONSE:
-                Event<ReceiveDeregisterResponse> deregisterResponseEvent =
+                Event<DeregisterResponseReceive> deregisterResponseEvent =
                         eventFactory.receiveDeregisterResponse(marshalledBytes);
                 node.onEvent(deregisterResponseEvent, communicationSocket);
                 break;

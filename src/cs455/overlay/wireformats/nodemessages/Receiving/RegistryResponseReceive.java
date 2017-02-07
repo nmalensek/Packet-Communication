@@ -1,4 +1,4 @@
-package cs455.overlay.wireformats.nodemessages;
+package cs455.overlay.wireformats.nodemessages.Receiving;
 
 
 import cs455.overlay.wireformats.Event;
@@ -9,12 +9,12 @@ import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
 import java.io.IOException;
 
-public class ReceiveRegistryResponse implements Protocol, Event {
+public class RegistryResponseReceive implements Protocol, Event {
     private int messageType;
     private String additionalInfo;
     private byte registrationStatus;
 
-    public ReceiveRegistryResponse(byte[] marshalledBytes) throws IOException {
+    public RegistryResponseReceive(byte[] marshalledBytes) throws IOException {
         ByteArrayInputStream byteArrayInputStream =
                 new ByteArrayInputStream(marshalledBytes);
         DataInputStream dataInputStream =

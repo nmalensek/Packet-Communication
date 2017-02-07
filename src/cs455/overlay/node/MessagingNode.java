@@ -7,6 +7,11 @@ import cs455.overlay.util.TextInputThread;
 import cs455.overlay.wireformats.Event;
 import cs455.overlay.wireformats.nodemessages.*;
 import cs455.overlay.wireformats.eventfactory.EventFactory;
+import cs455.overlay.wireformats.nodemessages.Receiving.DeregisterResponseReceive;
+import cs455.overlay.wireformats.nodemessages.Receiving.MessagingNodesListReceive;
+import cs455.overlay.wireformats.nodemessages.Receiving.RegistryResponseReceive;
+import cs455.overlay.wireformats.nodemessages.Sending.Deregister;
+import cs455.overlay.wireformats.nodemessages.Sending.SendRegister;
 
 import java.io.IOException;
 import java.net.Inet4Address;
@@ -73,13 +78,13 @@ public class MessagingNode implements Node {
     }
 
     public void onEvent(Event event, Socket destinationSocket) throws IOException {
-        if (event instanceof ReceiveRegistryResponse) {
-            ((ReceiveRegistryResponse) event).printMessage();
-        } else if (event instanceof ReceiveDeregisterResponse) {
-            ((ReceiveDeregisterResponse) event).printMessage();
+        if (event instanceof RegistryResponseReceive) {
+            ((RegistryResponseReceive) event).printMessage();
+        } else if (event instanceof DeregisterResponseReceive) {
+            ((DeregisterResponseReceive) event).printMessage();
             registrySocket.close();
-        } else if (event instanceof ReceiveMessagingNodesList) {
-           processMessagingNodesList(((ReceiveMessagingNodesList) event).getNodesToConnectTo());
+        } else if (event instanceof MessagingNodesListReceive) {
+           processMessagingNodesList(((MessagingNodesListReceive) event).getNodesToConnectTo());
         } else if (event instanceof NodeConnection) {
             processNewConnection(((NodeConnection) event).getNodeID());
             if (nodeConnections.size() == 4) {

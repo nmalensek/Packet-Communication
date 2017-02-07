@@ -1,29 +1,19 @@
-package cs455.overlay.wireformats.nodemessages;
+package cs455.overlay.wireformats.registrymessages.sending;
 
 import cs455.overlay.wireformats.Event;
 import cs455.overlay.wireformats.Protocol;
 
-import java.io.BufferedOutputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
+import java.io.*;
 
-public class Deregister implements Protocol, Event<Deregister> {
+public class RegisterRequestResponse implements Protocol, Event {
 
-    private int messageType = DEREGISTER_REQUEST;
-    private int portNumber;
-    private String ipAddress;
+    private int messageType = REGISTER_RESPONSE;
+    private byte successOrFailure;
+    private String additionalInfo;
 
-    public void setHostAndPort(String host, int port) {
-        this.ipAddress = host;
-        this.portNumber = port;
+    public RegisterRequestResponse getType() {
+        return this;
     }
-
-    public int getMessageType() {
-        return messageType;
-    }
-
-    public Deregister getType() { return this; }
 
     //marshalls bytes
     public byte[] getBytes() throws IOException {
@@ -32,10 +22,10 @@ public class Deregister implements Protocol, Event<Deregister> {
         DataOutputStream dataOutputStream =
                 new DataOutputStream(new BufferedOutputStream(byteArrayOutputStream));
 
-        dataOutputStream.writeInt(getMessageType());
-        dataOutputStream.writeInt(portNumber);
+        dataOutputStream.writeInt(messageType);
+        dataOutputStream.writeByte(successOrFailure);
 
-        byte[] identifierBytes = ipAddress.getBytes();
+        byte[] identifierBytes = additionalInfo.getBytes();
         int elementLength = identifierBytes.length;
         dataOutputStream.writeInt(elementLength);
         dataOutputStream.write(identifierBytes);
@@ -48,5 +38,13 @@ public class Deregister implements Protocol, Event<Deregister> {
 
         return marshalledBytes;
     }
+
+    public void setAdditionalInfo(String info) {
+        additionalInfo = info;
+    }
+    public void printAdditionalInfo() {
+        System.out.println(additionalInfo);
+    }
+    public void setSuccessOrFailure(byte sOrF) { successOrFailure = sOrF; }
 
 }

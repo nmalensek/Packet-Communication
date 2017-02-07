@@ -4,6 +4,10 @@ import cs455.overlay.node.NodeRecord;
 
 import java.util.*;
 
+/**
+ * code adapted from http://www.vogella.com/tutorials/JavaAlgorithmsDijkstra/article.html
+ */
+
 public class ShortestPath {
     private final List<NodeRecord> nodes;
     private final List<Edge> edges;

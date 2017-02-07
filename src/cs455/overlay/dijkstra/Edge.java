@@ -2,6 +2,10 @@ package cs455.overlay.dijkstra;
 
 import cs455.overlay.node.NodeRecord;
 
+/**
+ * code adapted from http://www.vogella.com/tutorials/JavaAlgorithmsDijkstra/article.html
+ */
+
 public class Edge {
     private final String id;
     private final NodeRecord source;

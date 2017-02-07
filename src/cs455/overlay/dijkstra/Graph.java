@@ -4,6 +4,10 @@ import cs455.overlay.node.NodeRecord;
 
 import java.util.List;
 
+/**
+ * code adapted from http://www.vogella.com/tutorials/JavaAlgorithmsDijkstra/article.html
+ */
+
 public class Graph {
     private final List<NodeRecord> vertices;
     private final List<Edge> edges;

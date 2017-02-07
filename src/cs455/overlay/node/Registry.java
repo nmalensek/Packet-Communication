@@ -14,6 +14,7 @@ import cs455.overlay.wireformats.registrymessages.sending.MessagingNodesList;
 import java.io.IOException;
 import java.net.Socket;
 import java.util.*;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class Registry implements Node {
 
@@ -21,6 +22,8 @@ public class Registry implements Node {
     private Map<String, NodeRecord> nodeMap = new HashMap<>();
     private int connectionRequirement;
     private List<Edge> links;
+    private boolean overlayEstablished = false;
+    private boolean linkWeightsSent = false;
 
     public void startServer() {
         TCPServerThread registryServerThread = new TCPServerThread(this, portNum);
@@ -60,7 +63,28 @@ public class Registry implements Node {
                 connectionRequirement = numberPortion;
                 verifyConnectionRequirement();
                 setupOverlay();
+                mapLinksAndAssignWeights();
                 sendMessagingNodesList();
+                overlayEstablished = true;
+                break;
+            case "list-weights":
+                if(overlayEstablished) {
+                    listWeights();
+                } else {
+                    System.out.println("Overlay hasn\'t been successfully set up yet, " +
+                            "please set up the overlay.");
+                }
+                break;
+            case "send-overlay-link-weights":
+                if(!linkWeightsSent && overlayEstablished) {
+                    //send link weights
+                    linkWeightsSent = true;
+                } else if (!linkWeightsSent && !overlayEstablished){
+                    System.out.println("Overlay hasn\'t been successfully set up yet, " +
+                            "please set up the overlay first.");
+                } else if (linkWeightsSent) {
+                    System.out.println("Link weights have already been sent.");
+                }
                 break;
             default:
                 System.out.println("Not a valid command.");
@@ -72,9 +96,10 @@ public class Registry implements Node {
             System.out.println(node);
         }
     }
-    //TODO check for 2 nodes (can only have 1 connection) and 1 node
+
+    //TODO check for 2 nodes (can only have 1 connection)
     private void verifyConnectionRequirement() {
-        if(nodeMap.size() < connectionRequirement) {
+        if (nodeMap.size() < connectionRequirement || nodeMap.size() == 1) {
             System.out.println("Not enough nodes to fulfill connection requirement, please re-enter.");
         }
     }
@@ -102,32 +127,29 @@ public class Registry implements Node {
         }
     }
 
-    private void mapVertices() {
-//        nodes = new ArrayList<>();
-//        for (cs455.overlay.node.NodeRecord node : nodeMap.values()) {
-//            nodes.add(location);
-//        }
-    }
-
-    private void mapLinks() {
-//        links = new ArrayList<>();
-//        for (cs455.overlay.node.NodeRecord node : nodeMap.values()) {
-//            for(cs455.overlay.node.NodeRecord nodeRecord : node.getNodesToConnectToList()) {
-//
-//            }
-//            Edge edge = new Edge()
-//        }
-    }
-
-    public void assignLinkWeights() {
+    private void mapLinksAndAssignWeights() {
+        links = new ArrayList<>();
+        for (NodeRecord source : nodeMap.values()) {
+            for (NodeRecord destination : source.getNodesToConnectToList()) {
+                int weight = ThreadLocalRandom.current().nextInt(1, 11);
+                Edge edge = new Edge(source.getNodeID() + destination.getNodeID(),
+                        source, destination, weight);
+                Edge reverseEdge = new Edge(destination.getNodeID() + source.getNodeID(),
+                        destination, source, weight);
+                links.add(edge);
+                links.add(reverseEdge);
+            }
+        }
     }
 
     public void initiateTask() {
 
     }
 
-    public void listWeights() {
-
+    private void listWeights() {
+        for (Edge link : links) {
+            System.out.println(link);
+        }
     }
 
     public void sendOverlayLinkWeights() {

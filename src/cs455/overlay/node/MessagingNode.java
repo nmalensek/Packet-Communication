@@ -82,8 +82,10 @@ public class MessagingNode implements Node {
            processMessagingNodesList(((ReceiveMessagingNodesList) event).getNodesToConnectTo());
         } else if (event instanceof NodeConnection) {
             processNewConnection(((NodeConnection) event).getNodeID());
-            System.out.println("All connections established. Number of connections: " //TODO Fix, prints after every connection
-                    + nodeConnections.size());
+            if (nodeConnections.size() == 4) {
+                System.out.println("All connections established. Number of connections: "
+                        + nodeConnections.size());
+            }
         }
     }
 

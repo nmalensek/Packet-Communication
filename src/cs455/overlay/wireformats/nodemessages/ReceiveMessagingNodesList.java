@@ -18,6 +18,8 @@ public class ReceiveMessagingNodesList implements Protocol, Event<ReceiveMessagi
         System.out.println(getNodesToConnectTo());
     }
 
+    public int getNumberOfPeerMessagingNodes() {return numberOfPeerMessagingNodes;}
+
     public ReceiveMessagingNodesList getType() { return this; }
 
     public ReceiveMessagingNodesList(byte[] marshalledBytes) throws IOException {

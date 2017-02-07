@@ -13,7 +13,7 @@ import java.util.List;
 public class MessagingNodesList implements Protocol, Event {
 
     private int messageType = MESSAGING_NODES_LIST;
-    private int numberOfPeerMessagingNodes; //this number of connections node should initiate. then print total connections once done.
+    private int numberOfPeerMessagingNodes; //number of connections node should initiate. then print total connections once done.
     private String messagingNodes;
 
     public MessagingNodesList getType() {

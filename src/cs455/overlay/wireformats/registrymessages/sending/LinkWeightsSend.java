@@ -48,9 +48,9 @@ public class LinkWeightsSend implements Protocol, Event<LinkWeightsSend> {
     public void setMessagingNodes(List<Edge> linkList) {
         linkInfo = "";
         for (Edge edge : linkList) {
-            linkInfo += edge.getSource().getNodeID();
+            linkInfo += edge.getSource().getId();
             linkInfo += " ";
-            linkInfo += edge.getDestination().getNodeID();
+            linkInfo += edge.getDestination().getId();
             linkInfo += " ";
             linkInfo += edge.getWeight();
             linkInfo += "\n";

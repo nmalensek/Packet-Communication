@@ -1,6 +1,6 @@
 package cs455.overlay.dijkstra;
 
-import cs455.overlay.node.NodeRecord;
+import java.lang.String;
 
 /**
  * code adapted from http://www.vogella.com/tutorials/JavaAlgorithmsDijkstra/article.html
@@ -8,11 +8,11 @@ import cs455.overlay.node.NodeRecord;
 
 public class Edge {
     private final String id;
-    private final NodeRecord source;
-    private final NodeRecord destination;
+    private final Vertex source;
+    private final Vertex destination;
     private final int weight;
 
-    public Edge(String id, NodeRecord source, NodeRecord destination, int weight) {
+    public Edge(String id, Vertex source, Vertex destination, int weight) {
         this.id = id;
         this.source = source;
         this.destination = destination;
@@ -23,11 +23,11 @@ public class Edge {
         return id;
     }
 
-    public NodeRecord getSource() {
+    public Vertex getSource() {
         return source;
     }
 
-    public NodeRecord getDestination() {
+    public Vertex getDestination() {
         return destination;
     }
 
@@ -37,7 +37,7 @@ public class Edge {
 
     @Override
     public String toString() {
-        return source.getNodeID() + " "
-                + destination.getNodeID() + " " + weight;
+        return source + " "
+                + destination + " " + weight;
     }
 }

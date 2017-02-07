@@ -3,6 +3,7 @@ package cs455.overlay.wireformats.eventfactory;
 import cs455.overlay.wireformats.Event;
 import cs455.overlay.wireformats.nodemessages.*;
 import cs455.overlay.wireformats.nodemessages.Receiving.DeregisterResponseReceive;
+import cs455.overlay.wireformats.nodemessages.Receiving.LinkWeightsReceive;
 import cs455.overlay.wireformats.nodemessages.Receiving.MessagingNodesListReceive;
 import cs455.overlay.wireformats.nodemessages.Receiving.RegistryResponseReceive;
 import cs455.overlay.wireformats.nodemessages.Sending.Deregister;
@@ -96,5 +97,11 @@ public final class EventFactory {
         NodeConnection receiveNodeConnection = new NodeConnection();
         receiveNodeConnection.receiveBytes(marshalledBytes);
         return receiveNodeConnection;
+    }
+
+    public static final Event<LinkWeightsReceive> receiveLinkWeights(
+            byte[] marshalledBytes) throws IOException {
+        LinkWeightsReceive linkWeightsReceive = new LinkWeightsReceive(marshalledBytes);
+        return linkWeightsReceive;
     }
 }

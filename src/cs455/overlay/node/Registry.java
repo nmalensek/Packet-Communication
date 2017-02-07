@@ -1,6 +1,7 @@
 package cs455.overlay.node;
 
 import cs455.overlay.dijkstra.Edge;
+import cs455.overlay.dijkstra.Vertex;
 import cs455.overlay.transport.TCPServerThread;
 import cs455.overlay.wireformats.registrymessages.receiving.DeregistrationReceiver;
 import cs455.overlay.util.OverlayCreator;
@@ -9,6 +10,7 @@ import cs455.overlay.util.TextInputThread;
 import cs455.overlay.wireformats.registrymessages.receiving.DeregisterRequestReceive;
 import cs455.overlay.wireformats.registrymessages.receiving.RegisterRequestReceive;
 import cs455.overlay.wireformats.Event;
+import cs455.overlay.wireformats.registrymessages.sending.LinkWeightsSend;
 import cs455.overlay.wireformats.registrymessages.sending.MessagingNodesList;
 
 import java.io.IOException;
@@ -77,7 +79,7 @@ public class Registry implements Node {
                 break;
             case "send-overlay-link-weights":
                 if(!linkWeightsSent && overlayEstablished) {
-                    //send link weights
+                    sendOverlayLinkWeights();
                     linkWeightsSent = true;
                 } else if (!linkWeightsSent && !overlayEstablished){
                     System.out.println("Overlay hasn\'t been successfully set up yet, " +
@@ -120,7 +122,7 @@ public class Registry implements Node {
 
     private void sendMessagingNodesList() throws IOException {
         MessagingNodesList messagingNodesList = new MessagingNodesList();
-        for (cs455.overlay.node.NodeRecord node : nodeMap.values()) {
+        for (NodeRecord node : nodeMap.values()) {
             messagingNodesList.setNumberOfPeerMessagingNodes(node.getConnectionsNeededToInitiate());
             messagingNodesList.setMessagingNodes(node.getNodesToConnectToList());
             node.getSender().sendData(messagingNodesList.getBytes());
@@ -132,10 +134,12 @@ public class Registry implements Node {
         for (NodeRecord source : nodeMap.values()) {
             for (NodeRecord destination : source.getNodesToConnectToList()) {
                 int weight = ThreadLocalRandom.current().nextInt(1, 11);
-                Edge edge = new Edge(source.getNodeID() + destination.getNodeID(),
-                        source, destination, weight);
-                Edge reverseEdge = new Edge(destination.getNodeID() + source.getNodeID(),
-                        destination, source, weight);
+                Vertex start = new Vertex(source.getNodeID());
+                Vertex end = new Vertex(destination.getNodeID());
+                Edge edge = new Edge(start.getId() + end.getId(),
+                        start, end, weight);
+                Edge reverseEdge = new Edge(end.getId() + start.getId(),
+                        end, start, weight);
                 links.add(edge);
                 links.add(reverseEdge);
             }
@@ -152,8 +156,13 @@ public class Registry implements Node {
         }
     }
 
-    public void sendOverlayLinkWeights() {
-
+    public void sendOverlayLinkWeights() throws IOException {
+        LinkWeightsSend linkWeightsSend = new LinkWeightsSend();
+        linkWeightsSend.setNumberOfLinks(links.size());
+        linkWeightsSend.setMessagingNodes(links);
+        for (NodeRecord node : nodeMap.values()) {
+            node.getSender().sendData(linkWeightsSend.getBytes());
+        }
     }
 
     public void start() {

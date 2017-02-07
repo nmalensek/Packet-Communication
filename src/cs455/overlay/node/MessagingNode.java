@@ -1,5 +1,6 @@
 package cs455.overlay.node;
 
+import cs455.overlay.dijkstra.Edge;
 import cs455.overlay.transport.TCPReceiverThread;
 import cs455.overlay.transport.TCPSender;
 import cs455.overlay.transport.TCPServerThread;
@@ -7,9 +8,7 @@ import cs455.overlay.util.TextInputThread;
 import cs455.overlay.wireformats.Event;
 import cs455.overlay.wireformats.nodemessages.*;
 import cs455.overlay.wireformats.eventfactory.EventFactory;
-import cs455.overlay.wireformats.nodemessages.Receiving.DeregisterResponseReceive;
-import cs455.overlay.wireformats.nodemessages.Receiving.MessagingNodesListReceive;
-import cs455.overlay.wireformats.nodemessages.Receiving.RegistryResponseReceive;
+import cs455.overlay.wireformats.nodemessages.Receiving.*;
 import cs455.overlay.wireformats.nodemessages.Sending.Deregister;
 import cs455.overlay.wireformats.nodemessages.Sending.SendRegister;
 
@@ -18,6 +17,7 @@ import java.net.Inet4Address;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -37,6 +37,7 @@ public class MessagingNode implements Node {
     private EventFactory eF = EventFactory.getInstance();
     private byte[] message;
     private Map<String, NodeRecord> nodeConnections = new HashMap<>();
+    private List<Edge> links;
 
     public MessagingNode(String registryHostName, int registryPort) throws IOException {
         this.registryHostName = registryHostName;
@@ -91,6 +92,9 @@ public class MessagingNode implements Node {
                 System.out.println("All connections established. Number of connections: "
                         + nodeConnections.size());
             }
+        } else if (event instanceof LinkWeightsReceive) {
+            LinkWeightsProcess linkWeightsProcess = new LinkWeightsProcess();
+            linkWeightsProcess.processLinkWeights(((LinkWeightsReceive) event).getLinkInfo());
         }
     }
 

@@ -3,29 +3,26 @@ package cs455.tests;
 import cs455.overlay.dijkstra.Edge;
 import cs455.overlay.dijkstra.Graph;
 import cs455.overlay.dijkstra.ShortestPath;
-import cs455.overlay.node.NodeRecord;
+import cs455.overlay.dijkstra.Vertex;
 
 import java.io.IOException;
-import java.net.Inet4Address;
-import java.net.Socket;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
 public class TestShortestPath {
 
-    private List<cs455.overlay.node.NodeRecord> nodes;
+    private List<Vertex> nodes;
     private List<Edge> edges;
-    Socket socket = new Socket(Inet4Address.getLocalHost().getHostName(), 2500);
 
     public TestShortestPath() throws IOException {
     }
 
-    public void testExcute() throws IOException {
-        nodes = new ArrayList<NodeRecord>();
+    public void testExecute() throws IOException {
+        nodes = new ArrayList<Vertex>();
         edges = new ArrayList<Edge>();
         for (int i = 0; i < 11; i++) {
-            NodeRecord location = new NodeRecord("Node_" + i, 111 + i, socket);
+            Vertex location = new Vertex("Node_" + i);
             nodes.add(location);
         }
 
@@ -57,9 +54,9 @@ public class TestShortestPath {
         Graph graph = new Graph(nodes, edges);
         ShortestPath dijkstra = new ShortestPath(graph);
         dijkstra.execute(nodes.get(5));
-        LinkedList<NodeRecord> path = dijkstra.getPath(nodes.get(3));
+        LinkedList<Vertex> path = dijkstra.getPath(nodes.get(3));
 
-        for (NodeRecord vertex : path) {
+        for (Vertex vertex : path) {
             System.out.println(vertex);
         }
 
@@ -67,14 +64,14 @@ public class TestShortestPath {
 
     private void addLane(String laneId, int sourceLocNo, int destLocNo,
                          int duration) {
-        String sourceID = nodes.get(sourceLocNo).getNodeID();
-        String destID = nodes.get(destLocNo).getNodeID();
-        Edge lane = new Edge(sourceID + " " + destID,nodes.get(sourceLocNo), nodes.get(destLocNo), duration );
+        String sourceID = nodes.get(sourceLocNo).getId();
+        String destID = nodes.get(destLocNo).getId();
+        Edge lane = new Edge(sourceID + " " + destID, nodes.get(sourceLocNo), nodes.get(destLocNo), duration );
         edges.add(lane);
     }
 
     public static void main(String[] args) throws IOException {
         TestShortestPath testShortestPath = new TestShortestPath();
-        testShortestPath.testExcute();
+        testShortestPath.testExecute();
     }
 }

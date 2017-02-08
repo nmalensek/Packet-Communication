@@ -38,7 +38,7 @@ public class DeregistrationReceiver {
         if (!nodeMap.containsKey(key)) {
             sendDeregistrationResponse(destinationSocket,
                     "Unable to deregister, node is not registered!", false, FAILURE);
-        } else if(!deregisteringHost.equals(destinationSocket.getInetAddress().toString())) {
+        } else if(!deregisteringHost.equals(destinationSocket.getInetAddress().getHostAddress())) {
             sendDeregistrationResponse(destinationSocket,
                     "Unable to deregister, IP in message does not match sender\'s IP.", false, FAILURE);
         } else {
@@ -53,6 +53,7 @@ public class DeregistrationReceiver {
                                            byte successOrFailure) throws IOException {
         DeregistrationResponse deregistrationResponse = eventFactory.sendDeregistrationResponse().getType();
         deregistrationResponse.setAdditionalInfo(error);
+        deregistrationResponse.setSuccessOrFailure(successOrFailure);
         replySender = new TCPSender(deregisteringNode);
         replySender.sendData(deregistrationResponse.getBytes());
     }

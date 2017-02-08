@@ -43,5 +43,6 @@ public class DeregisterResponseReceive implements Protocol, Event {
     public void printMessage() {
         System.out.println(additionalInfo);
     }
+    public byte getDeRegistrationStatus() { return deRegistrationStatus; }
 
 }

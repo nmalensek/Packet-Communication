@@ -76,7 +76,7 @@ public class MessagingNode implements Node {
 
     private void deregister() throws IOException {
         Deregister deregister = eF.createDeregistrationEvent().getType();
-        deregister.setHostAndPort(registrySocket.getLocalAddress().toString(), randomPort);
+        deregister.setHostAndPort(Inet4Address.getLocalHost().getHostAddress(), randomPort);
         message = deregister.getBytes();
         registrySender.sendData(message);
     }
@@ -90,8 +90,14 @@ public class MessagingNode implements Node {
         if (event instanceof RegistryResponseReceive) {
             ((RegistryResponseReceive) event).printMessage();
         } else if (event instanceof DeregisterResponseReceive) {
-            ((DeregisterResponseReceive) event).printMessage();
-            registrySocket.close();
+            byte failure = 0;
+            if (((DeregisterResponseReceive) event).getDeRegistrationStatus() == failure) {
+                ((DeregisterResponseReceive) event).printMessage();
+            } else {
+                ((DeregisterResponseReceive) event).printMessage();
+                registrySocket.close();
+                System.exit(0);
+            }
         } else if (event instanceof MessagingNodesListReceive) {
            processMessagingNodesList(((MessagingNodesListReceive) event).getNodesToConnectTo());
         } else if (event instanceof NodeConnection) {
@@ -220,6 +226,15 @@ public class MessagingNode implements Node {
         } catch (IOException ioe) {
             ioe.printStackTrace();
         }
+    }
+
+    private void resetCounters() {
+        sendTracker = 0;
+        receiveTracker = 0;
+        relayTracker = 0;
+        sendSummation = 0;
+        receiveSummation = 0;
+        numberOfConnections = 0;
     }
 
 }

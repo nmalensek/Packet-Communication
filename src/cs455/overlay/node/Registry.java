@@ -62,12 +62,16 @@ public class Registry implements Node {
                 listMessagingNodes();
                 break;
             case "setup-overlay":
-                connectionRequirement = numberPortion;
-                verifyConnectionRequirement();
-                setupOverlay();
-                mapLinksAndAssignWeights();
-                sendMessagingNodesList();
-                overlayEstablished = true;
+                if (!overlayEstablished) {
+                    connectionRequirement = numberPortion;
+                    verifyConnectionRequirement();
+                    setupOverlay();
+                    mapLinksAndAssignWeights();
+                    sendMessagingNodesList();
+                    overlayEstablished = true;
+                } else {
+                    System.out.println("Overlay is already established.");
+                }
                 break;
             case "list-weights":
                 if(overlayEstablished) {
@@ -136,7 +140,7 @@ public class Registry implements Node {
                 int weight = ThreadLocalRandom.current().nextInt(1, 11);
                 Vertex start = new Vertex(source.getNodeID());
                 Vertex end = new Vertex(destination.getNodeID());
-                Edge edge = new Edge(start.getId() + end.getId(),
+                Edge edge = new Edge(start.getId() + " " + end.getId(),
                         start, end, weight);
                 Edge reverseEdge = new Edge(end.getId() + start.getId(),
                         end, start, weight);
@@ -144,10 +148,6 @@ public class Registry implements Node {
                 links.add(reverseEdge);
             }
         }
-    }
-
-    public void initiateTask() {
-
     }
 
     private void listWeights() {
@@ -163,6 +163,10 @@ public class Registry implements Node {
         for (NodeRecord node : nodeMap.values()) {
             node.getSender().sendData(linkWeightsSend.getBytes());
         }
+    }
+
+    public void initiateTask() {
+
     }
 
     public void start() {

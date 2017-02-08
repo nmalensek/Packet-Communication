@@ -42,7 +42,7 @@ public class OverlayCreator {
     }
 
     public void connectToNodesInSequence(List<String> sequentialList) {
-        for (ListIterator<String> recordListIterator = sequentialList.listIterator(); recordListIterator.hasNext(); ) {
+        for (ListIterator<String> recordListIterator = sequentialList.listIterator(); recordListIterator.hasNext();) {
             try {
                 String currentRecord = recordListIterator.next();
                 int currentPosition = sequentialList.indexOf(currentRecord);

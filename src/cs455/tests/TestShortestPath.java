@@ -1,29 +1,29 @@
 package cs455.tests;
 
-import cs455.overlay.dijkstra.Edge;
-import cs455.overlay.dijkstra.Graph;
-import cs455.overlay.dijkstra.ShortestPath;
-import cs455.overlay.dijkstra.Vertex;
+import cs455.overlay.dijkstra.*;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 public class TestShortestPath {
 
-    private List<Vertex> nodes;
-    private List<Edge> edges;
+    private List<Vertex> vertices;
+    private List<Edge> links;
+    private Map<String, Edge> edgeMap = new HashMap<>();
+    private RoutingCache routingCache;
+    private Graph graph;
+    private ShortestPath shortestPath;
+    private String thisNodeID = "Node_0";
 
     public TestShortestPath() throws IOException {
     }
 
     public void testExecute() throws IOException {
-        nodes = new ArrayList<Vertex>();
-        edges = new ArrayList<Edge>();
+        vertices = new ArrayList<Vertex>();
+        links = new ArrayList<Edge>();
         for (int i = 0; i < 11; i++) {
             Vertex location = new Vertex("Node_" + i);
-            nodes.add(location);
+            vertices.add(location);
         }
 
         addLane("link_0", 0, 1, 85);
@@ -49,29 +49,87 @@ public class TestShortestPath {
         addLane("link_10", 9, 10, 40);
         addLane("link_10", 10, 9, 40);
         addLane("link_11", 10, 1, 600);
+    }
 
-        // Lets check from location Loc_0 to Loc_10
-        Graph graph = new Graph(nodes, edges);
-        ShortestPath dijkstra = new ShortestPath(graph);
-        dijkstra.execute(nodes.get(5));
-        LinkedList<Vertex> path = dijkstra.getPath(nodes.get(3));
-
-        for (Vertex vertex : path) {
-            System.out.println(vertex);
+    private Vertex findThisNodeInVertexList() {
+        for (Vertex vertex : vertices) {
+            if(thisNodeID.equals(vertex.getId())) {
+                return vertex;
+            }
         }
+        throw new RuntimeException();
+    }
 
+
+    private void computeShortestPaths() {
+        routingCache = new RoutingCache(links, edgeMap);
+        graph = new Graph(vertices, links);
+        shortestPath = new ShortestPath(graph);
+        LinkedList<Vertex> path = new LinkedList<>();
+        Vertex thisNode = findThisNodeInVertexList();
+        shortestPath.execute(thisNode);
+        for (Vertex destNode : vertices) {
+            if (!thisNode.equals(destNode)) {
+                path = shortestPath.getPath(destNode);
+                routingCache.cacheShortestPath(destNode.getId(), path);
+            }
+        }
+    }
+
+    private void print() {
+        routingCache.printMap(thisNodeID);
+//        routingCache.simplePrint();
     }
 
     private void addLane(String laneId, int sourceLocNo, int destLocNo,
                          int duration) {
-        String sourceID = nodes.get(sourceLocNo).getId();
-        String destID = nodes.get(destLocNo).getId();
-        Edge lane = new Edge(sourceID + " " + destID, nodes.get(sourceLocNo), nodes.get(destLocNo), duration );
-        edges.add(lane);
+        String sourceID = vertices.get(sourceLocNo).getId();
+        String destID = vertices.get(destLocNo).getId();
+        Edge lane = new Edge(sourceID + " " + destID, vertices.get(sourceLocNo), vertices.get(destLocNo), duration);
+        links.add(lane);
+        edgeMap.put(lane.getId(), lane);
     }
 
     public static void main(String[] args) throws IOException {
         TestShortestPath testShortestPath = new TestShortestPath();
         testShortestPath.testExecute();
+        testShortestPath.computeShortestPaths();
+        testShortestPath.print();
     }
 }
+
+//    ShortestPath dijkstra = new ShortestPath(graph);
+//        dijkstra.execute(nodes.get(4));
+//    LinkedList<Vertex> path = dijkstra.getPath(nodes.get(8));
+//
+//        for (Vertex vertex : path) {
+//        System.out.println(vertex);
+//    }
+
+//
+//        dijkstra.execute(nodes.get(0));
+//                for (Vertex destNode : nodes) {
+//                if (!nodes.get(0).equals(destNode)) {
+//                path = dijkstra.getPath(destNode);
+//                String pathString = "";
+//                pathString += nodes.get(0).toString();
+//                for (ListIterator<Vertex> vertexListIterator = path.listIterator(); vertexListIterator.hasNext();) {
+//        try {
+//        Vertex currentVertex = vertexListIterator.next();
+//        int currentPosition = path.indexOf(currentVertex);
+//        Vertex nextVertex = path.get(currentPosition + 1);
+//        Edge nextEdge = edgeMap.get(currentVertex.getId() + " " + nextVertex.getId());
+//
+//        pathString += "--";
+//        pathString += nextEdge.getWeight();
+//        pathString += "--";
+//        pathString += nextVertex;
+//        } catch (IndexOutOfBoundsException e) {
+//        pathString = pathString.substring(0, pathString.length());
+//        }
+//
+//        }
+//        System.out.println(pathString);
+//        }
+//        }
+//        }

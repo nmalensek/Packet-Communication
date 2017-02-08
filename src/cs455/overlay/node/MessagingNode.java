@@ -1,6 +1,6 @@
 package cs455.overlay.node;
 
-import cs455.overlay.dijkstra.Edge;
+import cs455.overlay.dijkstra.*;
 import cs455.overlay.transport.TCPReceiverThread;
 import cs455.overlay.transport.TCPSender;
 import cs455.overlay.transport.TCPServerThread;
@@ -17,6 +17,7 @@ import java.net.Inet4Address;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
@@ -31,6 +32,7 @@ public class MessagingNode implements Node {
     private String registryHostName;
     private int registryPort;
     private int randomPort;
+    private String thisNodeID;
     private Socket registrySocket;
     private TCPSender registrySender;
     private TCPServerThread receivingSocket;
@@ -38,6 +40,11 @@ public class MessagingNode implements Node {
     private byte[] message;
     private Map<String, NodeRecord> nodeConnections = new HashMap<>();
     private List<Edge> links;
+    private List<Vertex> vertices;
+    private Map<String, Edge> edgeMap;
+    private Graph graph;
+    private ShortestPath shortestPath;
+    private RoutingCache routingCache;
 
     public MessagingNode(String registryHostName, int registryPort) throws IOException {
         this.registryHostName = registryHostName;
@@ -62,6 +69,7 @@ public class MessagingNode implements Node {
     private void register() throws IOException {
         SendRegister sendRegister = eF.createRegisterSendEvent().getType();
         sendRegister.setHostAndPort(Inet4Address.getLocalHost().getHostAddress(), randomPort);
+        thisNodeID = Inet4Address.getLocalHost().getHostAddress() + ":" + randomPort;
         message = sendRegister.getBytes();
         registrySender.sendData(message);
     }
@@ -95,6 +103,11 @@ public class MessagingNode implements Node {
         } else if (event instanceof LinkWeightsReceive) {
             LinkWeightsProcess linkWeightsProcess = new LinkWeightsProcess();
             linkWeightsProcess.processLinkWeights(((LinkWeightsReceive) event).getLinkInfo());
+            vertices = linkWeightsProcess.getVertexList();
+            links = linkWeightsProcess.getEdgeList();
+            edgeMap = linkWeightsProcess.getEdgeMap();
+            computeShortestPaths();
+            System.out.println("Link weights received and processed. Ready to send messages.");
         }
     }
 
@@ -138,7 +151,7 @@ public class MessagingNode implements Node {
     public void processText(String command) throws IOException {
         switch (command) {
             case "print-shortest-path":
-                printShortestPath();
+                printShortestPaths();
                 break;
             case "exit-overlay":
                 deregister();
@@ -166,28 +179,33 @@ public class MessagingNode implements Node {
         }
     }
 
-    private void getConnectionCount() {
-        nodeConnections.size();
+    private Vertex findThisNodeInVertexList() {
+        for (Vertex vertex : vertices) {
+            if(thisNodeID.equals(vertex.getId())) {
+                return vertex;
+            }
+        }
+        throw new RuntimeException();
     }
 
-    private void connectToNode(String host, int port) {
-
+    private void computeShortestPaths() {
+        routingCache = new RoutingCache(links, edgeMap);
+        graph = new Graph(vertices, links);
+        shortestPath = new ShortestPath(graph);
+        LinkedList<Vertex> path = new LinkedList<>();
+        Vertex thisNode = findThisNodeInVertexList();
+        shortestPath.execute(thisNode);
+        for (Vertex destNode : vertices) {
+            if (!thisNode.equals(destNode)) {
+                path = shortestPath.getPath(destNode);
+                routingCache.cacheShortestPath(destNode.getId(), path);
+            }
+        }
     }
 
-    public void initiateConnection() {
-        int numberOfConnections;
-    }
 
-    public void acceptLinkWeights() {
-
-    }
-
-    public void acceptMessage() throws IOException {
-
-    }
-
-    public void printShortestPath() {
-
+    public void printShortestPaths() {
+        routingCache.printMap(thisNodeID);
     }
 
     public static void main(String[] args) {

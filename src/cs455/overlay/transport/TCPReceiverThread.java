@@ -6,6 +6,7 @@ import cs455.overlay.wireformats.Protocol;
 import cs455.overlay.wireformats.eventfactory.EventFactory;
 import cs455.overlay.wireformats.nodemessages.NodeConnection;
 import cs455.overlay.wireformats.nodemessages.Receiving.DeregisterResponseReceive;
+import cs455.overlay.wireformats.nodemessages.Receiving.LinkWeightsReceive;
 import cs455.overlay.wireformats.nodemessages.Receiving.MessagingNodesListReceive;
 import cs455.overlay.wireformats.nodemessages.Receiving.RegistryResponseReceive;
 import cs455.overlay.wireformats.registrymessages.receiving.DeregisterRequestReceive;
@@ -83,7 +84,9 @@ public class TCPReceiverThread extends Thread implements Protocol {
                 node.onEvent(receiveMessagingNodesListEvent, communicationSocket);
                 break;
             case LINK_WEIGHTS:
-                //do something
+                Event<LinkWeightsReceive> receiveLinkWeightsEvent =
+                        eventFactory.receiveLinkWeights(marshalledBytes);
+                node.onEvent(receiveLinkWeightsEvent, communicationSocket);
             case TASK_INITIATE:
                 //do something else
             case SEND_MESSAGE:
@@ -106,7 +109,7 @@ public class TCPReceiverThread extends Thread implements Protocol {
                 node.onEvent(receiveNodeConnectionEvent, communicationSocket);
                 break;
             default:
-                //error
+                System.out.println("Something went horribly wrong, please restart.");
         }
     }
 }

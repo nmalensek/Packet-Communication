@@ -1,12 +1,10 @@
 package cs455.overlay.wireformats.eventfactory;
 
 import cs455.overlay.wireformats.Event;
+import cs455.overlay.wireformats.nodemessages.Receiving.*;
+import cs455.overlay.wireformats.nodemessages.Sending.MessageSend;
 import cs455.overlay.wireformats.TaskInitiate;
 import cs455.overlay.wireformats.nodemessages.*;
-import cs455.overlay.wireformats.nodemessages.Receiving.DeregisterResponseReceive;
-import cs455.overlay.wireformats.nodemessages.Receiving.LinkWeightsReceive;
-import cs455.overlay.wireformats.nodemessages.Receiving.MessagingNodesListReceive;
-import cs455.overlay.wireformats.nodemessages.Receiving.RegistryResponseReceive;
 import cs455.overlay.wireformats.nodemessages.Sending.Deregister;
 import cs455.overlay.wireformats.nodemessages.Sending.SendRegister;
 import cs455.overlay.wireformats.registrymessages.sending.DeregistrationResponse;
@@ -111,5 +109,11 @@ public final class EventFactory {
         TaskInitiate taskInitiate = new TaskInitiate();
         taskInitiate.readTaskInitiateMessage(marshalledBytes);
         return taskInitiate;
+    }
+
+    public static final Event<MessageReceive> receiveMessage(
+            byte[] marshalledBytes) throws IOException {
+        MessageReceive messageReceive = new MessageReceive(marshalledBytes);
+        return messageReceive;
     }
 }

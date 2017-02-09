@@ -3,7 +3,7 @@ package cs455.overlay.wireformats.nodemessages.Sending;
 import cs455.overlay.dijkstra.RoutingCache;
 import cs455.overlay.dijkstra.Vertex;
 import cs455.overlay.node.NodeRecord;
-import cs455.overlay.wireformats.MessageSend;
+import cs455.overlay.util.CommunicationTracker;
 
 import java.io.IOException;
 import java.util.*;
@@ -17,13 +17,15 @@ public class MessageCreator {
     private RoutingCache routingCache;
     private String nodeToSendMessagesTo;
     private LinkedList<Vertex> path;
+    private CommunicationTracker communicationTracker;
 
     public MessageCreator(List<Vertex> verticesInOverlay, Map<String,
-            NodeRecord> directConnections, RoutingCache routingCache) {
+            NodeRecord> directConnections, RoutingCache routingCache, CommunicationTracker communicationTracker) {
         this.copyOfVerticesInOverlay = new ArrayList<>(verticesInOverlay); //copies vertices so nothing damages original list
         this.copyOfDirectConnections = new HashMap<>(directConnections);  //copies map so nothing damages original map
         this.routingCache = routingCache;
         this.nodeMap = new HashMap<>();
+        this.communicationTracker = communicationTracker;
         addVerticesToOverlayMap();
     }
 
@@ -62,10 +64,12 @@ public class MessageCreator {
     public void sendMessage() throws IOException {
         NodeRecord nextNodeInPath = determineNextNode();
         MessageSend messageSend = new MessageSend();
-        messageSend.setRoutingpath(path);
+        messageSend.setRoutingPath(path);
         for (int numMessages = 0; numMessages < 5; numMessages++) {
             messageSend.setPayload();
             nextNodeInPath.getSender().sendData(messageSend.getBytes());
+            communicationTracker.incrementSendTracker();
+            communicationTracker.incrementSendSummation(messageSend.getPayload());
         }
     }
 

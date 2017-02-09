@@ -6,10 +6,7 @@ import cs455.overlay.wireformats.Protocol;
 import cs455.overlay.wireformats.TaskInitiate;
 import cs455.overlay.wireformats.eventfactory.EventFactory;
 import cs455.overlay.wireformats.nodemessages.NodeConnection;
-import cs455.overlay.wireformats.nodemessages.Receiving.DeregisterResponseReceive;
-import cs455.overlay.wireformats.nodemessages.Receiving.LinkWeightsReceive;
-import cs455.overlay.wireformats.nodemessages.Receiving.MessagingNodesListReceive;
-import cs455.overlay.wireformats.nodemessages.Receiving.RegistryResponseReceive;
+import cs455.overlay.wireformats.nodemessages.Receiving.*;
 import cs455.overlay.wireformats.registrymessages.receiving.DeregisterRequestReceive;
 import cs455.overlay.wireformats.registrymessages.receiving.RegisterRequestReceive;
 
@@ -93,7 +90,9 @@ public class TCPReceiverThread extends Thread implements Protocol {
                         eventFactory.receiveTaskInitiate(marshalledBytes);
                 node.onEvent(receiveTaskInitiateEvent, communicationSocket);
             case SEND_MESSAGE:
-                //do something
+                Event<MessageReceive> receiveMessage =
+                        eventFactory.receiveMessage(marshalledBytes);
+                node.onEvent(receiveMessage, communicationSocket);
             case TASK_COMPLETE:
                 //do something
             case PULL_TRAFFIC_SUMMARY:

@@ -4,6 +4,7 @@ import cs455.overlay.dijkstra.*;
 import cs455.overlay.transport.TCPReceiverThread;
 import cs455.overlay.transport.TCPSender;
 import cs455.overlay.transport.TCPServerThread;
+import cs455.overlay.util.CommunicationTracker;
 import cs455.overlay.util.TextInputThread;
 import cs455.overlay.wireformats.Event;
 import cs455.overlay.wireformats.TaskInitiate;
@@ -42,6 +43,7 @@ public class MessagingNode implements Node {
     private Graph graph;
     private ShortestPath shortestPath;
     private RoutingCache routingCache;
+    private CommunicationTracker communicationTracker = new CommunicationTracker();
 
     public MessagingNode(String registryHostName, int registryPort) throws IOException {
         this.registryHostName = registryHostName;
@@ -113,9 +115,13 @@ public class MessagingNode implements Node {
             System.out.println("Link weights received and processed. Ready to send messages.");
         } else if (event instanceof TaskInitiate) {
             int numberOfRounds = ((TaskInitiate) event).getRounds();
-            //TODO use knowledge of all other nodes from link-weights message to randomly pick destination!
-            //currently only selects from nodes this node has a direct connection to!
-            MessageCreator messageCreator = new MessageCreator(vertices, nodeConnections, routingCache);
+            MessageCreator messageCreator = new MessageCreator(vertices, nodeConnections, routingCache, communicationTracker);
+            for (int roundsSent = 0; roundsSent < numberOfRounds; roundsSent++) {
+                messageCreator.prepareMessage(thisNodeID);
+                messageCreator.sendMessage();
+            }
+        } else if (event instanceof MessageReceive) {
+
         }
     }
 

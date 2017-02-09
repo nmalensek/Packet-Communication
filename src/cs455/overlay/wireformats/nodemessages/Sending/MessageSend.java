@@ -1,6 +1,8 @@
-package cs455.overlay.wireformats;
+package cs455.overlay.wireformats.nodemessages.Sending;
 
 import cs455.overlay.dijkstra.Vertex;
+import cs455.overlay.wireformats.Event;
+import cs455.overlay.wireformats.Protocol;
 
 import java.io.BufferedOutputStream;
 import java.io.ByteArrayOutputStream;
@@ -43,7 +45,7 @@ public class MessageSend implements Protocol, Event<MessageSend> {
         return marshalledBytes;
     }
 
-    public void setRoutingpath(List<Vertex> routeList) {
+    public void setRoutingPath(List<Vertex> routeList) {
         routingPath = "";
         for (Vertex vertex : routeList) {
             routingPath += vertex.getId();
@@ -53,6 +55,7 @@ public class MessageSend implements Protocol, Event<MessageSend> {
     public void setPayload() {
         payload = ThreadLocalRandom.current().nextInt(-2147483648, 2147483647);
     }
+    public int getPayload() { return payload; }
 
     public String getRoutingPath() { return routingPath; }
 }

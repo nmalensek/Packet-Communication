@@ -113,7 +113,9 @@ public class MessagingNode implements Node {
             System.out.println("Link weights received and processed. Ready to send messages.");
         } else if (event instanceof TaskInitiate) {
             int numberOfRounds = ((TaskInitiate) event).getRounds();
-            MessageCreator messageCreator = new MessageCreator(numberOfRounds, nodeConnections, routingCache);
+            //TODO use knowledge of all other nodes from link-weights message to randomly pick destination!
+            //currently only selects from nodes this node has a direct connection to!
+            MessageCreator messageCreator = new MessageCreator(vertices, nodeConnections, routingCache);
         }
     }
 

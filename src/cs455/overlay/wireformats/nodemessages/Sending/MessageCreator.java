@@ -11,55 +11,67 @@ import java.util.concurrent.ThreadLocalRandom;
 
 public class MessageCreator {
 
-    private int numberOfRounds;
-    private Map<String, NodeRecord> copyOfNodeMap;
+    private List<Vertex> copyOfVerticesInOverlay;
+    private HashMap<String, String> nodeMap;
+    private Map<String, NodeRecord> copyOfDirectConnections;
     private RoutingCache routingCache;
-    private NodeRecord nodeToSendMessagesTo;
+    private String nodeToSendMessagesTo;
     private LinkedList<Vertex> path;
 
-    public MessageCreator(int numberOfRounds, Map<String, NodeRecord> nodeMap, RoutingCache routingCache) {
-        this.numberOfRounds = numberOfRounds;
-        this.copyOfNodeMap = new HashMap<>(nodeMap); //copies nodeMap so removeNodeFromMap doesn't permanently remove node
+    public MessageCreator(List<Vertex> verticesInOverlay, Map<String,
+            NodeRecord> directConnections, RoutingCache routingCache) {
+        this.copyOfVerticesInOverlay = new ArrayList<>(verticesInOverlay); //copies vertices so nothing damages original list
+        this.copyOfDirectConnections = new HashMap<>(directConnections);  //copies map so nothing damages original map
         this.routingCache = routingCache;
+        this.nodeMap = new HashMap<>();
+        addVerticesToOverlayMap();
+    }
+
+    private void addVerticesToOverlayMap() {
+        for (Vertex vertex : copyOfVerticesInOverlay) {
+            nodeMap.put(vertex.getId(), vertex.getId());
+        }
     }
 
     public void prepareMessage(String nodeID) {
-        removeNodeFromMap(nodeID);
+        removeNodeFromOverlayMap(nodeID);
         chooseRandomNode();
         getPathToSelectedNode(nodeToSendMessagesTo);
     }
 
     //prevents node from messaging itself
-    private void removeNodeFromMap(String nodeID) {
-        copyOfNodeMap.remove(nodeID);
+    private void removeNodeFromOverlayMap(String nodeID) {
+        nodeMap.remove(nodeID);
     }
 
     public void chooseRandomNode() {
         List<String> randomList = new ArrayList<>();
-        for (String node : copyOfNodeMap.keySet()) {
+        for (String node : nodeMap.keySet()) {
             randomList.add(node);
         }
         int randomNode = ThreadLocalRandom.current().nextInt(0, randomList.size());
-        nodeToSendMessagesTo = copyOfNodeMap.get(randomList.get(randomNode));
+        nodeToSendMessagesTo = nodeMap.get(randomList.get(randomNode));
     }
 
-    private void getPathToSelectedNode(NodeRecord nodeToMessage) {
+    private void getPathToSelectedNode(String nodeToMessage) {
         Map<String, LinkedList<Vertex>> shortestPathMap = routingCache.getShortestPathsMap();
-        path = shortestPathMap.get(nodeToMessage.getNodeID());
+        path = shortestPathMap.get(nodeToMessage);
         path.removeFirst(); //origin node, should not include in path
     }
 
     public void sendMessage() throws IOException {
+        NodeRecord nextNodeInPath = determineNextNode();
         MessageSend messageSend = new MessageSend();
         messageSend.setRoutingpath(path);
-        messageSend.setPayload();
-        NodeRecord nextNodeInPath = determineNextNode();
-        nextNodeInPath.
+        for (int numMessages = 0; numMessages < 5; numMessages++) {
+            messageSend.setPayload();
+            nextNodeInPath.getSender().sendData(messageSend.getBytes());
+        }
     }
 
     private NodeRecord determineNextNode() {
         Vertex nextVertex = path.getFirst();
-        NodeRecord nextNode = copyOfNodeMap.get(nextVertex.getId());
+        NodeRecord nextNode = copyOfDirectConnections.get(nextVertex.getId());
         return nextNode;
     }
 

@@ -1,6 +1,7 @@
 package cs455.tests;
 
 import cs455.overlay.dijkstra.*;
+import cs455.overlay.node.NodeRecord;
 
 import java.io.IOException;
 import java.util.*;
@@ -14,6 +15,7 @@ public class TestShortestPath {
     private Graph graph;
     private ShortestPath shortestPath;
     private String thisNodeID = "Node_0";
+    private LinkedList<Vertex> path;
 
     public TestShortestPath() throws IOException {
     }
@@ -76,9 +78,24 @@ public class TestShortestPath {
         }
     }
 
+    private void getPathToSelectedNode(String nodeToMessage) {
+        Map<String, LinkedList<Vertex>> shortestPathMap = routingCache.getShortestPathsMap();
+        path = shortestPathMap.get(nodeToMessage);
+        path.removeFirst(); //origin node, should not include in path
+        for (Vertex vertex : path) {
+            System.out.println(vertex);
+        }
+    }
+
+    public void sendMessage() {
+        String routingPath = "";
+        for (Vertex vertex : path) {
+            routingPath += vertex.getId();
+        }
+    }
+
     private void print() {
         routingCache.printMap(thisNodeID);
-//        routingCache.simplePrint();
     }
 
     private void addLane(String laneId, int sourceLocNo, int destLocNo,
@@ -94,7 +111,9 @@ public class TestShortestPath {
         TestShortestPath testShortestPath = new TestShortestPath();
         testShortestPath.testExecute();
         testShortestPath.computeShortestPaths();
-        testShortestPath.print();
+        testShortestPath.getPathToSelectedNode("Node_2");
+        testShortestPath.getPathToSelectedNode("Node_5");
+//        testShortestPath.print();
     }
 }
 

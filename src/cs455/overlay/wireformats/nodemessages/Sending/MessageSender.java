@@ -13,6 +13,7 @@ public class MessageSender {
     private Map<String, NodeRecord> nodeMap;
     private RoutingCache routingCache;
     private NodeRecord nodeToSendMessagesTo;
+    private LinkedList<Vertex> path;
 
     public MessageSender(int numberOfRounds, Map<String, NodeRecord> nodeMap, RoutingCache routingCache) {
         this.numberOfRounds = numberOfRounds;
@@ -20,8 +21,14 @@ public class MessageSender {
         this.routingCache = routingCache;
     }
 
+    public void prepareMessage(String nodeID) {
+        removeNodeFromMap(nodeID);
+        chooseRandomNode();
+        getPathToSelectedNode(nodeToSendMessagesTo);
+    }
+
     //prevents node from messaging itself
-    public void removeNodeFromMap(String nodeID) {
+    private void removeNodeFromMap(String nodeID) {
         nodeMap.remove(nodeID);
     }
 
@@ -32,12 +39,19 @@ public class MessageSender {
         }
         int randomNode = ThreadLocalRandom.current().nextInt(0, randomList.size());
         nodeToSendMessagesTo = nodeMap.get(randomList.get(randomNode));
-        getPathToSelectedNode(nodeToSendMessagesTo);
     }
 
     private void getPathToSelectedNode(NodeRecord nodeToMessage) {
         Map<String, LinkedList<Vertex>> shortestPathMap = routingCache.getShortestPathsMap();
-        LinkedList<Vertex> path = shortestPathMap.get(nodeToMessage.getNodeID());
+        path = shortestPathMap.get(nodeToMessage.getNodeID());
+        path.removeFirst(); //origin node, should not include in path
+    }
+
+    public void sendMessage() {
+        String routingPath = "";
+        for (Vertex vertex : path) {
+            routingPath += vertex.getId();
+        }
     }
 
 }

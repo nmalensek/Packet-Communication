@@ -114,7 +114,6 @@ public class MessagingNode implements Node {
         } else if (event instanceof TaskInitiate) {
             int numberOfRounds = ((TaskInitiate) event).getRounds();
             MessageSender messageSender = new MessageSender(numberOfRounds, nodeConnections, routingCache);
-            messageSender.removeNodeFromMap(thisNodeID);
         }
     }
 

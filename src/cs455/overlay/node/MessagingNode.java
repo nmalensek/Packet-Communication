@@ -4,7 +4,6 @@ import cs455.overlay.dijkstra.*;
 import cs455.overlay.transport.TCPReceiverThread;
 import cs455.overlay.transport.TCPSender;
 import cs455.overlay.transport.TCPServerThread;
-import cs455.overlay.util.CommunicationTracker;
 import cs455.overlay.util.TextInputThread;
 import cs455.overlay.wireformats.Event;
 import cs455.overlay.wireformats.TaskInitiate;
@@ -12,7 +11,7 @@ import cs455.overlay.wireformats.nodemessages.*;
 import cs455.overlay.wireformats.eventfactory.EventFactory;
 import cs455.overlay.wireformats.nodemessages.Receiving.*;
 import cs455.overlay.wireformats.nodemessages.Sending.Deregister;
-import cs455.overlay.wireformats.nodemessages.Sending.MessageSender;
+import cs455.overlay.wireformats.nodemessages.Sending.MessageCreator;
 import cs455.overlay.wireformats.nodemessages.Sending.SendRegister;
 
 import java.io.IOException;
@@ -29,6 +28,7 @@ public class MessagingNode implements Node {
     private String registryHostName;
     private int registryPort;
     private int randomPort;
+    private String thisNodeIP = Inet4Address.getLocalHost().getHostAddress();
     private String thisNodeID;
     private Socket registrySocket;
     private TCPSender registrySender;
@@ -65,15 +65,15 @@ public class MessagingNode implements Node {
 
     private void register() throws IOException {
         SendRegister sendRegister = eF.createRegisterSendEvent().getType();
-        sendRegister.setHostAndPort(Inet4Address.getLocalHost().getHostAddress(), randomPort);
-        thisNodeID = Inet4Address.getLocalHost().getHostAddress() + ":" + randomPort;
+        sendRegister.setHostAndPort(thisNodeIP, randomPort);
+        thisNodeID = thisNodeIP + ":" + randomPort;
         message = sendRegister.getBytes();
         registrySender.sendData(message);
     }
 
     private void deregister() throws IOException {
         Deregister deregister = eF.createDeregistrationEvent().getType();
-        deregister.setHostAndPort(Inet4Address.getLocalHost().getHostAddress(), randomPort);
+        deregister.setHostAndPort(thisNodeIP, randomPort);
         message = deregister.getBytes();
         registrySender.sendData(message);
     }
@@ -113,7 +113,7 @@ public class MessagingNode implements Node {
             System.out.println("Link weights received and processed. Ready to send messages.");
         } else if (event instanceof TaskInitiate) {
             int numberOfRounds = ((TaskInitiate) event).getRounds();
-            MessageSender messageSender = new MessageSender(numberOfRounds, nodeConnections, routingCache);
+            MessageCreator messageCreator = new MessageCreator(numberOfRounds, nodeConnections, routingCache);
         }
     }
 
@@ -147,9 +147,7 @@ public class MessagingNode implements Node {
 
     private void tellOtherNodeAboutConnection(NodeRecord nodeConnectingTo) throws IOException {
         NodeConnection nodeConnection = eF.sendNodeConnection().getType();
-        String thisNodeHost = Inet4Address.getLocalHost().getHostAddress();
-        int thisNodePort = randomPort;
-        String thisNodeID = thisNodeHost + ":" + Integer.toString(thisNodePort);
+        String thisNodeID = thisNodeIP + ":" + Integer.toString(randomPort);
         nodeConnection.setNodeID(thisNodeID);
         nodeConnectingTo.getSender().sendData(nodeConnection.getBytes());
     }

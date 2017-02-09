@@ -3,21 +3,23 @@ package cs455.overlay.wireformats.nodemessages.Sending;
 import cs455.overlay.dijkstra.RoutingCache;
 import cs455.overlay.dijkstra.Vertex;
 import cs455.overlay.node.NodeRecord;
+import cs455.overlay.wireformats.MessageSend;
 
+import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 
-public class MessageSender {
+public class MessageCreator {
 
     private int numberOfRounds;
-    private Map<String, NodeRecord> nodeMap;
+    private Map<String, NodeRecord> copyOfNodeMap;
     private RoutingCache routingCache;
     private NodeRecord nodeToSendMessagesTo;
     private LinkedList<Vertex> path;
 
-    public MessageSender(int numberOfRounds, Map<String, NodeRecord> nodeMap, RoutingCache routingCache) {
+    public MessageCreator(int numberOfRounds, Map<String, NodeRecord> nodeMap, RoutingCache routingCache) {
         this.numberOfRounds = numberOfRounds;
-        this.nodeMap = nodeMap;
+        this.copyOfNodeMap = new HashMap<>(nodeMap); //copies nodeMap so removeNodeFromMap doesn't permanently remove node
         this.routingCache = routingCache;
     }
 
@@ -29,16 +31,16 @@ public class MessageSender {
 
     //prevents node from messaging itself
     private void removeNodeFromMap(String nodeID) {
-        nodeMap.remove(nodeID);
+        copyOfNodeMap.remove(nodeID);
     }
 
     public void chooseRandomNode() {
         List<String> randomList = new ArrayList<>();
-        for (String node : nodeMap.keySet()) {
+        for (String node : copyOfNodeMap.keySet()) {
             randomList.add(node);
         }
         int randomNode = ThreadLocalRandom.current().nextInt(0, randomList.size());
-        nodeToSendMessagesTo = nodeMap.get(randomList.get(randomNode));
+        nodeToSendMessagesTo = copyOfNodeMap.get(randomList.get(randomNode));
     }
 
     private void getPathToSelectedNode(NodeRecord nodeToMessage) {
@@ -47,11 +49,18 @@ public class MessageSender {
         path.removeFirst(); //origin node, should not include in path
     }
 
-    public void sendMessage() {
-        String routingPath = "";
-        for (Vertex vertex : path) {
-            routingPath += vertex.getId();
-        }
+    public void sendMessage() throws IOException {
+        MessageSend messageSend = new MessageSend();
+        messageSend.setRoutingpath(path);
+        messageSend.setPayload();
+        NodeRecord nextNodeInPath = determineNextNode();
+        nextNodeInPath.
+    }
+
+    private NodeRecord determineNextNode() {
+        Vertex nextVertex = path.getFirst();
+        NodeRecord nextNode = copyOfNodeMap.get(nextVertex.getId());
+        return nextNode;
     }
 
 }

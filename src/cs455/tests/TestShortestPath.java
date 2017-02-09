@@ -1,10 +1,10 @@
 package cs455.tests;
 
 import cs455.overlay.dijkstra.*;
-import cs455.overlay.node.NodeRecord;
 
 import java.io.IOException;
 import java.util.*;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class TestShortestPath {
 
@@ -28,29 +28,29 @@ public class TestShortestPath {
             vertices.add(location);
         }
 
-        addLane("link_0", 0, 1, 85);
-        addLane("link_0", 1, 0, 85);
-        addLane("link_1", 0, 2, 217);
-        addLane("link_1", 2, 0, 217);
-        addLane("link_2", 0, 4, 173);
-        addLane("link_2", 4, 0, 173);
-        addLane("link_3", 2, 6, 186);
-        addLane("link_3", 6, 2, 186);
-        addLane("link_4", 2, 7, 103);
-        addLane("link_4", 7, 2, 103);
-        addLane("link_5", 3, 7, 183);
-        addLane("link_5", 7, 3, 183);
-        addLane("link_6", 5, 8, 250);
-        addLane("link_6", 8, 5, 250);
-        addLane("link_7", 8, 9, 84);
-        addLane("link_7", 9, 8, 84);
-        addLane("link_8", 7, 9, 167);
-        addLane("link_8", 9, 7, 167);
-        addLane("link_9", 4, 9, 502);
-        addLane("link_9", 9, 4, 502);
-        addLane("link_10", 9, 10, 40);
-        addLane("link_10", 10, 9, 40);
-        addLane("link_11", 10, 1, 600);
+        addLink("link_0", 0, 1, 85);
+        addLink("link_0", 1, 0, 85);
+        addLink("link_1", 0, 2, 217);
+        addLink("link_1", 2, 0, 217);
+        addLink("link_2", 0, 4, 173);
+        addLink("link_2", 4, 0, 173);
+        addLink("link_3", 2, 6, 186);
+        addLink("link_3", 6, 2, 186);
+        addLink("link_4", 2, 7, 103);
+        addLink("link_4", 7, 2, 103);
+        addLink("link_5", 3, 7, 183);
+        addLink("link_5", 7, 3, 183);
+        addLink("link_6", 5, 8, 250);
+        addLink("link_6", 8, 5, 250);
+        addLink("link_7", 8, 9, 84);
+        addLink("link_7", 9, 8, 84);
+        addLink("link_8", 7, 9, 167);
+        addLink("link_8", 9, 7, 167);
+        addLink("link_9", 4, 9, 502);
+        addLink("link_9", 9, 4, 502);
+        addLink("link_10", 9, 10, 40);
+        addLink("link_10", 10, 9, 40);
+        addLink("link_11", 10, 1, 600);
     }
 
     private Vertex findThisNodeInVertexList() {
@@ -94,17 +94,22 @@ public class TestShortestPath {
         }
     }
 
+    private void testRandomPayload() {
+        int payload = ThreadLocalRandom.current().nextInt(1, 2147483647);
+        System.out.println(payload);
+    }
+
     private void print() {
         routingCache.printMap(thisNodeID);
     }
 
-    private void addLane(String laneId, int sourceLocNo, int destLocNo,
+    private void addLink(String linkID, int sourceLocNo, int destLocNo,
                          int duration) {
         String sourceID = vertices.get(sourceLocNo).getId();
         String destID = vertices.get(destLocNo).getId();
-        Edge lane = new Edge(sourceID + " " + destID, vertices.get(sourceLocNo), vertices.get(destLocNo), duration);
-        links.add(lane);
-        edgeMap.put(lane.getId(), lane);
+        Edge link = new Edge(sourceID + " " + destID, vertices.get(sourceLocNo), vertices.get(destLocNo), duration);
+        links.add(link);
+        edgeMap.put(link.getId(), link);
     }
 
     public static void main(String[] args) throws IOException {
@@ -113,6 +118,7 @@ public class TestShortestPath {
         testShortestPath.computeShortestPaths();
         testShortestPath.getPathToSelectedNode("Node_2");
         testShortestPath.getPathToSelectedNode("Node_5");
+//        testShortestPath.testRandomPayload();
 //        testShortestPath.print();
     }
 }

@@ -3,6 +3,7 @@ package cs455.overlay.transport;
 import cs455.overlay.node.Node;
 import cs455.overlay.wireformats.Event;
 import cs455.overlay.wireformats.Protocol;
+import cs455.overlay.wireformats.TaskInitiate;
 import cs455.overlay.wireformats.eventfactory.EventFactory;
 import cs455.overlay.wireformats.nodemessages.NodeConnection;
 import cs455.overlay.wireformats.nodemessages.Receiving.DeregisterResponseReceive;
@@ -88,7 +89,9 @@ public class TCPReceiverThread extends Thread implements Protocol {
                         eventFactory.receiveLinkWeights(marshalledBytes);
                 node.onEvent(receiveLinkWeightsEvent, communicationSocket);
             case TASK_INITIATE:
-                //do something else
+                Event<TaskInitiate> receiveTaskInitiateEvent =
+                        eventFactory.receiveTaskInitiate(marshalledBytes);
+                node.onEvent(receiveTaskInitiateEvent, communicationSocket);
             case SEND_MESSAGE:
                 //do something
             case TASK_COMPLETE:

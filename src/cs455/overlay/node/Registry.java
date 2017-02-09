@@ -3,6 +3,7 @@ package cs455.overlay.node;
 import cs455.overlay.dijkstra.Edge;
 import cs455.overlay.dijkstra.Vertex;
 import cs455.overlay.transport.TCPServerThread;
+import cs455.overlay.wireformats.TaskInitiate;
 import cs455.overlay.wireformats.registrymessages.receiving.DeregistrationReceiver;
 import cs455.overlay.util.OverlayCreator;
 import cs455.overlay.wireformats.registrymessages.receiving.RegistrationReceiver;
@@ -92,6 +93,10 @@ public class Registry implements Node {
                     System.out.println("Link weights have already been sent.");
                 }
                 break;
+            case "start":
+                if (overlayEstablished) {
+                    initiateTask(numberPortion);
+                }
             default:
                 System.out.println("Not a valid command.");
         }
@@ -165,12 +170,12 @@ public class Registry implements Node {
         }
     }
 
-    public void initiateTask() {
-
-    }
-
-    public void start() {
-
+    public void initiateTask(int numberOfRounds) throws IOException {
+        TaskInitiate taskInitiate = new TaskInitiate();
+        taskInitiate.setRounds(numberOfRounds);
+        for (NodeRecord nodeRecord : nodeMap.values()) {
+            nodeRecord.getSender().sendData(taskInitiate.getBytes());
+        }
     }
 
     public static void main(String[] args) throws IOException {

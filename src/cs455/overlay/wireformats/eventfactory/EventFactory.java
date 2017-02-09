@@ -1,6 +1,7 @@
 package cs455.overlay.wireformats.eventfactory;
 
 import cs455.overlay.wireformats.Event;
+import cs455.overlay.wireformats.TaskInitiate;
 import cs455.overlay.wireformats.nodemessages.*;
 import cs455.overlay.wireformats.nodemessages.Receiving.DeregisterResponseReceive;
 import cs455.overlay.wireformats.nodemessages.Receiving.LinkWeightsReceive;
@@ -103,5 +104,12 @@ public final class EventFactory {
             byte[] marshalledBytes) throws IOException {
         LinkWeightsReceive linkWeightsReceive = new LinkWeightsReceive(marshalledBytes);
         return linkWeightsReceive;
+    }
+
+    public static final Event<TaskInitiate> receiveTaskInitiate(
+            byte[] marshalledBytes) throws IOException {
+        TaskInitiate taskInitiate = new TaskInitiate();
+        taskInitiate.readTaskInitiateMessage(marshalledBytes);
+        return taskInitiate;
     }
 }

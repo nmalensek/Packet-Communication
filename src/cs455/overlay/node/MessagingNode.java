@@ -4,12 +4,15 @@ import cs455.overlay.dijkstra.*;
 import cs455.overlay.transport.TCPReceiverThread;
 import cs455.overlay.transport.TCPSender;
 import cs455.overlay.transport.TCPServerThread;
+import cs455.overlay.util.CommunicationTracker;
 import cs455.overlay.util.TextInputThread;
 import cs455.overlay.wireformats.Event;
+import cs455.overlay.wireformats.TaskInitiate;
 import cs455.overlay.wireformats.nodemessages.*;
 import cs455.overlay.wireformats.eventfactory.EventFactory;
 import cs455.overlay.wireformats.nodemessages.Receiving.*;
 import cs455.overlay.wireformats.nodemessages.Sending.Deregister;
+import cs455.overlay.wireformats.nodemessages.Sending.MessageSender;
 import cs455.overlay.wireformats.nodemessages.Sending.SendRegister;
 
 import java.io.IOException;
@@ -23,12 +26,6 @@ import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class MessagingNode implements Node {
-    private int sendTracker = 0;
-    private int receiveTracker = 0;
-    private int relayTracker = 0;
-    private long sendSummation = 0;
-    private long receiveSummation = 0;
-    private int numberOfConnections = 0;
     private String registryHostName;
     private int registryPort;
     private int randomPort;
@@ -114,6 +111,10 @@ public class MessagingNode implements Node {
             edgeMap = linkWeightsProcess.getEdgeMap();
             computeShortestPaths();
             System.out.println("Link weights received and processed. Ready to send messages.");
+        } else if (event instanceof TaskInitiate) {
+            int numberOfRounds = ((TaskInitiate) event).getRounds();
+            MessageSender messageSender = new MessageSender(numberOfRounds, nodeConnections, routingCache);
+            messageSender.removeNodeFromMap(thisNodeID);
         }
     }
 
@@ -162,7 +163,7 @@ public class MessagingNode implements Node {
             case "exit-overlay":
                 deregister();
                 break;
-            case "list-connections":
+            case "list-connections": //TODO delete this and the printConnections() method in final version
                 printConnections();
                 break;
             default:
@@ -200,7 +201,7 @@ public class MessagingNode implements Node {
         shortestPath = new ShortestPath(graph);
         LinkedList<Vertex> path = new LinkedList<>();
         Vertex thisNode = findThisNodeInVertexList();
-        shortestPath.execute(thisNode);
+        shortestPath.computeShortestPath(thisNode);
         for (Vertex destNode : vertices) {
             if (!thisNode.equals(destNode)) {
                 path = shortestPath.getPath(destNode);
@@ -208,7 +209,6 @@ public class MessagingNode implements Node {
             }
         }
     }
-
 
     public void printShortestPaths() {
         routingCache.printMap(thisNodeID);
@@ -227,14 +227,4 @@ public class MessagingNode implements Node {
             ioe.printStackTrace();
         }
     }
-
-    private void resetCounters() {
-        sendTracker = 0;
-        receiveTracker = 0;
-        relayTracker = 0;
-        sendSummation = 0;
-        receiveSummation = 0;
-        numberOfConnections = 0;
-    }
-
 }

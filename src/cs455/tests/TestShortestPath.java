@@ -67,7 +67,7 @@ public class TestShortestPath {
         shortestPath = new ShortestPath(graph);
         LinkedList<Vertex> path = new LinkedList<>();
         Vertex thisNode = findThisNodeInVertexList();
-        shortestPath.execute(thisNode);
+        shortestPath.computeShortestPath(thisNode);
         for (Vertex destNode : vertices) {
             if (!thisNode.equals(destNode)) {
                 path = shortestPath.getPath(destNode);
@@ -99,7 +99,7 @@ public class TestShortestPath {
 }
 
 //    ShortestPath dijkstra = new ShortestPath(graph);
-//        dijkstra.execute(nodes.get(4));
+//        dijkstra.computeShortestPath(nodes.get(4));
 //    LinkedList<Vertex> path = dijkstra.getPath(nodes.get(8));
 //
 //        for (Vertex vertex : path) {
@@ -107,7 +107,7 @@ public class TestShortestPath {
 //    }
 
 //
-//        dijkstra.execute(nodes.get(0));
+//        dijkstra.computeShortestPath(nodes.get(0));
 //                for (Vertex destNode : nodes) {
 //                if (!nodes.get(0).equals(destNode)) {
 //                path = dijkstra.getPath(destNode);

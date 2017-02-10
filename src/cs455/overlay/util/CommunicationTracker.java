@@ -28,6 +28,14 @@ public class CommunicationTracker {
         receiveSummation = receiveSummation + amountToAdd;
     }
 
+    public void printAll() {
+        System.out.println("sent: " + sendTracker);
+        System.out.println("received: " + receiveTracker);
+        System.out.println("relayed: " + relayTracker);
+        System.out.println("send summation: " + sendSummation);
+        System.out.println("receive summation: " + receiveSummation);
+    }
+
     public void resetCounters() {
         int sendTracker = 0;
         int receiveTracker = 0;

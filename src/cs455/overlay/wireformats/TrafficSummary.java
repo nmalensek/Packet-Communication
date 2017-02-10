@@ -1,6 +1,6 @@
 package cs455.overlay.wireformats;
 
-public class TaskSummaryResponse implements Protocol {
+public class TrafficSummary implements Protocol {
 
     int messageType = TRAFFIC_SUMMARY;
     String ipAddress;

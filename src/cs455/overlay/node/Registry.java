@@ -3,6 +3,8 @@ package cs455.overlay.node;
 import cs455.overlay.dijkstra.Edge;
 import cs455.overlay.dijkstra.Vertex;
 import cs455.overlay.transport.TCPServerThread;
+import cs455.overlay.wireformats.PullTrafficSummary;
+import cs455.overlay.wireformats.TaskComplete;
 import cs455.overlay.wireformats.TaskInitiate;
 import cs455.overlay.wireformats.registrymessages.receiving.DeregistrationReceiver;
 import cs455.overlay.util.OverlayCreator;
@@ -27,6 +29,7 @@ public class Registry implements Node {
     private List<Edge> links;
     private boolean overlayEstablished = false;
     private boolean linkWeightsSent = false;
+    private int finishedNodes;
 
     public void startServer() {
         TCPServerThread registryServerThread = new TCPServerThread(this, portNum);
@@ -44,6 +47,11 @@ public class Registry implements Node {
             DeregistrationReceiver deregistrationReceiver = new DeregistrationReceiver(
                     ((DeregisterRequestReceive) event), nodeMap, destinationSocket);
             deregistrationReceiver.checkDeRegistration();
+        } else if (event instanceof TaskComplete) {
+            ++finishedNodes;
+            if(finishedNodes == nodeMap.size()) {
+                pullTrafficSummary();
+            }
         }
     }
 
@@ -95,27 +103,28 @@ public class Registry implements Node {
                 break;
             case "start":
                 if (overlayEstablished) {
+                    finishedNodes = 0;
                     initiateTask(numberPortion);
                 }
+                break;
             default:
                 System.out.println("Not a valid command.");
         }
     }
 
-    public void listMessagingNodes() {
+    private void listMessagingNodes() {
         for (String node : nodeMap.keySet()) {
             System.out.println(node);
         }
     }
 
-    //TODO check for 2 nodes (can only have 1 connection)
     private void verifyConnectionRequirement() {
-        if (nodeMap.size() < connectionRequirement || nodeMap.size() == 1) {
+        if (nodeMap.size() < connectionRequirement || nodeMap.size() < 3) {
             System.out.println("Not enough nodes to fulfill connection requirement, please re-enter.");
         }
     }
 
-    public void setupOverlay() {
+    private void setupOverlay() {
         OverlayCreator overlayCreator = new OverlayCreator(connectionRequirement, nodeMap);
         overlayCreator.createOverlay();
     }
@@ -161,7 +170,7 @@ public class Registry implements Node {
         }
     }
 
-    public void sendOverlayLinkWeights() throws IOException {
+    private void sendOverlayLinkWeights() throws IOException {
         LinkWeightsSend linkWeightsSend = new LinkWeightsSend();
         linkWeightsSend.setNumberOfLinks(links.size());
         linkWeightsSend.setMessagingNodes(links);
@@ -170,11 +179,18 @@ public class Registry implements Node {
         }
     }
 
-    public void initiateTask(int numberOfRounds) throws IOException {
+    private void initiateTask(int numberOfRounds) throws IOException {
         TaskInitiate taskInitiate = new TaskInitiate();
         taskInitiate.setRounds(numberOfRounds);
         for (NodeRecord nodeRecord : nodeMap.values()) {
             nodeRecord.getSender().sendData(taskInitiate.getBytes());
+        }
+    }
+
+    private void pullTrafficSummary() throws IOException {
+        PullTrafficSummary pullTrafficSummary = new PullTrafficSummary();
+        for (NodeRecord nodeRecord : nodeMap.values()) {
+            nodeRecord.getSender().sendData(pullTrafficSummary.getBytes());
         }
     }
 

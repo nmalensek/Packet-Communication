@@ -4,6 +4,7 @@ import cs455.overlay.dijkstra.RoutingCache;
 import cs455.overlay.dijkstra.Vertex;
 import cs455.overlay.node.NodeRecord;
 import cs455.overlay.util.CommunicationTracker;
+import cs455.overlay.wireformats.nodemessages.Message;
 
 import java.io.IOException;
 import java.util.*;
@@ -16,8 +17,9 @@ public class MessageCreator {
     private Map<String, NodeRecord> copyOfDirectConnections;
     private RoutingCache routingCache;
     private String nodeToSendMessagesTo;
-    private LinkedList<Vertex> path;
     private CommunicationTracker communicationTracker;
+    private String stringPath;
+    private LinkedList<Vertex> path;
 
     public MessageCreator(List<Vertex> verticesInOverlay, Map<String,
             NodeRecord> directConnections, RoutingCache routingCache, CommunicationTracker communicationTracker) {
@@ -56,27 +58,42 @@ public class MessageCreator {
     }
 
     private void getPathToSelectedNode(String nodeToMessage) {
-        Map<String, LinkedList<Vertex>> shortestPathMap = routingCache.getShortestPathsMap();
+        Map<String, LinkedList<Vertex>> shortestPathMap = new HashMap<>(routingCache.getShortestPathsMap());
         path = shortestPathMap.get(nodeToMessage);
         path.removeFirst(); //origin node, should not include in path
+        convertPathToStrings(path);
+    }
+
+    private void convertPathToStrings(LinkedList<Vertex> vertexPath) {
+        stringPath = "";
+        for (Vertex vertex : vertexPath) {
+            stringPath += vertex.getId();
+            stringPath += "\n";
+        }
     }
 
     public void sendMessage() throws IOException {
         NodeRecord nextNodeInPath = determineNextNode();
-        MessageSend messageSend = new MessageSend();
-        messageSend.setRoutingPath(path);
+        Message message = new Message();
+        message.setRoutingPath(stringPath);
         for (int numMessages = 0; numMessages < 5; numMessages++) {
-            messageSend.setPayload();
-            nextNodeInPath.getSender().sendData(messageSend.getBytes());
+            message.setPayload();
+            nextNodeInPath.getSender().sendData(message.getBytes());
             communicationTracker.incrementSendTracker();
-            communicationTracker.incrementSendSummation(messageSend.getPayload());
+            communicationTracker.incrementSendSummation(message.getPayload());
         }
     }
 
     private NodeRecord determineNextNode() {
-        Vertex nextVertex = path.getFirst();
-        NodeRecord nextNode = copyOfDirectConnections.get(nextVertex.getId());
-        return nextNode;
+        try {
+            Vertex nextVertex = path.getFirst();
+            NodeRecord nextNode = copyOfDirectConnections.get(nextVertex.getId());
+            return nextNode;
+            //TODO Remove exception handling and RuntimeException once it's confirmed to work
+        } catch (NoSuchElementException e) {
+            System.out.println(nodeToSendMessagesTo);
+        }
+        throw new RuntimeException();
     }
 
 }

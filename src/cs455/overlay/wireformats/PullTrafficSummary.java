@@ -2,13 +2,11 @@ package cs455.overlay.wireformats;
 
 import java.io.*;
 
-public class TaskComplete implements Protocol, Event<TaskComplete> {
+public class PullTrafficSummary implements Protocol, Event<PullTrafficSummary> {
 
-    int messageType = TASK_COMPLETE;
-    int portNumber;
-    String ipAddress;
+    int messageType = PULL_TRAFFIC_SUMMARY;
 
-    public TaskComplete getType() {
+    public PullTrafficSummary getType() {
         return this;
     }
 
@@ -20,12 +18,6 @@ public class TaskComplete implements Protocol, Event<TaskComplete> {
                 new DataOutputStream(new BufferedOutputStream(byteArrayOutputStream));
 
         dataOutputStream.writeInt(messageType);
-        dataOutputStream.writeInt(portNumber);
-
-        byte[] identifierBytes = ipAddress.getBytes();
-        int elementLength = identifierBytes.length;
-        dataOutputStream.writeInt(elementLength);
-        dataOutputStream.write(identifierBytes);
 
         dataOutputStream.flush();
         marshalledBytes = byteArrayOutputStream.toByteArray();
@@ -43,31 +35,8 @@ public class TaskComplete implements Protocol, Event<TaskComplete> {
                 new DataInputStream(new BufferedInputStream(byteArrayInputStream));
 
         messageType = dataInputStream.readInt();
-        portNumber = dataInputStream.readInt();
-
-        int routeLength = dataInputStream.readInt();
-        byte[] identifierBytes = new byte[routeLength];
-        dataInputStream.readFully(identifierBytes);
-
-        ipAddress = new String(identifierBytes);
 
         byteArrayInputStream.close();
         dataInputStream.close();
-    }
-
-    public void setPortNumber(int portNumber) {
-        this.portNumber = portNumber;
-    }
-
-    public void setIpAddress(String ipAddress) {
-        this.ipAddress = ipAddress;
-    }
-
-    public int getPortNumber() {
-        return portNumber;
-    }
-
-    public String getIpAddress() {
-        return ipAddress;
     }
 }

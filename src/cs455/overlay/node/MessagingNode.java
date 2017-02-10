@@ -6,12 +6,12 @@ import cs455.overlay.transport.TCPSender;
 import cs455.overlay.transport.TCPServerThread;
 import cs455.overlay.util.CommunicationTracker;
 import cs455.overlay.util.TextInputThread;
-import cs455.overlay.wireformats.Event;
-import cs455.overlay.wireformats.TaskInitiate;
+import cs455.overlay.wireformats.*;
 import cs455.overlay.wireformats.nodemessages.*;
 import cs455.overlay.wireformats.eventfactory.EventFactory;
 import cs455.overlay.wireformats.nodemessages.Receiving.*;
 import cs455.overlay.wireformats.nodemessages.Sending.Deregister;
+import cs455.overlay.wireformats.nodemessages.Message;
 import cs455.overlay.wireformats.nodemessages.Sending.MessageCreator;
 import cs455.overlay.wireformats.nodemessages.Sending.SendRegister;
 
@@ -28,7 +28,7 @@ import java.util.concurrent.ThreadLocalRandom;
 public class MessagingNode implements Node {
     private String registryHostName;
     private int registryPort;
-    private int randomPort;
+    private int thisNodePort;
     private String thisNodeIP = Inet4Address.getLocalHost().getHostAddress();
     private String thisNodeID;
     private Socket registrySocket;
@@ -44,6 +44,7 @@ public class MessagingNode implements Node {
     private ShortestPath shortestPath;
     private RoutingCache routingCache;
     private CommunicationTracker communicationTracker = new CommunicationTracker();
+    private MessageProcessor messageProcessor = new MessageProcessor(communicationTracker);
 
     public MessagingNode(String registryHostName, int registryPort) throws IOException {
         this.registryHostName = registryHostName;
@@ -62,26 +63,26 @@ public class MessagingNode implements Node {
     }
 
     private void chooseRandomPort() {
-        randomPort = ThreadLocalRandom.current().nextInt(49152, 65535);
+        thisNodePort = ThreadLocalRandom.current().nextInt(49152, 65535);
     }
 
     private void register() throws IOException {
         SendRegister sendRegister = eF.createRegisterSendEvent().getType();
-        sendRegister.setHostAndPort(thisNodeIP, randomPort);
-        thisNodeID = thisNodeIP + ":" + randomPort;
+        sendRegister.setHostAndPort(thisNodeIP, thisNodePort);
+        thisNodeID = thisNodeIP + ":" + thisNodePort;
         message = sendRegister.getBytes();
         registrySender.sendData(message);
     }
 
     private void deregister() throws IOException {
         Deregister deregister = eF.createDeregistrationEvent().getType();
-        deregister.setHostAndPort(thisNodeIP, randomPort);
+        deregister.setHostAndPort(thisNodeIP, thisNodePort);
         message = deregister.getBytes();
         registrySender.sendData(message);
     }
 
     private void createServerThread() throws IOException {
-        receivingSocket = new TCPServerThread(this, randomPort);
+        receivingSocket = new TCPServerThread(this, thisNodePort);
         receivingSocket.start();
     }
 
@@ -98,7 +99,7 @@ public class MessagingNode implements Node {
                 System.exit(0);
             }
         } else if (event instanceof MessagingNodesListReceive) {
-           processMessagingNodesList(((MessagingNodesListReceive) event).getNodesToConnectTo());
+            processMessagingNodesList(((MessagingNodesListReceive) event).getNodesToConnectTo());
         } else if (event instanceof NodeConnection) {
             processNewConnection(((NodeConnection) event).getNodeID());
             if (nodeConnections.size() == 4) {
@@ -112,6 +113,7 @@ public class MessagingNode implements Node {
             links = linkWeightsProcess.getEdgeList();
             edgeMap = linkWeightsProcess.getEdgeMap();
             computeShortestPaths();
+            messageProcessor.setDirectConnections(nodeConnections); //store direct connections for relaying messages
             System.out.println("Link weights received and processed. Ready to send messages.");
         } else if (event instanceof TaskInitiate) {
             int numberOfRounds = ((TaskInitiate) event).getRounds();
@@ -120,14 +122,17 @@ public class MessagingNode implements Node {
                 messageCreator.prepareMessage(thisNodeID);
                 messageCreator.sendMessage();
             }
-        } else if (event instanceof MessageReceive) {
+            taskComplete();
+        } else if (event instanceof Message) {
+            messageProcessor.processRoutingPath(((Message) event));
+        } else if (event instanceof PullTrafficSummary) {
 
         }
     }
 
     private void processMessagingNodesList(String stringToSplit) throws IOException {
         String[] splitByNewLine = stringToSplit.split("\\n");
-        for(String nodeID : splitByNewLine) {
+        for (String nodeID : splitByNewLine) {
             String[] splitIDApart = nodeID.split(":");
             String host = splitIDApart[0];
             int port = Integer.parseInt(splitIDApart[1]);
@@ -155,7 +160,7 @@ public class MessagingNode implements Node {
 
     private void tellOtherNodeAboutConnection(NodeRecord nodeConnectingTo) throws IOException {
         NodeConnection nodeConnection = eF.sendNodeConnection().getType();
-        String thisNodeID = thisNodeIP + ":" + Integer.toString(randomPort);
+        String thisNodeID = thisNodeIP + ":" + Integer.toString(thisNodePort);
         nodeConnection.setNodeID(thisNodeID);
         nodeConnectingTo.getSender().sendData(nodeConnection.getBytes());
     }
@@ -182,9 +187,9 @@ public class MessagingNode implements Node {
     }
 
     private void printConnections() {
-        if(nodeConnections.size() == 0) {
+        if (nodeConnections.size() == 0) {
             System.out.println("No connections available, is the overlay set up?");
-        } else{
+        } else {
             for (String s : nodeConnections.keySet()) {
                 System.out.println(s);
             }
@@ -193,7 +198,7 @@ public class MessagingNode implements Node {
 
     private Vertex findThisNodeInVertexList() {
         for (Vertex vertex : vertices) {
-            if(thisNodeID.equals(vertex.getId())) {
+            if (thisNodeID.equals(vertex.getId())) {
                 return vertex;
             }
         }
@@ -215,8 +220,21 @@ public class MessagingNode implements Node {
         }
     }
 
-    public void printShortestPaths() {
+    private void printShortestPaths() {
         routingCache.printMap(thisNodeID);
+        System.out.println("----");
+        routingCache.simplePrint();
+    }
+
+    private void taskComplete() throws IOException {
+        TaskComplete taskComplete = new TaskComplete();
+        taskComplete.setIpAddress(thisNodeIP);
+        taskComplete.setPortNumber(thisNodePort);
+        registrySender.sendData(taskComplete.getBytes());
+    }
+
+    private void sendTrafficSummary() throws IOException {
+        TrafficSummary trafficSummary = new TrafficSummary();
     }
 
     public static void main(String[] args) {

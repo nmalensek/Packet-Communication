@@ -1,23 +1,18 @@
-package cs455.overlay.wireformats.nodemessages.Sending;
+package cs455.overlay.wireformats.nodemessages;
 
-import cs455.overlay.dijkstra.Vertex;
 import cs455.overlay.wireformats.Event;
 import cs455.overlay.wireformats.Protocol;
 
-import java.io.BufferedOutputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.util.List;
+import java.io.*;
 import java.util.concurrent.ThreadLocalRandom;
 
-public class MessageSend implements Protocol, Event<MessageSend> {
+public class Message implements Protocol, Event<Message> {
 
     private int messageType = SEND_MESSAGE;
     private String routingPath;
     private int payload;
 
-    public MessageSend getType() {
+    public Message getType() {
         return this;
     }
 
@@ -45,11 +40,27 @@ public class MessageSend implements Protocol, Event<MessageSend> {
         return marshalledBytes;
     }
 
-    public void setRoutingPath(List<Vertex> routeList) {
-        routingPath = "";
-        for (Vertex vertex : routeList) {
-            routingPath += vertex.getId();
-        }
+    public void readMessage(byte[] marshalledBytes) throws IOException {
+        ByteArrayInputStream byteArrayInputStream =
+                new ByteArrayInputStream(marshalledBytes);
+        DataInputStream dataInputStream =
+                new DataInputStream(new BufferedInputStream(byteArrayInputStream));
+
+        messageType = dataInputStream.readInt();
+        payload = dataInputStream.readInt();
+
+        int routeLength = dataInputStream.readInt();
+        byte[] identifierBytes = new byte[routeLength];
+        dataInputStream.readFully(identifierBytes);
+
+        routingPath = new String(identifierBytes);
+
+        byteArrayInputStream.close();
+        dataInputStream.close();
+    }
+
+    public void setRoutingPath(String routeString) {
+        routingPath = routeString;
     }
 
     public void setPayload() {

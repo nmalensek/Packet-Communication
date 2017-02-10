@@ -3,10 +3,12 @@ package cs455.overlay.transport;
 import cs455.overlay.node.Node;
 import cs455.overlay.wireformats.Event;
 import cs455.overlay.wireformats.Protocol;
+import cs455.overlay.wireformats.TaskComplete;
 import cs455.overlay.wireformats.TaskInitiate;
 import cs455.overlay.wireformats.eventfactory.EventFactory;
 import cs455.overlay.wireformats.nodemessages.NodeConnection;
 import cs455.overlay.wireformats.nodemessages.Receiving.*;
+import cs455.overlay.wireformats.nodemessages.Message;
 import cs455.overlay.wireformats.registrymessages.receiving.DeregisterRequestReceive;
 import cs455.overlay.wireformats.registrymessages.receiving.RegisterRequestReceive;
 
@@ -51,7 +53,7 @@ public class TCPReceiverThread extends Thread implements Protocol {
         }
     }
 
-    public void determineMessageType(byte[] marshalledBytes) throws IOException {
+    public synchronized void determineMessageType(byte[] marshalledBytes) throws IOException {
         ByteArrayInputStream byteArrayInputStream =
                 new ByteArrayInputStream(marshalledBytes);
         DataInputStream dataInputStream =
@@ -85,16 +87,21 @@ public class TCPReceiverThread extends Thread implements Protocol {
                 Event<LinkWeightsReceive> receiveLinkWeightsEvent =
                         eventFactory.receiveLinkWeights(marshalledBytes);
                 node.onEvent(receiveLinkWeightsEvent, communicationSocket);
+                break;
             case TASK_INITIATE:
                 Event<TaskInitiate> receiveTaskInitiateEvent =
                         eventFactory.receiveTaskInitiate(marshalledBytes);
                 node.onEvent(receiveTaskInitiateEvent, communicationSocket);
+                break;
             case SEND_MESSAGE:
-                Event<MessageReceive> receiveMessage =
+                Event<Message> receiveMessageEvent =
                         eventFactory.receiveMessage(marshalledBytes);
-                node.onEvent(receiveMessage, communicationSocket);
+                node.onEvent(receiveMessageEvent, communicationSocket);
+                break;
             case TASK_COMPLETE:
-                //do something
+                Event<TaskComplete> taskCompleteEvent =
+                        eventFactory.taskComplete(marshalledBytes);
+                node.onEvent(taskCompleteEvent, communicationSocket);
             case PULL_TRAFFIC_SUMMARY:
                 //do something else
             case TRAFFIC_SUMMARY:

@@ -29,6 +29,7 @@ public class Registry implements Node {
     private boolean linkWeightsSent = false;
     private int finishedNodes;
     private int numberOfSummariesReceived;
+    private TrafficPrinter trafficPrinter = new TrafficPrinter();
 
     public void startServer() {
         TCPServerThread registryServerThread = new TCPServerThread(this, portNum);
@@ -57,12 +58,13 @@ public class Registry implements Node {
                 }
             }
         } else if (event instanceof TrafficSummary) {
-            TrafficPrinter trafficPrinter = new TrafficPrinter(((TrafficSummary) event));
-            trafficPrinter.processSummary();
+            trafficPrinter.processSummary(((TrafficSummary) event));
             ++numberOfSummariesReceived;
             if (numberOfSummariesReceived == nodeMap.size()) {
                 trafficPrinter.addTotalsToString();
                 trafficPrinter.printTrafficSummary();
+                numberOfSummariesReceived = 0;
+                trafficPrinter.resetTrafficString();
             }
         }
     }

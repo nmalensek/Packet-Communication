@@ -99,10 +99,12 @@ public class TCPReceiverThread extends Thread implements Protocol {
                 Event<TaskComplete> taskCompleteEvent =
                         eventFactory.taskComplete(marshalledBytes);
                 node.onEvent(taskCompleteEvent, communicationSocket);
+                break;
             case PULL_TRAFFIC_SUMMARY:
                 Event<PullTrafficSummary> receivePullTrafficSummary =
                         eventFactory.receivePullTrafficSummary(marshalledBytes);
                 node.onEvent(receivePullTrafficSummary, communicationSocket);
+                break;
             case TRAFFIC_SUMMARY:
                 Event<TrafficSummary> receiveTrafficSummary =
                         eventFactory.receiveTrafficSummary(marshalledBytes);

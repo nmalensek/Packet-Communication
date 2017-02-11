@@ -49,14 +49,20 @@ public class Registry implements Node {
         } else if (event instanceof TaskComplete) {
             ++finishedNodes;
             if(finishedNodes == nodeMap.size()) {
-                pullTrafficSummary();
+                try {
+                    Thread.sleep(1500);
+                    pullTrafficSummary();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
             }
         } else if (event instanceof TrafficSummary) {
             TrafficPrinter trafficPrinter = new TrafficPrinter(((TrafficSummary) event));
             trafficPrinter.processSummary();
             ++numberOfSummariesReceived;
             if (numberOfSummariesReceived == nodeMap.size()) {
-                trafficPrinter.printTotalSummary();
+                trafficPrinter.addTotalsToString();
+                trafficPrinter.printTrafficSummary();
             }
         }
     }

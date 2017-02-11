@@ -1,5 +1,7 @@
 package cs455.overlay.util;
 
+import cs455.overlay.wireformats.TrafficSummary;
+
 public class CommunicationTracker {
 
     private int sendTracker = 0;
@@ -28,20 +30,24 @@ public class CommunicationTracker {
         receiveSummation = receiveSummation + amountToAdd;
     }
 
-    public void printAll() {
-        System.out.println("sent: " + sendTracker);
-        System.out.println("received: " + receiveTracker);
-        System.out.println("relayed: " + relayTracker);
-        System.out.println("send summation: " + sendSummation);
-        System.out.println("receive summation: " + receiveSummation);
+    public TrafficSummary createTrafficSummary(String nodeIP, int nodePort) {
+        TrafficSummary trafficSummary = new TrafficSummary();
+        trafficSummary.setIpAddress(nodeIP);
+        trafficSummary.setPortNumber(nodePort);
+        trafficSummary.setSentMessages(sendTracker);
+        trafficSummary.setSendSummation(sendSummation);
+        trafficSummary.setReceivedMessages(receiveTracker);
+        trafficSummary.setReceiveSummation(receiveSummation);
+        trafficSummary.setRelayedMessages(relayTracker);
+        return trafficSummary;
     }
 
     public void resetCounters() {
-        int sendTracker = 0;
-        int receiveTracker = 0;
-        int relayTracker = 0;
-        long sendSummation = 0;
-        long receiveSummation = 0;
+        sendTracker = 0;
+        receiveTracker = 0;
+        relayTracker = 0;
+        sendSummation = 0;
+        receiveSummation = 0;
     }
 
 }

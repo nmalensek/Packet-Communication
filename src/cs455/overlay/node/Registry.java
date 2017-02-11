@@ -3,16 +3,14 @@ package cs455.overlay.node;
 import cs455.overlay.dijkstra.Edge;
 import cs455.overlay.dijkstra.Vertex;
 import cs455.overlay.transport.TCPServerThread;
-import cs455.overlay.wireformats.PullTrafficSummary;
-import cs455.overlay.wireformats.TaskComplete;
-import cs455.overlay.wireformats.TaskInitiate;
+import cs455.overlay.util.TrafficPrinter;
+import cs455.overlay.wireformats.*;
 import cs455.overlay.wireformats.registrymessages.receiving.DeregistrationReceiver;
 import cs455.overlay.util.OverlayCreator;
 import cs455.overlay.wireformats.registrymessages.receiving.RegistrationReceiver;
 import cs455.overlay.util.TextInputThread;
 import cs455.overlay.wireformats.registrymessages.receiving.DeregisterRequestReceive;
 import cs455.overlay.wireformats.registrymessages.receiving.RegisterRequestReceive;
-import cs455.overlay.wireformats.Event;
 import cs455.overlay.wireformats.registrymessages.sending.LinkWeightsSend;
 import cs455.overlay.wireformats.registrymessages.sending.MessagingNodesList;
 
@@ -30,6 +28,7 @@ public class Registry implements Node {
     private boolean overlayEstablished = false;
     private boolean linkWeightsSent = false;
     private int finishedNodes;
+    private int numberOfSummariesReceived;
 
     public void startServer() {
         TCPServerThread registryServerThread = new TCPServerThread(this, portNum);
@@ -51,6 +50,13 @@ public class Registry implements Node {
             ++finishedNodes;
             if(finishedNodes == nodeMap.size()) {
                 pullTrafficSummary();
+            }
+        } else if (event instanceof TrafficSummary) {
+            TrafficPrinter trafficPrinter = new TrafficPrinter(((TrafficSummary) event));
+            trafficPrinter.processSummary();
+            ++numberOfSummariesReceived;
+            if (numberOfSummariesReceived == nodeMap.size()) {
+                trafficPrinter.printTotalSummary();
             }
         }
     }

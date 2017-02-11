@@ -1,10 +1,7 @@
 package cs455.overlay.wireformats.eventfactory;
 
-import cs455.overlay.wireformats.Event;
-import cs455.overlay.wireformats.PullTrafficSummary;
-import cs455.overlay.wireformats.TaskComplete;
+import cs455.overlay.wireformats.*;
 import cs455.overlay.wireformats.nodemessages.Receiving.*;
-import cs455.overlay.wireformats.TaskInitiate;
 import cs455.overlay.wireformats.nodemessages.*;
 import cs455.overlay.wireformats.nodemessages.Sending.Deregister;
 import cs455.overlay.wireformats.nodemessages.Message;
@@ -126,5 +123,12 @@ public final class EventFactory {
         PullTrafficSummary pullTrafficSummary = new PullTrafficSummary();
         pullTrafficSummary.readMessage(marshalledBytes);
         return pullTrafficSummary;
+    }
+
+    public static Event<TrafficSummary> receiveTrafficSummary(
+            byte[] marshalledBytes) throws IOException {
+        TrafficSummary trafficSummary = new TrafficSummary();
+        trafficSummary.readMessage(marshalledBytes);
+        return trafficSummary;
     }
 }

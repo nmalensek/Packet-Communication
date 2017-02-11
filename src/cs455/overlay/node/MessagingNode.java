@@ -126,7 +126,8 @@ public class MessagingNode implements Node {
         } else if (event instanceof Message) {
             messageProcessor.processRoutingPath(((Message) event));
         } else if (event instanceof PullTrafficSummary) {
-
+            createAndSendTrafficSummary();
+            communicationTracker.resetCounters();
         }
     }
 
@@ -233,8 +234,9 @@ public class MessagingNode implements Node {
         registrySender.sendData(taskComplete.getBytes());
     }
 
-    private void sendTrafficSummary() throws IOException {
-        TrafficSummary trafficSummary = new TrafficSummary();
+    private void createAndSendTrafficSummary() throws IOException {
+        TrafficSummary summary = communicationTracker.createTrafficSummary(thisNodeIP, thisNodePort);
+        registrySender.sendData(summary.getBytes());
     }
 
     public static void main(String[] args) {

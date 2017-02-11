@@ -58,7 +58,8 @@ public class MessageCreator {
     }
 
     private void getPathToSelectedNode(String nodeToMessage) {
-        Map<String, LinkedList<Vertex>> shortestPathMap = new HashMap<>(routingCache.getShortestPathsMap());
+        Map<String, LinkedList<Vertex>> shortestPathMap =
+                new HashMap<>(routingCache.getShortestPathsMap()); //MUST COPY HERE, otherwise nodes will delete path knowledge
         path = shortestPathMap.get(nodeToMessage);
         path.removeFirst(); //origin node, should not include in path
         convertPathToStrings(path);

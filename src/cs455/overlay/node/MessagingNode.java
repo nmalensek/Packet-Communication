@@ -131,7 +131,7 @@ public class MessagingNode implements Node {
         }
     }
 
-    private void processMessagingNodesList(String stringToSplit) throws IOException {
+    private synchronized void processMessagingNodesList(String stringToSplit) throws IOException {
         String[] splitByNewLine = stringToSplit.split("\\n");
         for (String nodeID : splitByNewLine) {
             String[] splitIDApart = nodeID.split(":");
@@ -143,14 +143,14 @@ public class MessagingNode implements Node {
     }
 
     //splits apart id, stores connection, and ignores returned Vertex
-    private void processNewConnection(String nodeIDLine) throws IOException {
+    private synchronized void processNewConnection(String nodeIDLine) throws IOException {
         String[] splitIDApart = nodeIDLine.split(":");
         String host = splitIDApart[0];
         int port = Integer.parseInt(splitIDApart[1]);
         cacheConnection(host, port, nodeIDLine);
     }
 
-    private NodeRecord cacheConnection(String host, int port, String nodeID) throws IOException {
+    private synchronized NodeRecord cacheConnection(String host, int port, String nodeID) throws IOException {
         Socket nodeSocket = new Socket(host, port);
         NodeRecord newNodeRecord = new NodeRecord(host, port, nodeSocket);
         TCPReceiverThread receiverThread = new TCPReceiverThread(nodeSocket, this);
@@ -237,6 +237,7 @@ public class MessagingNode implements Node {
     private void createAndSendTrafficSummary() throws IOException {
         TrafficSummary summary = communicationTracker.createTrafficSummary(thisNodeIP, thisNodePort);
         registrySender.sendData(summary.getBytes());
+        communicationTracker.printCounters();
     }
 
     public static void main(String[] args) {

@@ -50,4 +50,12 @@ public class CommunicationTracker {
         receiveSummation = 0;
     }
 
+    public void printCounters() {
+        System.out.println(sendTracker);
+        System.out.println(sendSummation);
+        System.out.println(receiveTracker);
+        System.out.println(receiveSummation);
+        System.out.println(relayTracker);
+    }
+
 }

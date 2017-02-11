@@ -15,16 +15,11 @@ import java.io.IOException;
 
 public final class EventFactory {
 
-    private static EventFactory instance = null;
+    private static final EventFactory instance = new EventFactory();
 
-    protected EventFactory() {
-
-    }
+    private EventFactory() { }
 
     public static EventFactory getInstance() {
-        if (instance == null) {
-            instance = new EventFactory();
-        }
         return instance;
     }
 

@@ -48,10 +48,10 @@ public class Registry implements Node {
                     ((DeregisterRequestReceive) event), nodeMap, destinationSocket);
             deregistrationReceiver.checkDeRegistration();
         } else if (event instanceof TaskComplete) {
-            ++finishedNodes;
+            finishedNodes++;
             if(finishedNodes == nodeMap.size()) {
                 try {
-                    Thread.sleep(1500);
+                    Thread.sleep(15000);
                     pullTrafficSummary();
                 } catch (InterruptedException e) {
                     e.printStackTrace();
@@ -59,7 +59,7 @@ public class Registry implements Node {
             }
         } else if (event instanceof TrafficSummary) {
             trafficPrinter.processSummary(((TrafficSummary) event));
-            ++numberOfSummariesReceived;
+            numberOfSummariesReceived++;
             if (numberOfSummariesReceived == nodeMap.size()) {
                 trafficPrinter.addTotalsToString();
                 trafficPrinter.printTrafficSummary();

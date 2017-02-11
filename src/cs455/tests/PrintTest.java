@@ -3,6 +3,11 @@ package cs455.tests;
 public class PrintTest {
 
     private String traffic = "";
+    private int totalSend;
+    private int totalReceive;
+    private long sendSummationTotal;
+    private long receiveSummationTotal;
+    private int totalRelay;
 
     public void setupString() {
        traffic += String.format("%-15s %-10s %-10s %-15s %-15s %-8s %n", "", "",
@@ -13,24 +18,43 @@ public class PrintTest {
                 "messages", "messages", "messages", "messages");
     }
 
+    public void getTotals() {
+        traffic += String.format("%-30s %-10s %-10s %-15s %-15s %-8s %n", "",
+                totalSend, totalReceive,
+                sendSummationTotal, receiveSummationTotal, totalRelay);
+    }
+
     public void processSummary(String nodeID, int sentMessages, int receivedMessages, long sentSummation,
                                long receiveSummation, int relayedMessages) {
         traffic += String.format("%-15s %-10s %-10s %-15s %-15s %-8s %n",
                 nodeID, sentMessages, receivedMessages, sentSummation, receiveSummation, relayedMessages);
+        totalSend = totalSend + sentMessages;
+        totalReceive = totalReceive + receivedMessages;
+        sendSummationTotal = sendSummationTotal + sentSummation;
+        receiveSummationTotal = receiveSummationTotal + receiveSummation;
+        totalRelay = totalRelay + relayedMessages;
     }
 
     private void addDataToString() {
-        processSummary("Node1:52661", 25000, 25440, -340040800604L,
+        processSummary("Node1:52661", 100000, 25440, -340040800604L,
                 -144703367090L, 40445);
-        processSummary("Node2:53534", 25000, 25440, -340040800604L,
+        processSummary("Node2:53534", 100000, 25440, -340040800604L,
                 -144703367090L, 40445);
-        processSummary("Node3:99887", 25000, 25440, -340040800604L,
+        processSummary("Node3:99887", 100000, 25440, -340040800604L,
                 -144703367090L, 40445);
-        processSummary("Node4:57761", 25000, 25440, -340040800604L,
+        processSummary("Node4:57761", 100000, 25440, -340040800604L,
                 -144703367090L, 40445);
-        processSummary("Node5:21661", 25000, 25440, -340040800604L,
+        processSummary("Node5:21661", 100000, 25440, -340040800604L,
                 -144703367090L, 40445);
-        processSummary("Node6:90661", 25000, 25440, -340040800604L,
+        processSummary("Node6:90661", 100000, 25440, -340040800604L,
+                -144703367090L, 40445);
+        processSummary("Node7:90661", 100000, 25440, -340040800604L,
+                -144703367090L, 40445);
+        processSummary("Node8:90661", 100000, 25440, -340040800604L,
+                -144703367090L, 40445);
+        processSummary("Node9:90661", 100000, 25440, -340040800604L,
+                -144703367090L, 40445);
+        processSummary("Node10:90661", 100000, 25440, -340040800604L,
                 -144703367090L, 40445);
     }
 
@@ -42,6 +66,7 @@ public class PrintTest {
         PrintTest printTest = new PrintTest();
         printTest.setupString();
         printTest.addDataToString();
+        printTest.getTotals();
         printTest.printTotalSummary();
     }
 

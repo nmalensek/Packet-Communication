@@ -4,9 +4,7 @@ import cs455.overlay.wireformats.TrafficSummary;
 
 public class TrafficPrinter {
 
-    private TrafficSummary summary;
     private String traffic = "";
-    private int numberOfSummariesReceived;
     private int totalMessagesSent;
     private int totalMessagesReceived;
     private long totalSendSummation;
@@ -27,7 +25,6 @@ public class TrafficPrinter {
     }
 
     public synchronized void processSummary(TrafficSummary summary) {
-        this.summary = summary;
         String nodeID = summary.getIpAddress() + ":" + summary.getPortNumber();
         int sentMessages = summary.getSentMessages();
         totalMessagesSent = totalMessagesSent + sentMessages;

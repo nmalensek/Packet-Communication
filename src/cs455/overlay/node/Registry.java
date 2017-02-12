@@ -64,7 +64,7 @@ public class Registry implements Node {
                 trafficPrinter.addTotalsToString();
                 trafficPrinter.printTrafficSummary();
                 numberOfSummariesReceived = 0;
-                trafficPrinter.resetTrafficString();
+                trafficPrinter.resetTrafficStringAndCounters();
             }
         }
     }
@@ -119,6 +119,9 @@ public class Registry implements Node {
                 if (overlayEstablished) {
                     finishedNodes = 0;
                     initiateTask(numberPortion);
+                } else {
+                    System.out.println("Overlay hasn\'t been successfully set up yet, " +
+                            "please set up the overlay.");
                 }
                 break;
             default:

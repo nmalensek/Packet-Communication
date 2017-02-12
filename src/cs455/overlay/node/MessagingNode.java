@@ -45,6 +45,8 @@ public class MessagingNode implements Node {
     private RoutingCache routingCache;
     private CommunicationTracker communicationTracker = new CommunicationTracker();
     private MessageProcessor messageProcessor = new MessageProcessor(communicationTracker);
+    private boolean linkWeightsReceived = false;
+    private boolean overlaySetUp = false;
 
     public MessagingNode(String registryHostName, int registryPort) throws IOException {
         this.registryHostName = registryHostName;
@@ -114,6 +116,7 @@ public class MessagingNode implements Node {
             edgeMap = linkWeightsProcess.getEdgeMap();
             computeShortestPaths();
             messageProcessor.setDirectConnections(nodeConnections); //store direct connections for relaying messages
+            linkWeightsReceived = true;
             System.out.println("Link weights received and processed. Ready to send messages.");
         } else if (event instanceof TaskInitiate) {
             int numberOfRounds = ((TaskInitiate) event).getRounds();
@@ -159,7 +162,7 @@ public class MessagingNode implements Node {
         return newNodeRecord;
     }
 
-    private void tellOtherNodeAboutConnection(NodeRecord nodeConnectingTo) throws IOException {
+    private synchronized void tellOtherNodeAboutConnection(NodeRecord nodeConnectingTo) throws IOException {
         NodeConnection nodeConnection = eF.sendNodeConnection().getType();
         String thisNodeID = thisNodeIP + ":" + Integer.toString(thisNodePort);
         nodeConnection.setNodeID(thisNodeID);
@@ -169,14 +172,23 @@ public class MessagingNode implements Node {
     public void processText(String command) throws IOException {
         switch (command) {
             case "print-shortest-path":
-                printShortestPaths();
+                if (linkWeightsReceived) {
+                    printShortestPaths();
+                } else {
+                    System.out.println("Link weights haven\'t been received yet, " +
+                            "please re-try after link weights are sent.");
+                }
                 break;
             case "exit-overlay":
-                deregister();
+                if (!overlaySetUp) {
+                    deregister();
+                } else {
+                    System.out.println("Overlay is set up, cannot deregister.");
+                }
                 break;
-            case "list-connections": //TODO delete this and the printConnections() method in final version
-                printConnections();
-                break;
+//            case "list-connections":
+//                printConnections();
+//                break;
             default:
                 System.out.println("Not a valid command.");
         }
@@ -185,16 +197,6 @@ public class MessagingNode implements Node {
     private void listenForTextInput() throws IOException {
         TextInputThread textInputThread = new TextInputThread(this);
         textInputThread.start();
-    }
-
-    private void printConnections() {
-        if (nodeConnections.size() == 0) {
-            System.out.println("No connections available, is the overlay set up?");
-        } else {
-            for (String s : nodeConnections.keySet()) {
-                System.out.println(s);
-            }
-        }
     }
 
     private Vertex findThisNodeInVertexList() {
@@ -223,8 +225,8 @@ public class MessagingNode implements Node {
 
     private void printShortestPaths() {
         routingCache.printMap(thisNodeID);
-        System.out.println("----");
-        routingCache.simplePrint();
+//        System.out.println("----");
+//        routingCache.simplePrint();
     }
 
     private void taskComplete() throws IOException {
@@ -232,13 +234,23 @@ public class MessagingNode implements Node {
         taskComplete.setIpAddress(thisNodeIP);
         taskComplete.setPortNumber(thisNodePort);
         registrySender.sendData(taskComplete.getBytes());
+//        communicationTracker.printCounters();
     }
 
     private void createAndSendTrafficSummary() throws IOException {
         TrafficSummary summary = communicationTracker.createTrafficSummary(thisNodeIP, thisNodePort);
         registrySender.sendData(summary.getBytes());
-        communicationTracker.printCounters();
     }
+
+//    private void printConnections() { //used to help debug
+//        if (nodeConnections.size() == 0) {
+//            System.out.println("No connections available, is the overlay set up?");
+//        } else {
+//            for (String s : nodeConnections.keySet()) {
+//                System.out.println(s);
+//            }
+//        }
+//    }
 
     public static void main(String[] args) {
         String host = args[0];

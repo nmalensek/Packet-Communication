@@ -1,4 +1,4 @@
-package cs455.tests;
+package cs455.overlay.tests;
 
 import cs455.overlay.node.Node;
 import cs455.overlay.node.NodeRecord;

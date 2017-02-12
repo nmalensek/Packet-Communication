@@ -1,4 +1,4 @@
-package cs455.tests;
+package cs455.overlay.tests;
 
 public class PrintTest {
 

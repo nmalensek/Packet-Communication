@@ -55,7 +55,13 @@ public class TrafficPrinter {
         System.out.println(traffic);
     }
 
-    public void resetTrafficString() {
+    public void resetTrafficStringAndCounters() {
         traffic = "";
+        totalMessagesSent = 0;
+        totalMessagesReceived = 0;
+        totalSendSummation = 0;
+        totalReceiveSummation = 0;
+        totalMessagesRelayed = 0;
+
     }
 }

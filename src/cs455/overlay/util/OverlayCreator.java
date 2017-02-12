@@ -89,7 +89,7 @@ public class OverlayCreator {
                     break;
                 }
             }
-            currentNode.printNodesList();
+//            currentNode.printNodesList();
         }
     }
 
@@ -102,7 +102,7 @@ public class OverlayCreator {
     }
 
     private void reEstablishConnections() {
-        System.out.println("Impossible to create overlay, starting over...");
+//        System.out.println("Impossible to create overlay, starting over...");
         for (NodeRecord node : registeredNodes.values()) {
             node.getNodesToConnectToList().clear();
             node.resetNumberOfConnections();

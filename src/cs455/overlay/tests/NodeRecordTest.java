@@ -1,7 +1,6 @@
-package cs455.tests;
+package cs455.overlay.tests;
 
 import cs455.overlay.node.NodeRecord;
-import cs455.overlay.transport.TCPReceiverThread;
 
 import java.io.IOException;
 import java.net.Inet4Address;

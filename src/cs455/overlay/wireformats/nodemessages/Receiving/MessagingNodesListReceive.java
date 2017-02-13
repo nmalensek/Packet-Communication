@@ -10,7 +10,7 @@ import java.io.IOException;
 
 public class MessagingNodesListReceive implements Protocol, Event<MessagingNodesListReceive> {
     private int messageType = MESSAGING_NODES_LIST;
-    private int numberOfPeerMessagingNodes; //this number of connections node should initiate. then print total connections once done.
+    private int numberOfRequiredConnections; //this number of connections node should initiate.
     private String nodesToConnectTo;
     //messaging node info (hostname:portnum)
 
@@ -18,7 +18,7 @@ public class MessagingNodesListReceive implements Protocol, Event<MessagingNodes
         System.out.println(getNodesToConnectTo());
     }
 
-    public int getNumberOfPeerMessagingNodes() {return numberOfPeerMessagingNodes;}
+    public int getNumberOfRequiredConnections() {return numberOfRequiredConnections;}
 
     public MessagingNodesListReceive getType() { return this; }
 
@@ -29,7 +29,7 @@ public class MessagingNodesListReceive implements Protocol, Event<MessagingNodes
                 new DataInputStream(new BufferedInputStream(byteArrayInputStream));
 
         messageType = dataInputStream.readInt();
-        numberOfPeerMessagingNodes = dataInputStream.readInt();
+        numberOfRequiredConnections = dataInputStream.readInt();
 
         int nodeLength = dataInputStream.readInt();
         byte[] identifierBytes = new byte[nodeLength];

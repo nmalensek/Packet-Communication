@@ -44,8 +44,7 @@ public class TCPReceiverThread extends Thread implements Protocol {
                 se.printStackTrace();
                 break;
             } catch (IOException ioe) {
-                ioe.printStackTrace();
-                break;
+                ioe.getMessage();
             }
         }
     }

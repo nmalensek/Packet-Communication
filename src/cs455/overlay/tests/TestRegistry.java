@@ -38,7 +38,7 @@ public class TestRegistry implements Node {
             receiver.checkRegistration();
         } else if (event instanceof DeregisterRequestReceive) {
             DeregistrationReceiver deregistrationReceiver = new DeregistrationReceiver(
-                    ((DeregisterRequestReceive) event), nodeMap, destinationSocket);
+                    ((DeregisterRequestReceive) event), nodeMap, destinationSocket, true);
             deregistrationReceiver.checkDeRegistration();
         }
     }
@@ -98,7 +98,7 @@ public class TestRegistry implements Node {
     private void sendMessagingNodesList() throws IOException {
         MessagingNodesList messagingNodesList = new MessagingNodesList();
         for (NodeRecord node : nodeMap.values()) {
-            messagingNodesList.setNumberOfPeerMessagingNodes(node.getConnectionsNeededToInitiate());
+            messagingNodesList.setNumberOfRequiredConnections(node.getConnectionsNeededToInitiate());
             messagingNodesList.setMessagingNodes(node.getNodesToConnectToList());
             node.getSender().sendData(messagingNodesList.getBytes());
         }

@@ -31,6 +31,7 @@ public class MessagingNode implements Node {
     private int thisNodePort;
     private String thisNodeIP = Inet4Address.getLocalHost().getHostAddress();
     private String thisNodeID;
+    private int requiredConnections;
     private Socket registrySocket;
     private TCPSender registrySender;
     private TCPServerThread receivingSocket;
@@ -103,9 +104,10 @@ public class MessagingNode implements Node {
             }
         } else if (event instanceof MessagingNodesListReceive) {
             processMessagingNodesList(((MessagingNodesListReceive) event).getNodesToConnectTo());
+            requiredConnections = ((MessagingNodesListReceive) event).getNumberOfRequiredConnections();
         } else if (event instanceof NodeConnection) {
             processNewConnection(((NodeConnection) event).getNodeID());
-            if (nodeConnections.size() == 4) {
+            if (nodeConnections.size() == requiredConnections) {
                 System.out.println("All connections established. Number of connections: "
                         + nodeConnections.size());
                 receivedNodeList = true;

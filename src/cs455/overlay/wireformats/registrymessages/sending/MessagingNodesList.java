@@ -13,7 +13,7 @@ import java.util.List;
 public class MessagingNodesList implements Protocol, Event<MessagingNodesList> {
 
     private int messageType = MESSAGING_NODES_LIST;
-    private int numberOfPeerMessagingNodes; //number of connections node should initiate. then print total connections once done.
+    private int numberOfRequiredConnections; //number of connections overlay requires
     private String messagingNodes;
 
     public MessagingNodesList getType() {
@@ -28,7 +28,7 @@ public class MessagingNodesList implements Protocol, Event<MessagingNodesList> {
                 new DataOutputStream(new BufferedOutputStream(byteArrayOutputStream));
 
         dataOutputStream.writeInt(messageType);
-        dataOutputStream.writeInt(numberOfPeerMessagingNodes);
+        dataOutputStream.writeInt(numberOfRequiredConnections);
 
         byte[] identifierBytes = messagingNodes.getBytes();
         int elementLength = identifierBytes.length;
@@ -52,7 +52,7 @@ public class MessagingNodesList implements Protocol, Event<MessagingNodesList> {
         }
     }
 
-    public void setNumberOfPeerMessagingNodes(int nodes) {
-        numberOfPeerMessagingNodes = nodes;
+    public void setNumberOfRequiredConnections(int nodes) {
+        numberOfRequiredConnections = nodes;
     }
 }

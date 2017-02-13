@@ -64,7 +64,6 @@ public class Registry implements Node {
                 trafficPrinter.addTotalsToString();
                 trafficPrinter.printTrafficSummary();
                 numberOfSummariesReceived = 0;
-                trafficPrinter.resetTrafficStringAndCounters();
             }
         }
     }
@@ -117,6 +116,8 @@ public class Registry implements Node {
                 break;
             case "start":
                 if (overlayEstablished && linkWeightsSent) {
+                    //counter resets when task starts in case there are still messages from last run coming in
+                    trafficPrinter.resetTrafficStringAndCounters();
                     finishedNodes = 0;
                     initiateTask(numberPortion);
                 } else {
@@ -158,7 +159,7 @@ public class Registry implements Node {
     private void sendMessagingNodesList() throws IOException {
         MessagingNodesList messagingNodesList = new MessagingNodesList();
         for (NodeRecord node : nodeMap.values()) {
-            messagingNodesList.setNumberOfPeerMessagingNodes(node.getConnectionsNeededToInitiate());
+            messagingNodesList.setNumberOfRequiredConnections(connectionRequirement);
             messagingNodesList.setMessagingNodes(node.getNodesToConnectToList());
             node.getSender().sendData(messagingNodesList.getBytes());
         }

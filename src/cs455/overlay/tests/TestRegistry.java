@@ -75,7 +75,6 @@ public class TestRegistry implements Node {
         }
     }
 
-    //TODO check for 2 nodes (can only have 1 connection) and 1 node
     private void verifyConnectionRequirement() {
         if (nodeMap.size() < connectionRequirement) {
             System.out.println("Not enough nodes to fulfill connection requirement, please re-enter.");

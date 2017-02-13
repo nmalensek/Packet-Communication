@@ -45,7 +45,7 @@ public class Registry implements Node {
             receiver.checkRegistration();
         } else if (event instanceof DeregisterRequestReceive) {
             DeregistrationReceiver deregistrationReceiver = new DeregistrationReceiver(
-                    ((DeregisterRequestReceive) event), nodeMap, destinationSocket);
+                    ((DeregisterRequestReceive) event), nodeMap, destinationSocket, overlayEstablished);
             deregistrationReceiver.checkDeRegistration();
         } else if (event instanceof TaskComplete) {
             finishedNodes++;
@@ -116,7 +116,7 @@ public class Registry implements Node {
                 }
                 break;
             case "start":
-                if (overlayEstablished) {
+                if (overlayEstablished && linkWeightsSent) {
                     finishedNodes = 0;
                     initiateTask(numberPortion);
                 } else {
@@ -182,8 +182,8 @@ public class Registry implements Node {
     }
 
     private void listWeights() {
-        for (Edge link : links) {
-            System.out.println(link);
+        for (int i = 0; i < links.size(); i +=2) {
+            System.out.println(links.get(i));
         }
     }
 

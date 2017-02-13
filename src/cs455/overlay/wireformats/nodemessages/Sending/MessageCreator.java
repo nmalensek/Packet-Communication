@@ -86,15 +86,14 @@ public class MessageCreator {
     }
 
     private NodeRecord determineNextNode() {
-        try {
+//        try { //uncomment to help with debugging
             Vertex nextVertex = path.getFirst();
             NodeRecord nextNode = copyOfDirectConnections.get(nextVertex.getId());
             return nextNode;
-            //TODO Remove exception handling and RuntimeException once it's confirmed to work
-        } catch (NoSuchElementException e) {
-            System.out.println(nodeToSendMessagesTo);
-        }
-        throw new RuntimeException();
+//        } catch (NoSuchElementException e) {
+//            System.out.println(nodeToSendMessagesTo);
+//        }
+//        throw new RuntimeException();
     }
 
 }

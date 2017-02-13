@@ -47,6 +47,7 @@ public class MessagingNode implements Node {
     private MessageProcessor messageProcessor = new MessageProcessor(communicationTracker);
     private boolean linkWeightsReceived = false;
     private boolean overlaySetUp = false;
+    private boolean receivedNodeList = false;
 
     public MessagingNode(String registryHostName, int registryPort) throws IOException {
         this.registryHostName = registryHostName;
@@ -107,6 +108,8 @@ public class MessagingNode implements Node {
             if (nodeConnections.size() == 4) {
                 System.out.println("All connections established. Number of connections: "
                         + nodeConnections.size());
+                receivedNodeList = true;
+                overlaySetUp = true;
             }
         } else if (event instanceof LinkWeightsReceive) {
             LinkWeightsProcess linkWeightsProcess = new LinkWeightsProcess();
@@ -119,13 +122,17 @@ public class MessagingNode implements Node {
             linkWeightsReceived = true;
             System.out.println("Link weights received and processed. Ready to send messages.");
         } else if (event instanceof TaskInitiate) {
-            int numberOfRounds = ((TaskInitiate) event).getRounds();
-            MessageCreator messageCreator = new MessageCreator(vertices, nodeConnections, routingCache, communicationTracker);
-            for (int roundsSent = 0; roundsSent < numberOfRounds; roundsSent++) {
-                messageCreator.prepareMessage(thisNodeID);
-                messageCreator.sendMessage();
+            if (receivedNodeList) {
+                int numberOfRounds = ((TaskInitiate) event).getRounds();
+                MessageCreator messageCreator = new MessageCreator(vertices, nodeConnections, routingCache, communicationTracker);
+                for (int roundsSent = 0; roundsSent < numberOfRounds; roundsSent++) {
+                    messageCreator.prepareMessage(thisNodeID);
+                    messageCreator.sendMessage();
+                }
+                taskComplete();
+            } else {
+                System.out.println("List of nodes to connect to has not been received yet, please send again.");
             }
-            taskComplete();
         } else if (event instanceof Message) {
             messageProcessor.processRoutingPath(((Message) event));
         } else if (event instanceof PullTrafficSummary) {

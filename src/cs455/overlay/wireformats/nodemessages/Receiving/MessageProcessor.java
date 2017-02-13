@@ -51,17 +51,16 @@ public class MessageProcessor {
                 updatedRoute += "\n";
             }
         }
-        try {
+//        try { //uncomment try catch to help with debugging
             NodeRecord nextNode = getNextNode(nodeIDArray[1]);
             message.setRoutingPath(updatedRoute);
             nextNode.getSender().sendData(message.getBytes());
             communicationTracker.incrementRelayTracker();
-            //TODO Remove exception handling once it's confirmed to work
-        } catch (NullPointerException e) {
-            e.printStackTrace();
-            System.out.println(message.getRoutingPath());
-            System.out.println(updatedRoute);
-            System.out.println(getNextNode(nodeIDArray[1]).getNodeID());
-        }
+//        } catch (NullPointerException e) {
+//            e.printStackTrace();
+//            System.out.println(message.getRoutingPath());
+//            System.out.println(updatedRoute);
+//            System.out.println(getNextNode(nodeIDArray[1]).getNodeID());
+//        }
     }
 }

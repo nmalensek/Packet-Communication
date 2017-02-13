@@ -94,7 +94,6 @@ public class NodeRecordTest {
         }
     }
 
-    //TODO check that this is the proper way to check IP addresses, implementing it this way for now
     private void testPrint() throws UnknownHostException {
         String host = Inet4Address.getLocalHost().getHostAddress();
         System.out.println(host);

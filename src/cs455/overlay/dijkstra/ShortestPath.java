@@ -6,8 +6,6 @@ import java.util.*;
  * code adapted from http://www.vogella.com/tutorials/JavaAlgorithmsDijkstra/article.html
  */
 
-//TODO add comments for what everything's doing
-
 public class ShortestPath {
     private final List<Vertex> nodes;
     private final List<Edge> edges;
@@ -32,11 +30,13 @@ public class ShortestPath {
             Vertex node = getMinimum(unSettledNodes);
             settledNodes.add(node);
             unSettledNodes.remove(node);
-            findMinimalDistances(node);
+            findShortestDistances(node);
         }
     }
 
-    private void findMinimalDistances(Vertex node) {
+    //if shortest distance to the destination is greater than the current node's distance plus the link weight between
+    //the source and destination, store the destination's distance plus the link weight between the two
+    private void findShortestDistances(Vertex node) {
         List<Vertex> adjacentNodes = getNeighbors(node);
         for (Vertex target : adjacentNodes) {
             if(getShortestDistance(target) > getShortestDistance(node) + getLinkWeight(node, target)) {
@@ -49,7 +49,7 @@ public class ShortestPath {
 
     private int getLinkWeight(Vertex node, Vertex target) {
         for(Edge edge : edges) {
-            if(edge.getSource().equals(node) && edge.getDestination().equals(target)) {
+            if(edge.getSource().equals(node) && edge.getDestination().equals(target)) { //finds weight between two nodes
                 return edge.getWeight();
             }
         }
@@ -59,7 +59,7 @@ public class ShortestPath {
     private List<Vertex> getNeighbors(Vertex node) {
         List<Vertex> neighbors = new ArrayList<>();
         for (Edge edge : edges) {
-            if (edge.getSource().equals(node) && !isSettled(edge.getDestination())) {
+            if (edge.getSource().equals(node) && !isSettled(edge.getDestination())) { //gets next possible nodes in path
                 neighbors.add(edge.getDestination());
             }
         }
@@ -71,7 +71,7 @@ public class ShortestPath {
         for (Vertex vertex : vertices) {
             if (minimum == null) {
                 minimum = vertex;
-            } else if (getShortestDistance(vertex) < getShortestDistance(minimum)){
+            } else if (getShortestDistance(vertex) < getShortestDistance(minimum)){ //compares node weight to previously calculated shortest distance
                 minimum = vertex;
             }
         }
@@ -80,12 +80,12 @@ public class ShortestPath {
 
     private boolean isSettled(Vertex vertex) {
         return settledNodes.contains(vertex);
-    }
+    } //shortest path has been determined
 
     private int getShortestDistance(Vertex destination) {
         Integer distance = weight.get(destination);
-        if(distance == null) {
-            return Integer.MAX_VALUE;
+        if (distance == null) {
+            return Integer.MAX_VALUE; //all nodes start with MAX_VALUE distance
         } else {
             return distance;
         }

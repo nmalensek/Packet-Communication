@@ -21,13 +21,15 @@ public class DeregistrationReceiver {
     private TCPSender replySender;
     private byte SUCCESS = 1;
     private byte FAILURE = 0;
+    private boolean overlayEstablished;
 
     public DeregistrationReceiver(Event<DeregisterRequestReceive> event,
                                 Map<String, NodeRecord> nodeMap,
-                                Socket destinationSocket) {
+                                Socket destinationSocket, boolean overlayEstablished) {
         this.event = event;
         this.nodeMap = nodeMap;
         this.destinationSocket = destinationSocket;
+        this.overlayEstablished = overlayEstablished;
 
         deregisteringHost = ((DeregisterRequestReceive) event).getIdentifier();
         deregisteringPort = ((DeregisterRequestReceive) event).getPortNumber();
@@ -41,6 +43,9 @@ public class DeregistrationReceiver {
         } else if(!deregisteringHost.equals(destinationSocket.getInetAddress().getHostAddress())) {
             sendDeregistrationResponse(destinationSocket,
                     "Unable to deregister, IP in message does not match sender\'s IP.", false, FAILURE);
+        } else if (overlayEstablished) {
+            sendDeregistrationResponse(destinationSocket,
+                    "Unable to deregister, overlay is already established.", false, FAILURE);
         } else {
             sendDeregistrationResponse(destinationSocket, "Deregistration successful!",
                     true, SUCCESS);

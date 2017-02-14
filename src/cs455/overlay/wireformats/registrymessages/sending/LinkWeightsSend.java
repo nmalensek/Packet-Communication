@@ -1,6 +1,6 @@
 package cs455.overlay.wireformats.registrymessages.sending;
 
-import cs455.overlay.dijkstra.Edge;
+import cs455.overlay.dijkstra.Connection;
 import cs455.overlay.wireformats.Event;
 import cs455.overlay.wireformats.Protocol;
 
@@ -45,14 +45,14 @@ public class LinkWeightsSend implements Protocol, Event<LinkWeightsSend> {
         return marshalledBytes;
     }
 
-    public void setMessagingNodes(List<Edge> linkList) {
+    public void setMessagingNodes(List<Connection> linkList) {
         linkInfo = "";
-        for (Edge edge : linkList) {
-            linkInfo += edge.getSource().getId();
+        for (Connection connection : linkList) {
+            linkInfo += connection.getSource().getId();
             linkInfo += " ";
-            linkInfo += edge.getDestination().getId();
+            linkInfo += connection.getDestination().getId();
             linkInfo += " ";
-            linkInfo += edge.getWeight();
+            linkInfo += connection.getWeight();
             linkInfo += "\n";
         }
     }

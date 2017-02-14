@@ -4,10 +4,10 @@ package cs455.overlay.dijkstra;
  * code adapted from http://www.vogella.com/tutorials/JavaAlgorithmsDijkstra/article.html
  */
 
-public class Vertex {
+public class Point {
     final private String id;
 
-    public Vertex(String id) {
+    public Point(String id) {
         this.id = id;
     }
 
@@ -23,9 +23,9 @@ public class Vertex {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        Vertex vertex = (Vertex) o;
+        Point point = (Point) o;
 
-        return id.equals(vertex.id);
+        return id.equals(point.id);
     }
 
     @Override

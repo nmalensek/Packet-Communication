@@ -38,9 +38,9 @@ public class MessagingNode implements Node {
     private EventFactory eF = EventFactory.getInstance();
     private byte[] message;
     private Map<String, NodeRecord> nodeConnections = new HashMap<>();
-    private List<Edge> links;
-    private List<Vertex> vertices;
-    private Map<String, Edge> edgeMap;
+    private List<Connection> links;
+    private List<Point> vertices;
+    private Map<String, Connection> edgeMap;
     private Graph graph;
     private ShortestPath shortestPath;
     private RoutingCache routingCache;
@@ -116,8 +116,8 @@ public class MessagingNode implements Node {
         } else if (event instanceof LinkWeightsReceive) {
             LinkWeightsProcess linkWeightsProcess = new LinkWeightsProcess();
             linkWeightsProcess.processLinkWeights(((LinkWeightsReceive) event).getLinkInfo());
-            vertices = linkWeightsProcess.getVertexList();
-            links = linkWeightsProcess.getEdgeList();
+            vertices = linkWeightsProcess.getPointList();
+            links = linkWeightsProcess.getConnectionList();
             edgeMap = linkWeightsProcess.getEdgeMap();
             computeShortestPaths();
             messageProcessor.setDirectConnections(nodeConnections); //store direct connections for relaying messages
@@ -154,7 +154,7 @@ public class MessagingNode implements Node {
         }
     }
 
-    //splits apart id, stores connection, and ignores returned Vertex
+    //splits apart id, stores connection, and ignores returned Point
     private synchronized void processNewConnection(String nodeIDLine) throws IOException {
         String[] splitIDApart = nodeIDLine.split(":");
         String host = splitIDApart[0];
@@ -208,10 +208,10 @@ public class MessagingNode implements Node {
         textInputThread.start();
     }
 
-    private Vertex findThisNodeInVertexList() {
-        for (Vertex vertex : vertices) {
-            if (thisNodeID.equals(vertex.getId())) {
-                return vertex;
+    private Point findThisNodeInVertexList() {
+        for (Point point : vertices) {
+            if (thisNodeID.equals(point.getId())) {
+                return point;
             }
         }
         throw new RuntimeException();
@@ -221,10 +221,10 @@ public class MessagingNode implements Node {
         routingCache = new RoutingCache(links, edgeMap);
         graph = new Graph(vertices, links);
         shortestPath = new ShortestPath(graph);
-        LinkedList<Vertex> path = new LinkedList<>();
-        Vertex thisNode = findThisNodeInVertexList();
+        LinkedList<Point> path = new LinkedList<>();
+        Point thisNode = findThisNodeInVertexList();
         shortestPath.computeShortestPath(thisNode);
-        for (Vertex destNode : vertices) {
+        for (Point destNode : vertices) {
             if (!thisNode.equals(destNode)) {
                 path = shortestPath.getPath(destNode);
                 routingCache.cacheShortestPath(destNode.getId(), path);

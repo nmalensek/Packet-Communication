@@ -6,13 +6,13 @@ import java.lang.String;
  * code adapted from http://www.vogella.com/tutorials/JavaAlgorithmsDijkstra/article.html
  */
 
-public class Edge {
+public class Connection {
     private final String id;
-    private final Vertex source;
-    private final Vertex destination;
+    private final Point source;
+    private final Point destination;
     private final int weight;
 
-    public Edge(String id, Vertex source, Vertex destination, int weight) {
+    public Connection(String id, Point source, Point destination, int weight) {
         this.id = id;
         this.source = source;
         this.destination = destination;
@@ -23,11 +23,11 @@ public class Edge {
         return id;
     }
 
-    public Vertex getSource() {
+    public Point getSource() {
         return source;
     }
 
-    public Vertex getDestination() {
+    public Point getDestination() {
         return destination;
     }
 
@@ -46,9 +46,9 @@ public class Edge {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        Edge edge = (Edge) o;
+        Connection connection = (Connection) o;
 
-        return id.equals(edge.id);
+        return id.equals(connection.id);
     }
 
     @Override

@@ -1,10 +1,6 @@
 package cs455.overlay.wireformats;
 
-import cs455.overlay.dijkstra.Edge;
-import cs455.overlay.wireformats.registrymessages.sending.LinkWeightsSend;
-
 import java.io.*;
-import java.util.List;
 
 public class TaskInitiate implements Protocol, Event<TaskInitiate> {
 

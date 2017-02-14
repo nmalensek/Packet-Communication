@@ -7,19 +7,19 @@ import java.util.*;
  */
 
 public class ShortestPath {
-    private final List<Vertex> nodes;
-    private final List<Edge> edges;
-    private Set<Vertex> settledNodes;
-    private Set<Vertex> unSettledNodes;
-    private Map<Vertex, Vertex> predecessors;
-    private Map<Vertex, Integer> weight;
+    private final List<Point> nodes;
+    private final List<Connection> connections;
+    private Set<Point> settledNodes;
+    private Set<Point> unSettledNodes;
+    private Map<Point, Point> predecessors;
+    private Map<Point, Integer> weight;
 
     public ShortestPath(Graph graph) {
         this.nodes = new ArrayList<>(graph.getVertices());
-        this.edges = new ArrayList<>(graph.getEdges());
+        this.connections = new ArrayList<>(graph.getConnections());
     }
 
-    public void computeShortestPath(Vertex source) {
+    public void computeShortestPath(Point source) {
         settledNodes = new HashSet<>();
         unSettledNodes = new HashSet<>();
         weight = new HashMap<>();
@@ -27,7 +27,7 @@ public class ShortestPath {
         weight.put(source, 0);
         unSettledNodes.add(source);
         while (unSettledNodes.size() > 0) {
-            Vertex node = getMinimum(unSettledNodes);
+            Point node = getMinimum(unSettledNodes);
             settledNodes.add(node);
             unSettledNodes.remove(node);
             findShortestDistances(node);
@@ -36,9 +36,9 @@ public class ShortestPath {
 
     //if shortest distance to the destination is greater than the current node's distance plus the link weight between
     //the source and destination, store the destination's distance plus the link weight between the two
-    private void findShortestDistances(Vertex node) {
-        List<Vertex> adjacentNodes = getNeighbors(node);
-        for (Vertex target : adjacentNodes) {
+    private void findShortestDistances(Point node) {
+        List<Point> adjacentNodes = getNeighbors(node);
+        for (Point target : adjacentNodes) {
             if(getShortestDistance(target) > getShortestDistance(node) + getLinkWeight(node, target)) {
                 weight.put(target, getShortestDistance(node) + getLinkWeight(node, target));
                 predecessors.put(target, node);
@@ -47,42 +47,42 @@ public class ShortestPath {
         }
     }
 
-    private int getLinkWeight(Vertex node, Vertex target) {
-        for(Edge edge : edges) {
-            if(edge.getSource().equals(node) && edge.getDestination().equals(target)) { //finds weight between two nodes
-                return edge.getWeight();
+    private int getLinkWeight(Point node, Point target) {
+        for(Connection connection : connections) {
+            if(connection.getSource().equals(node) && connection.getDestination().equals(target)) { //finds weight between two nodes
+                return connection.getWeight();
             }
         }
         throw new RuntimeException();
     }
 
-    private List<Vertex> getNeighbors(Vertex node) {
-        List<Vertex> neighbors = new ArrayList<>();
-        for (Edge edge : edges) {
-            if (edge.getSource().equals(node) && !isSettled(edge.getDestination())) { //gets next possible nodes in path
-                neighbors.add(edge.getDestination());
+    private List<Point> getNeighbors(Point node) {
+        List<Point> neighbors = new ArrayList<>();
+        for (Connection connection : connections) {
+            if (connection.getSource().equals(node) && !isSettled(connection.getDestination())) { //gets next possible nodes in path
+                neighbors.add(connection.getDestination());
             }
         }
         return neighbors;
     }
 
-    private Vertex getMinimum(Set<Vertex> vertices) {
-        Vertex minimum = null;
-        for (Vertex vertex : vertices) {
+    private Point getMinimum(Set<Point> vertices) {
+        Point minimum = null;
+        for (Point point : vertices) {
             if (minimum == null) {
-                minimum = vertex;
-            } else if (getShortestDistance(vertex) < getShortestDistance(minimum)){ //compares node weight to previously calculated shortest distance
-                minimum = vertex;
+                minimum = point;
+            } else if (getShortestDistance(point) < getShortestDistance(minimum)){ //compares node weight to previously calculated shortest distance
+                minimum = point;
             }
         }
         return minimum;
     }
 
-    private boolean isSettled(Vertex vertex) {
-        return settledNodes.contains(vertex);
+    private boolean isSettled(Point point) {
+        return settledNodes.contains(point);
     } //shortest path has been determined
 
-    private int getShortestDistance(Vertex destination) {
+    private int getShortestDistance(Point destination) {
         Integer distance = weight.get(destination);
         if (distance == null) {
             return Integer.MAX_VALUE; //all nodes start with MAX_VALUE distance
@@ -91,19 +91,16 @@ public class ShortestPath {
         }
     }
 
-    public LinkedList<Vertex> getPath(Vertex target) {
-        LinkedList<Vertex> path = new LinkedList<>();
-        Vertex step = target;
-        // check if a path exists
-        if (predecessors.get(step) == null) {
-            return null;
-        }
+    public LinkedList<Point> getPath(Point target) {
+        //check for no possible path unnecessary, overlay should never have a partition
+        LinkedList<Point> path = new LinkedList<>();
+        Point step = target;
         path.add(step);
         while (predecessors.get(step) != null) {
             step = predecessors.get(step);
             path.add(step);
         }
-        // Put it into the correct order
+        //put the shortest path into the correct order
         Collections.reverse(path);
         return path;
     }

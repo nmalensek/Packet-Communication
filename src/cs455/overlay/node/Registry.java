@@ -1,7 +1,7 @@
 package cs455.overlay.node;
 
-import cs455.overlay.dijkstra.Edge;
-import cs455.overlay.dijkstra.Vertex;
+import cs455.overlay.dijkstra.Connection;
+import cs455.overlay.dijkstra.Point;
 import cs455.overlay.transport.TCPServerThread;
 import cs455.overlay.util.TrafficPrinter;
 import cs455.overlay.wireformats.*;
@@ -24,7 +24,7 @@ public class Registry implements Node {
     private static int portNum;
     private Map<String, NodeRecord> nodeMap = new HashMap<>();
     private int connectionRequirement;
-    private List<Edge> links;
+    private List<Connection> links;
     private boolean overlayEstablished = false;
     private boolean linkWeightsSent = false;
     private int finishedNodes;
@@ -170,14 +170,14 @@ public class Registry implements Node {
         for (NodeRecord source : nodeMap.values()) {
             for (NodeRecord destination : source.getNodesToConnectToList()) {
                 int weight = ThreadLocalRandom.current().nextInt(1, 11);
-                Vertex start = new Vertex(source.getNodeID());
-                Vertex end = new Vertex(destination.getNodeID());
-                Edge edge = new Edge(start.getId() + " " + end.getId(),
+                Point start = new Point(source.getNodeID());
+                Point end = new Point(destination.getNodeID());
+                Connection connection = new Connection(start.getId() + " " + end.getId(),
                         start, end, weight);
-                Edge reverseEdge = new Edge(end.getId() + start.getId(),
+                Connection reverseConnection = new Connection(end.getId() + start.getId(),
                         end, start, weight);
-                links.add(edge);
-                links.add(reverseEdge);
+                links.add(connection);
+                links.add(reverseConnection);
             }
         }
     }

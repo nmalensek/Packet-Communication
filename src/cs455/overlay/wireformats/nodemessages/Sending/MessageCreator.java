@@ -1,7 +1,7 @@
 package cs455.overlay.wireformats.nodemessages.Sending;
 
+import cs455.overlay.dijkstra.Point;
 import cs455.overlay.dijkstra.RoutingCache;
-import cs455.overlay.dijkstra.Vertex;
 import cs455.overlay.node.NodeRecord;
 import cs455.overlay.util.CommunicationTracker;
 import cs455.overlay.wireformats.nodemessages.Message;
@@ -12,16 +12,16 @@ import java.util.concurrent.ThreadLocalRandom;
 
 public class MessageCreator {
 
-    private List<Vertex> copyOfVerticesInOverlay;
+    private List<Point> copyOfVerticesInOverlay;
     private HashMap<String, String> nodeMap;
     private Map<String, NodeRecord> copyOfDirectConnections;
     private RoutingCache routingCache;
     private String nodeToSendMessagesTo;
     private CommunicationTracker communicationTracker;
     private String stringPath;
-    private LinkedList<Vertex> path;
+    private LinkedList<Point> path;
 
-    public MessageCreator(List<Vertex> verticesInOverlay, Map<String,
+    public MessageCreator(List<Point> verticesInOverlay, Map<String,
             NodeRecord> directConnections, RoutingCache routingCache, CommunicationTracker communicationTracker) {
         this.copyOfVerticesInOverlay = new ArrayList<>(verticesInOverlay); //copies vertices so nothing damages original list
         this.copyOfDirectConnections = new HashMap<>(directConnections);  //copies map so nothing damages original map
@@ -32,8 +32,8 @@ public class MessageCreator {
     }
 
     private void addVerticesToOverlayMap() {
-        for (Vertex vertex : copyOfVerticesInOverlay) {
-            nodeMap.put(vertex.getId(), vertex.getId());
+        for (Point point : copyOfVerticesInOverlay) {
+            nodeMap.put(point.getId(), point.getId());
         }
     }
 
@@ -58,17 +58,17 @@ public class MessageCreator {
     }
 
     private void getPathToSelectedNode(String nodeToMessage) {
-        Map<String, LinkedList<Vertex>> shortestPathMap =
+        Map<String, LinkedList<Point>> shortestPathMap =
                 new HashMap<>(routingCache.getShortestPathsMap()); //MUST COPY HERE, otherwise nodes will delete path knowledge
         path = new LinkedList<>(shortestPathMap.get(nodeToMessage)); //and here?
         path.removeFirst(); //origin node, should not include in path
         convertPathToStrings(path);
     }
 
-    private void convertPathToStrings(LinkedList<Vertex> vertexPath) {
+    private void convertPathToStrings(LinkedList<Point> pointPath) {
         stringPath = "";
-        for (Vertex vertex : vertexPath) {
-            stringPath += vertex.getId();
+        for (Point point : pointPath) {
+            stringPath += point.getId();
             stringPath += "\n";
         }
     }
@@ -87,8 +87,8 @@ public class MessageCreator {
 
     private NodeRecord determineNextNode() {
 //        try { //uncomment to help with debugging
-            Vertex nextVertex = path.getFirst();
-            NodeRecord nextNode = copyOfDirectConnections.get(nextVertex.getId());
+            Point nextPoint = path.getFirst();
+            NodeRecord nextNode = copyOfDirectConnections.get(nextPoint.getId());
             return nextNode;
 //        } catch (NoSuchElementException e) {
 //            System.out.println(nodeToSendMessagesTo);

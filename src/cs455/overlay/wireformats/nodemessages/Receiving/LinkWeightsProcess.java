@@ -1,7 +1,7 @@
 package cs455.overlay.wireformats.nodemessages.Receiving;
 
-import cs455.overlay.dijkstra.Edge;
-import cs455.overlay.dijkstra.Vertex;
+import cs455.overlay.dijkstra.Connection;
+import cs455.overlay.dijkstra.Point;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -9,9 +9,9 @@ import java.util.List;
 import java.util.Map;
 
 public class LinkWeightsProcess {
-    private List<Vertex> vertexList = new ArrayList<>();
-    private List<Edge> edgeList = new ArrayList<>();
-    private Map<String, Edge> edgeMap = new HashMap<>();
+    private List<Point> pointList = new ArrayList<>();
+    private List<Connection> connectionList = new ArrayList<>();
+    private Map<String, Connection> edgeMap = new HashMap<>();
 
     public void processLinkWeights(String linkWeights) {
         String[] splitByNewLine = linkWeights.split("\\n");
@@ -20,34 +20,34 @@ public class LinkWeightsProcess {
             String sourceID = splitPath[0];
             String destID = splitPath[1];
             int weight = Integer.parseInt(splitPath[2]);
-            Vertex sourceVertex = new Vertex(sourceID);
-            Vertex destinationVertex = new Vertex(destID);
-            Edge newEdge = new Edge(sourceID + " " + destID, sourceVertex, destinationVertex, weight);
-            createVertex(sourceVertex);
-            createVertex(destinationVertex);
-            edgeList.add(newEdge);
-            edgeMap.put(newEdge.getId(), newEdge);
+            Point sourcePoint = new Point(sourceID);
+            Point destinationPoint = new Point(destID);
+            Connection newConnection = new Connection(sourceID + " " + destID, sourcePoint, destinationPoint, weight);
+            createVertex(sourcePoint);
+            createVertex(destinationPoint);
+            connectionList.add(newConnection);
+            edgeMap.put(newConnection.getId(), newConnection);
         }
     }
 
-    public List<Vertex> getVertexList() { return vertexList; }
+    public List<Point> getPointList() { return pointList; }
 
-    public List<Edge> getEdgeList() { return edgeList; }
+    public List<Connection> getConnectionList() { return connectionList; }
 
-    public Map<String, Edge> getEdgeMap() { return edgeMap; }
+    public Map<String, Connection> getEdgeMap() { return edgeMap; }
 
-    private void createVertex(Vertex vertex) {
-        if (!vertexList.contains(vertex)) {
-            vertexList.add(vertex);
+    private void createVertex(Point point) {
+        if (!pointList.contains(point)) {
+            pointList.add(point);
         }
     }
 
     public void getVertexListSize() {
-        System.out.println(vertexList.size());
+        System.out.println(pointList.size());
     }
 
     public void getEdgeListSize() {
-        System.out.println(edgeList.size());
+        System.out.println(connectionList.size());
     }
 
 }

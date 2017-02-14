@@ -8,23 +8,23 @@ import java.util.concurrent.ThreadLocalRandom;
 
 public class TestShortestPath {
 
-    private List<Vertex> vertices;
-    private List<Edge> links;
-    private Map<String, Edge> edgeMap = new HashMap<>();
+    private List<Point> vertices;
+    private List<Connection> links;
+    private Map<String, Connection> edgeMap = new HashMap<>();
     private RoutingCache routingCache;
     private Graph graph;
     private ShortestPath shortestPath;
     private String thisNodeID = "Node_0";
-    private LinkedList<Vertex> path;
+    private LinkedList<Point> path;
 
     public TestShortestPath() throws IOException {
     }
 
     public void testExecute() throws IOException {
-        vertices = new ArrayList<Vertex>();
-        links = new ArrayList<Edge>();
+        vertices = new ArrayList<Point>();
+        links = new ArrayList<Connection>();
         for (int i = 0; i < 11; i++) {
-            Vertex location = new Vertex("Node_" + i);
+            Point location = new Point("Node_" + i);
             vertices.add(location);
         }
 
@@ -53,10 +53,10 @@ public class TestShortestPath {
         addLink("link_11", 10, 1, 600);
     }
 
-    private Vertex findThisNodeInVertexList() {
-        for (Vertex vertex : vertices) {
-            if(thisNodeID.equals(vertex.getId())) {
-                return vertex;
+    private Point findThisNodeInVertexList() {
+        for (Point point : vertices) {
+            if(thisNodeID.equals(point.getId())) {
+                return point;
             }
         }
         throw new RuntimeException();
@@ -67,10 +67,10 @@ public class TestShortestPath {
         routingCache = new RoutingCache(links, edgeMap);
         graph = new Graph(vertices, links);
         shortestPath = new ShortestPath(graph);
-        LinkedList<Vertex> path = new LinkedList<>();
-        Vertex thisNode = findThisNodeInVertexList();
+        LinkedList<Point> path = new LinkedList<>();
+        Point thisNode = findThisNodeInVertexList();
         shortestPath.computeShortestPath(thisNode);
-        for (Vertex destNode : vertices) {
+        for (Point destNode : vertices) {
             if (!thisNode.equals(destNode)) {
                 path = shortestPath.getPath(destNode);
                 routingCache.cacheShortestPath(destNode.getId(), path);
@@ -79,18 +79,18 @@ public class TestShortestPath {
     }
 
     private void getPathToSelectedNode(String nodeToMessage) {
-        Map<String, LinkedList<Vertex>> shortestPathMap = routingCache.getShortestPathsMap();
+        Map<String, LinkedList<Point>> shortestPathMap = routingCache.getShortestPathsMap();
         path = shortestPathMap.get(nodeToMessage);
         path.removeFirst(); //origin node, should not include in path
-        for (Vertex vertex : path) {
-            System.out.println(vertex);
+        for (Point point : path) {
+            System.out.println(point);
         }
     }
 
     public void sendMessage() {
         String routingPath = "";
-        for (Vertex vertex : path) {
-            routingPath += vertex.getId();
+        for (Point point : path) {
+            routingPath += point.getId();
         }
     }
 
@@ -107,7 +107,7 @@ public class TestShortestPath {
                          int duration) {
         String sourceID = vertices.get(sourceLocNo).getId();
         String destID = vertices.get(destLocNo).getId();
-        Edge link = new Edge(sourceID + " " + destID, vertices.get(sourceLocNo), vertices.get(destLocNo), duration);
+        Connection link = new Connection(sourceID + " " + destID, vertices.get(sourceLocNo), vertices.get(destLocNo), duration);
         links.add(link);
         edgeMap.put(link.getId(), link);
     }
@@ -125,25 +125,25 @@ public class TestShortestPath {
 
 //    ShortestPath dijkstra = new ShortestPath(graph);
 //        dijkstra.computeShortestPath(nodes.get(4));
-//    LinkedList<Vertex> path = dijkstra.getPath(nodes.get(8));
+//    LinkedList<Point> path = dijkstra.getPath(nodes.get(8));
 //
-//        for (Vertex vertex : path) {
+//        for (Point vertex : path) {
 //        System.out.println(vertex);
 //    }
 
 //
 //        dijkstra.computeShortestPath(nodes.get(0));
-//                for (Vertex destNode : nodes) {
+//                for (Point destNode : nodes) {
 //                if (!nodes.get(0).equals(destNode)) {
 //                path = dijkstra.getPath(destNode);
 //                String pathString = "";
 //                pathString += nodes.get(0).toString();
-//                for (ListIterator<Vertex> vertexListIterator = path.listIterator(); vertexListIterator.hasNext();) {
+//                for (ListIterator<Point> vertexListIterator = path.listIterator(); vertexListIterator.hasNext();) {
 //        try {
-//        Vertex currentVertex = vertexListIterator.next();
+//        Point currentVertex = vertexListIterator.next();
 //        int currentPosition = path.indexOf(currentVertex);
-//        Vertex nextVertex = path.get(currentPosition + 1);
-//        Edge nextEdge = edgeMap.get(currentVertex.getId() + " " + nextVertex.getId());
+//        Point nextVertex = path.get(currentPosition + 1);
+//        Connection nextEdge = edgeMap.get(currentVertex.getId() + " " + nextVertex.getId());
 //
 //        pathString += "--";
 //        pathString += nextEdge.getWeight();

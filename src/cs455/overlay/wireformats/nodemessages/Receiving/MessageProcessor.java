@@ -1,6 +1,5 @@
 package cs455.overlay.wireformats.nodemessages.Receiving;
 
-import cs455.overlay.dijkstra.Vertex;
 import cs455.overlay.node.NodeRecord;
 import cs455.overlay.util.CommunicationTracker;
 import cs455.overlay.wireformats.nodemessages.Message;

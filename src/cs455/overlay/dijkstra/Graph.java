@@ -7,19 +7,19 @@ import java.util.List;
  */
 
 public class Graph {
-    private final List<Vertex> vertices;
-    private final List<Edge> edges;
+    private final List<Point> vertices;
+    private final List<Connection> connections;
 
-    public Graph(List<Vertex> vertices, List<Edge> edges) {
+    public Graph(List<Point> vertices, List<Connection> connections) {
         this.vertices = vertices;
-        this.edges = edges;
+        this.connections = connections;
     }
 
-    public List<Vertex> getVertices() {
+    public List<Point> getVertices() {
         return vertices;
     }
 
-    public List<Edge> getEdges() {
-        return edges;
+    public List<Connection> getConnections() {
+        return connections;
     }
 }

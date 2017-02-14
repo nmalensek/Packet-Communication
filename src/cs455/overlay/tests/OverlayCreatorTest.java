@@ -158,11 +158,11 @@ public class OverlayCreatorTest {
 //        for (ListIterator<String> randomListIterator = randomList.listIterator(); randomListIterator.hasNext(); ) {
 //            int attempt = 0;
 //            String currentRecord = randomListIterator.next();
-//            Vertex currentNode = nodeMap.get(currentRecord);
+//            Point currentNode = nodeMap.get(currentRecord);
 //            while (currentNode.getConnectionsNeededToInitiate() > 0) {
 //                int randomConnection = ThreadLocalRandom.current().nextInt(0, nodeMap.size());
 //                String randomKey = randomList.get(randomConnection);
-//                Vertex randomNode = nodeMap.get(randomKey);
+//                Point randomNode = nodeMap.get(randomKey);
 //
 //                if (integerList.contains(randomConnection)) {
 //                    //skip

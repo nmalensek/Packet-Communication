@@ -40,9 +40,7 @@ public class Registry implements Node {
 
     public void onEvent(Event event, Socket destinationSocket) throws IOException {
         if (event instanceof RegisterRequestReceive) {
-            RegistrationReceiver receiver = new RegistrationReceiver(
-                    ((RegisterRequestReceive) event), nodeMap, destinationSocket);
-            receiver.checkRegistration();
+            receiveRegistration(((RegisterRequestReceive) event), destinationSocket);
         } else if (event instanceof DeregisterRequestReceive) {
             DeregistrationReceiver deregistrationReceiver = new DeregistrationReceiver(
                     ((DeregisterRequestReceive) event), nodeMap, destinationSocket, overlayEstablished);
@@ -66,6 +64,13 @@ public class Registry implements Node {
                 numberOfSummariesReceived = 0;
             }
         }
+    }
+
+    private synchronized void receiveRegistration(RegisterRequestReceive registerRequestReceive,
+                                                  Socket destinationSocket) throws IOException {
+        RegistrationReceiver receiver = new RegistrationReceiver(
+                registerRequestReceive, nodeMap, destinationSocket);
+        receiver.checkRegistration();
     }
 
     public void processText(String command) throws IOException {

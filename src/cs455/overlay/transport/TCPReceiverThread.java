@@ -13,8 +13,13 @@ import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
 import java.io.IOException;
+import java.net.BindException;
 import java.net.Socket;
 import java.net.SocketException;
+
+/**
+ * code adapted from code provided by instructor at http://www.cs.colostate.edu/~cs455/lectures/CS455-HelpSession1.pdf
+ */
 
 public class TCPReceiverThread extends Thread implements Protocol {
 
@@ -42,6 +47,7 @@ public class TCPReceiverThread extends Thread implements Protocol {
 
             } catch (SocketException se) {
                 se.printStackTrace();
+                System.out.println("test");
                 break;
             } catch (IOException ioe) {
                 ioe.getMessage();

@@ -5,6 +5,10 @@ import cs455.overlay.node.Node;
 import java.io.IOException;
 import java.net.ServerSocket;
 
+/**
+ * code adapted from code provided by instructor at http://www.cs.colostate.edu/~cs455/lectures/CS455-HelpSession1.pdf
+ */
+
 public class TCPServerThread extends Thread {
     private Node node;
     private int portNum;

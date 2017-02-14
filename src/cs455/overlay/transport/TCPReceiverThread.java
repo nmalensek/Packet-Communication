@@ -9,7 +9,10 @@ import cs455.overlay.wireformats.nodemessages.Message;
 import cs455.overlay.wireformats.registrymessages.receiving.DeregisterRequestReceive;
 import cs455.overlay.wireformats.registrymessages.receiving.RegisterRequestReceive;
 
-import java.io.*;
+import java.io.BufferedInputStream;
+import java.io.ByteArrayInputStream;
+import java.io.DataInputStream;
+import java.io.IOException;
 import java.net.BindException;
 import java.net.Socket;
 import java.net.SocketException;
@@ -41,10 +44,7 @@ public class TCPReceiverThread extends Thread implements Protocol {
                 dataInputStream.readFully(data, 0, dataLength);
 
                 determineMessageType(data);
-            } catch (EOFException e) {
-                e.getMessage();
-            } catch (BindException be) {
-                System.exit(0);
+
             } catch (IOException ioe) {
                 ioe.getMessage();
             }

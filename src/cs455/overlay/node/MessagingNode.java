@@ -59,16 +59,12 @@ public class MessagingNode implements Node {
     }
 
     private void startUp() throws IOException {
-        try {
-            chooseRandomPort();
-            TCPReceiverThread receiverThread = new TCPReceiverThread(registrySocket, this);
-            receiverThread.start();
-            register();
-            createServerThread();
-            listenForTextInput();
-        } catch (BindException e) {
-            System.exit(0);
-        }
+        chooseRandomPort();
+        TCPReceiverThread receiverThread = new TCPReceiverThread(registrySocket, this);
+        receiverThread.start();
+        createServerThread();
+        listenForTextInput();
+        register();
     }
 
     private void chooseRandomPort() {

@@ -45,10 +45,6 @@ public class TCPReceiverThread extends Thread implements Protocol {
 
                 determineMessageType(data);
 
-            } catch (SocketException se) {
-                se.printStackTrace();
-                System.out.println("test");
-                break;
             } catch (IOException ioe) {
                 ioe.getMessage();
             }

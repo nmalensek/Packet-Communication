@@ -16,6 +16,7 @@ import cs455.overlay.wireformats.nodemessages.Sending.MessageCreator;
 import cs455.overlay.wireformats.nodemessages.Sending.SendRegister;
 
 import java.io.IOException;
+import java.net.BindException;
 import java.net.Inet4Address;
 import java.net.Socket;
 import java.net.UnknownHostException;
@@ -58,12 +59,16 @@ public class MessagingNode implements Node {
     }
 
     private void startUp() throws IOException {
-        chooseRandomPort();
-        TCPReceiverThread receiverThread = new TCPReceiverThread(registrySocket, this);
-        receiverThread.start();
-        register();
-        createServerThread();
-        listenForTextInput();
+        try {
+            chooseRandomPort();
+            TCPReceiverThread receiverThread = new TCPReceiverThread(registrySocket, this);
+            receiverThread.start();
+            register();
+            createServerThread();
+            listenForTextInput();
+        } catch (BindException e) {
+            System.exit(0);
+        }
     }
 
     private void chooseRandomPort() {

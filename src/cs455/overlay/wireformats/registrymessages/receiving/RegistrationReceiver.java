@@ -37,7 +37,7 @@ public class RegistrationReceiver {
         nodeRecord = new NodeRecord(host, port, destinationSocket);
     }
 
-    public void checkRegistration() throws IOException {
+    public synchronized void checkRegistration() throws IOException {
         if (nodeMap.containsKey(key)) {
             processRegistration(destinationSocket, false,
                     "node already exists at that address.", FAILURE);
@@ -59,7 +59,7 @@ public class RegistrationReceiver {
         }
     }
 
-    public void processRegistration(Socket nodeThatRegistered, boolean isSuccessfulConnection,
+    public synchronized void processRegistration(Socket nodeThatRegistered, boolean isSuccessfulConnection,
                                     String error, byte successOrFailure) throws IOException, SocketException {
         RegisterRequestResponse registerRequestResponse = eventFactory.createRegisterResponseEvent().getType();
         registerRequestResponse.setAdditionalInfo(registerResponseAdditionalInfo(isSuccessfulConnection, error));

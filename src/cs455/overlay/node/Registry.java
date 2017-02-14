@@ -48,7 +48,7 @@ public class Registry implements Node {
                     ((DeregisterRequestReceive) event), nodeMap, destinationSocket, overlayEstablished);
             deregistrationReceiver.checkDeRegistration();
         } else if (event instanceof TaskComplete) {
-            finishedNodes++;
+            ++finishedNodes;
             if(finishedNodes == nodeMap.size()) {
                 try {
                     Thread.sleep(15000);
@@ -59,7 +59,7 @@ public class Registry implements Node {
             }
         } else if (event instanceof TrafficSummary) {
             trafficPrinter.processSummary(((TrafficSummary) event));
-            numberOfSummariesReceived++;
+            ++numberOfSummariesReceived;
             if (numberOfSummariesReceived == nodeMap.size()) {
                 trafficPrinter.addTotalsToString();
                 trafficPrinter.printTrafficSummary();

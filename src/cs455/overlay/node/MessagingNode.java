@@ -59,6 +59,13 @@ public class MessagingNode implements Node {
         registrySender = new TCPSender(registrySocket);
     }
 
+    /**
+     * Setup method. Selects random port, starts a receiver thread with the registry so the node can receive
+     * registry messages, starts listening for other node connections and text input, and then sends a registration
+     * message to the registry.
+     * @throws IOException
+     */
+
     private void startUp() throws IOException {
         chooseRandomPort();
         TCPReceiverThread receiverThread = new TCPReceiverThread(registrySocket, this);
@@ -72,6 +79,20 @@ public class MessagingNode implements Node {
         thisNodePort = ThreadLocalRandom.current().nextInt(49152, 65535);
     }
 
+    private void createServerThread() throws IOException {
+        receivingSocket = new TCPServerThread(this, thisNodePort);
+        receivingSocket.start();
+    }
+
+    private void listenForTextInput() throws IOException {
+        TextInputThread textInputThread = new TextInputThread(this);
+        textInputThread.start();
+    }
+
+    /**
+     * Sends registration message to the registry, done upon startup.
+     * @throws IOException
+     */
     private void register() throws IOException {
         SendRegister sendRegister = eF.createRegisterSendEvent().getType();
         sendRegister.setHostAndPort(thisNodeIP, thisNodePort);
@@ -80,6 +101,10 @@ public class MessagingNode implements Node {
         registrySender.sendData(message);
     }
 
+    /**
+     * Messaging node deregisters from overlay, only possible if overlay hasn't been established already.
+     * @throws IOException
+     */
     private void deregister() throws IOException {
         Deregister deregister = eF.createDeregistrationEvent().getType();
         deregister.setHostAndPort(thisNodeIP, thisNodePort);
@@ -87,11 +112,12 @@ public class MessagingNode implements Node {
         registrySender.sendData(message);
     }
 
-    private void createServerThread() throws IOException {
-        receivingSocket = new TCPServerThread(this, thisNodePort);
-        receivingSocket.start();
-    }
-
+    /**
+     * Processes events and sends a response to the sender (if applicable).
+     * @param event Event generated based on the type of message that was sent to this node.
+     * @param destinationSocket sender's socket, allows responses.
+     * @throws IOException
+     */
     public void onEvent(Event event, Socket destinationSocket) throws IOException {
         if (event instanceof RegistryResponseReceive) {
             ((RegistryResponseReceive) event).printMessage();
@@ -147,6 +173,11 @@ public class MessagingNode implements Node {
         }
     }
 
+    /**
+     * Breaks apart String from MessagingNodesList message into format nodeHost:nodePort.
+     * @param stringToSplit String from MessagingNodesList message that must be split apart by newline character.
+     * @throws IOException
+     */
     private synchronized void processMessagingNodesList(String stringToSplit) throws IOException {
         String[] splitByNewLine = stringToSplit.split("\\n");
         for (String nodeID : splitByNewLine) {
@@ -158,7 +189,11 @@ public class MessagingNode implements Node {
         }
     }
 
-    //splits apart id, stores connection, and ignores returned Point
+    /**
+     * Splits apart id from MessagingNodesList message, stores connection, and ignores returned NodeRecord.
+     * @param nodeIDLine String separated into format nodeHost:nodePort from processMessagingNodesList method.
+     * @throws IOException
+     */
     private synchronized void processNewConnection(String nodeIDLine) throws IOException {
         String[] splitIDApart = nodeIDLine.split(":");
         String host = splitIDApart[0];
@@ -166,6 +201,14 @@ public class MessagingNode implements Node {
         cacheConnection(host, port, nodeIDLine);
     }
 
+    /**
+     * Stores knowledge of other messaging nodes that this messaging node is connected to.
+     * @param host other node's host
+     * @param port other node's port
+     * @param nodeID other node's ID (host + port)
+     * @return returns a NodeRecord object. Only used to inform the other node that a connection exists with this node.
+     * @throws IOException
+     */
     private synchronized NodeRecord cacheConnection(String host, int port, String nodeID) throws IOException {
         Socket nodeSocket = new Socket(host, port);
         NodeRecord newNodeRecord = new NodeRecord(host, port, nodeSocket);
@@ -175,6 +218,11 @@ public class MessagingNode implements Node {
         return newNodeRecord;
     }
 
+    /**
+     * Informs another node that the two nodes are connected, enabling links to be bidirectional.
+     * @param nodeConnectingTo node that this node is connected to.
+     * @throws IOException
+     */
     private synchronized void tellOtherNodeAboutConnection(NodeRecord nodeConnectingTo) throws IOException {
         NodeConnection nodeConnection = eF.sendNodeConnection().getType();
         String thisNodeID = thisNodeIP + ":" + Integer.toString(thisNodePort);
@@ -182,6 +230,11 @@ public class MessagingNode implements Node {
         nodeConnectingTo.getSender().sendData(nodeConnection.getBytes());
     }
 
+    /**
+     * Process text input from a user.
+     * @param command action the user requests from the messaging node.
+     * @throws IOException
+     */
     public void processText(String command) throws IOException {
         switch (command) {
             case "print-shortest-path":
@@ -207,11 +260,11 @@ public class MessagingNode implements Node {
         }
     }
 
-    private void listenForTextInput() throws IOException {
-        TextInputThread textInputThread = new TextInputThread(this);
-        textInputThread.start();
-    }
-
+    /**
+     * Searches through list of points in the overlay to find this messaging node. Used so this node is not included in
+     * computing the shortest path.
+     * @return returns the current messaging node.
+     */
     private Point findThisNodeInVertexList() {
         for (Point point : vertices) {
             if (thisNodeID.equals(point.getId())) {
@@ -221,6 +274,10 @@ public class MessagingNode implements Node {
         throw new RuntimeException();
     }
 
+    /**
+     * Finds the shortest path to every node in the overlay from this node. Excludes this node from the calculations
+     * (shortest path from itself to itself isn't counted). Shortest paths are stored in the RoutingCache class.
+     */
     private void computeShortestPaths() {
         routingCache = new RoutingCache(links, edgeMap);
         graph = new Graph(vertices, links);
@@ -236,12 +293,19 @@ public class MessagingNode implements Node {
         }
     }
 
+    /**
+     * Prints shortest path from this node to all other nodes in overlay.
+     */
     private void printShortestPaths() {
         routingCache.printMap(thisNodeID);
 //        System.out.println("----");
 //        routingCache.simplePrint();
     }
 
+    /**
+     * Informs registry all messages have been sent from this node.
+     * @throws IOException
+     */
     private void taskComplete() throws IOException {
         TaskComplete taskComplete = new TaskComplete();
         taskComplete.setIpAddress(thisNodeIP);

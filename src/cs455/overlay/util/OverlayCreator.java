@@ -27,12 +27,19 @@ public class OverlayCreator {
         checkIfSuccessful();
     }
 
+    /**
+     * Number of connections a node needs to initiate to satisfy the overlay's requirements (given by user text input).
+     */
     private void setNodeConnectionRequirement() {
         for (NodeRecord node : registeredNodes.values()) {
             node.setNumberOfConnectionsNodeNeedsToInitiate(requiredConnections);
         }
     }
 
+    /**
+     * Puts map of overlay nodes in a list so they can connect sequentially.
+     * @return
+     */
     private List<String> putKeysInList() {
         List<String> stringList = new LinkedList<>();
         for (String node : registeredNodes.keySet()) {
@@ -41,6 +48,11 @@ public class OverlayCreator {
         return stringList;
     }
 
+    /**
+     * Every node connects to its neighbor, which prevents partitioning. When the end of the list is reached, the last
+     * element connects to the first element.
+     * @param sequentialList
+     */
     public void connectToNodesInSequence(List<String> sequentialList) {
         for (ListIterator<String> recordListIterator = sequentialList.listIterator(); recordListIterator.hasNext();) {
             try {
@@ -61,6 +73,12 @@ public class OverlayCreator {
         }
     }
 
+    /**
+     * Connects each node to another random node in the overlay by choosing a random element in the list of keys (node IDs).
+     * A node cannot connect to itself or connect to a node that it's already connected to. This process continues until
+     * the node has a list of nodes to connect to equal to the number specified in the "setup-overlay #" command.
+     * @param randomList
+     */
     //TODO if have time, re-implement by taking a list, shuffling the list, and connecting to pre-defined elements in list
     private void connectToRandomNodes(List<String> randomList) {
         wasSuccessful = true;
@@ -93,6 +111,11 @@ public class OverlayCreator {
         }
     }
 
+    /**
+     * Increments amount of connections a node has and decrements the number of connections a node needs.
+     * @param currentNode node that's connecting to other nodes.
+     * @param nextNode node that's being connected to.
+     */
     private void updateConnections(NodeRecord currentNode, NodeRecord nextNode) {
         currentNode.incrementConnections();
         currentNode.decrementConnectionsToInitiate();
@@ -101,6 +124,10 @@ public class OverlayCreator {
         nextNode.decrementConnectionsToInitiate();
     }
 
+    /**
+     * Overlay creation can result in impossible overlays (cannot meet connection requirement), so the Registry resets
+     * the overlay and tries to create it again in that case.
+     */
     private void reEstablishConnections() {
 //        System.out.println("Impossible to create overlay, starting over...");
         for (NodeRecord node : registeredNodes.values()) {

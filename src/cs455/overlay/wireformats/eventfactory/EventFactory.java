@@ -15,6 +15,10 @@ import java.io.IOException;
 
 public final class EventFactory {
 
+    /**
+     * Class creates events based on the type of message received at a node so the node can respond accordingly.
+     */
+
     private static final EventFactory instance = new EventFactory();
 
     private EventFactory() { }

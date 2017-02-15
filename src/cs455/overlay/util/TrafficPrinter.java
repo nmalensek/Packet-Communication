@@ -24,6 +24,10 @@ public class TrafficPrinter {
                 "messages", "messages", "messages", "messages");
     }
 
+    /**
+     * Synchronized so the counts are accurate
+     * @param summary individual node's traffic summary
+     */
     public synchronized void processSummary(TrafficSummary summary) {
         String nodeID = summary.getIpAddress() + ":" + summary.getPortNumber();
         int sentMessages = summary.getSentMessages();

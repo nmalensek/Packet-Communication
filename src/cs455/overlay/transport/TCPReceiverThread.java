@@ -34,6 +34,9 @@ public class TCPReceiverThread extends Thread implements Protocol {
         dataInputStream = new DataInputStream(communicationSocket.getInputStream());
     }
 
+    /**
+     * Listens for a message coming in.
+     */
     public void run() {
         int dataLength;
         while (communicationSocket != null) {
@@ -51,6 +54,12 @@ public class TCPReceiverThread extends Thread implements Protocol {
         }
     }
 
+    /**
+     * Reads first line of message to determine the message type, then passes that to a switch statement to process
+     * the message the rest of the way and pass it to the node.
+     * @param marshalledBytes packaged message
+     * @throws IOException
+     */
     public synchronized void determineMessageType(byte[] marshalledBytes) throws IOException {
         ByteArrayInputStream byteArrayInputStream =
                 new ByteArrayInputStream(marshalledBytes);

@@ -18,6 +18,9 @@ public class NodeConnection implements Protocol, Event<NodeConnection> {
 
     public int getMessageType() { return messageType; }
 
+    /**
+     * Used to debug program (confirm nodes are connected).
+     */
     public void printHello() {
         System.out.println("Hello from " + getNodeID());
     }

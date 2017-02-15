@@ -31,6 +31,9 @@ public class Registry implements Node {
     private int numberOfSummariesReceived;
     private TrafficPrinter trafficPrinter = new TrafficPrinter();
 
+    /**
+     * Starts listening for node connections and text input from the user.
+     */
     public void startServer() {
         TCPServerThread registryServerThread = new TCPServerThread(this, portNum);
         registryServerThread.start();
@@ -38,6 +41,12 @@ public class Registry implements Node {
         textInputThread.start();
     }
 
+    /**
+     * Processes events and sends a follow-up message to the sender as applicable.
+     * @param event event that occurred.
+     * @param destinationSocket sender's communication socket, allows a response.
+     * @throws IOException
+     */
     public void onEvent(Event event, Socket destinationSocket) throws IOException {
         if (event instanceof RegisterRequestReceive) {
             receiveRegistration(((RegisterRequestReceive) event), destinationSocket);
@@ -66,6 +75,13 @@ public class Registry implements Node {
         }
     }
 
+    /**
+     * Receives a node's registration. Synchronized because a race condition occasionally happened where one node
+     * would overwrite another node's registration.
+     * @param registerRequestReceive copy of the message received so it can be processed further.
+     * @param destinationSocket sender's socket, allows a response.
+     * @throws IOException
+     */
     private synchronized void receiveRegistration(RegisterRequestReceive registerRequestReceive,
                                                   Socket destinationSocket) throws IOException {
         RegistrationReceiver receiver = new RegistrationReceiver(
@@ -73,6 +89,11 @@ public class Registry implements Node {
         receiver.checkRegistration();
     }
 
+    /**
+     * Process text input from a user.
+     * @param command action the user requests from the messaging node.
+     * @throws IOException
+     */
     public void processText(String command) throws IOException {
         String line = command;
         int numberPortion = 0;
@@ -152,6 +173,11 @@ public class Registry implements Node {
         overlayCreator.createOverlay();
     }
 
+    /**
+     * Displays an error message if a user tries to specify a non-integer when setting up the overlay.
+     * @param stringToCheck string the user entered.
+     * @return
+     */
     private int wasANumberEntered(String stringToCheck) {
         try {
             return Integer.parseInt(stringToCheck);
@@ -161,6 +187,10 @@ public class Registry implements Node {
         }
     }
 
+    /**
+     * Sends a list of nodes to connect to to every node in the overlay.
+     * @throws IOException
+     */
     private void sendMessagingNodesList() throws IOException {
         MessagingNodesList messagingNodesList = new MessagingNodesList();
         for (NodeRecord node : nodeMap.values()) {
@@ -170,6 +200,10 @@ public class Registry implements Node {
         }
     }
 
+    /**
+     * Assigns random weights to connections in overlay. Connections are unidirectional at this point, so the connection
+     * is then reversed to make it bidirectional.
+     */
     private void mapLinksAndAssignWeights() {
         links = new ArrayList<>();
         for (NodeRecord source : nodeMap.values()) {
@@ -187,12 +221,20 @@ public class Registry implements Node {
         }
     }
 
+    /**
+     * Prints every other connection (connections are duplicated in mapLinksAndAssignWeights method to make them
+     * bidirectional).
+     */
     private void listWeights() {
         for (int i = 0; i < links.size(); i +=2) {
             System.out.println(links.get(i));
         }
     }
 
+    /**
+     * Sends all link weights for all connections to all nodes in the overlay.
+     * @throws IOException
+     */
     private void sendOverlayLinkWeights() throws IOException {
         LinkWeightsSend linkWeightsSend = new LinkWeightsSend();
         linkWeightsSend.setNumberOfLinks(links.size());
@@ -202,6 +244,11 @@ public class Registry implements Node {
         }
     }
 
+    /**
+     * Tells nodes to start sending messages to each other.
+     * @param numberOfRounds how many rounds of 5 messages each a node should send.
+     * @throws IOException
+     */
     private void initiateTask(int numberOfRounds) throws IOException {
         TaskInitiate taskInitiate = new TaskInitiate();
         taskInitiate.setRounds(numberOfRounds);

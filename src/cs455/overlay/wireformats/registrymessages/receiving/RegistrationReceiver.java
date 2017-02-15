@@ -37,6 +37,12 @@ public class RegistrationReceiver {
         nodeRecord = new NodeRecord(host, port, destinationSocket);
     }
 
+    /**
+     * Checks if a node's already registered and that sender is the node trying to register. Stores knowledge of node
+     * if no errors occur. Also includes error handling for when the node's socket is closed before the registration
+     * response is sent.
+     * @throws IOException
+     */
     public synchronized void checkRegistration() throws IOException {
         if (nodeMap.containsKey(key)) {
             processRegistration(destinationSocket, false,
@@ -59,6 +65,15 @@ public class RegistrationReceiver {
         }
     }
 
+    /**
+     * Sends success or failure response to the registering node.
+     * @param nodeThatRegistered node that sent the original message.
+     * @param isSuccessfulConnection whether the node's connection was successful.
+     * @param error error if one occurred.
+     * @param successOrFailure if registration succeeded or failed.
+     * @throws IOException
+     * @throws SocketException
+     */
     public synchronized void processRegistration(Socket nodeThatRegistered, boolean isSuccessfulConnection,
                                     String error, byte successOrFailure) throws IOException, SocketException {
         RegisterRequestResponse registerRequestResponse = eventFactory.createRegisterResponseEvent().getType();

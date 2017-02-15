@@ -13,6 +13,14 @@ public class LinkWeightsProcess {
     private List<Connection> connectionList = new ArrayList<>();
     private Map<String, Connection> edgeMap = new HashMap<>();
 
+    /**
+     * Takes link weights from LinkWeightsSend message from Registry. Splits the string by newline and then by space
+     * to find the source node, destination node, and connection weight. The node then stores the specified connection.
+     * This occurs for every node in the overlay; each node can now message any other node in the overlay.
+     * This should result in a copy of the registry's overlay knowledge.
+     * @param linkWeights String of all connections and their respective weights in the overlay (from LinkWeightsSend
+     *                    message).
+     */
     public void processLinkWeights(String linkWeights) {
         String[] splitByNewLine = linkWeights.split("\\n");
         for(String path : splitByNewLine) {
@@ -36,6 +44,10 @@ public class LinkWeightsProcess {
 
     public Map<String, Connection> getEdgeMap() { return edgeMap; }
 
+    /**
+     * Ensures no duplicates are added in the overlay reconstruction.
+     * @param point node in the overlay.
+     */
     private void createVertex(Point point) {
         if (!pointList.contains(point)) {
             pointList.add(point);

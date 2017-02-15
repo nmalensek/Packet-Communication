@@ -36,6 +36,12 @@ public class DeregistrationReceiver {
         key = deregisteringHost + ":" + deregisteringPort;
     }
 
+    /**
+     * Checks if a node's registered and the message origin is the same as the host/port in the message. Nodes
+     * are not allowed to deregister if the overlay's been established. Otherwise, the Registry deletes the node
+     * from the overlay.
+     * @throws IOException
+     */
     public void checkDeRegistration() throws IOException {
         if (!nodeMap.containsKey(key)) {
             sendDeregistrationResponse(destinationSocket,
@@ -53,6 +59,14 @@ public class DeregistrationReceiver {
         }
     }
 
+    /**
+     * Informs node if deregistration was successful, and if not, what error occurred.
+     * @param deregisteringNode node that's trying to deregister.
+     * @param error error message (if applicable).
+     * @param deregisterSuccess whether the deregistration was successful (currently unused).
+     * @param successOrFailure whether the deregistration was successful.
+     * @throws IOException
+     */
     public void sendDeregistrationResponse(Socket deregisteringNode,
                                            String error, boolean deregisterSuccess,
                                            byte successOrFailure) throws IOException {

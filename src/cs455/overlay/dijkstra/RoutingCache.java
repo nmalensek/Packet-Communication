@@ -14,14 +14,28 @@ public class RoutingCache {
         this.edgeMap = new HashMap<>(edgeMap);
     }
 
+    /**
+     * Stores shortest path to a given node
+     * @param destination node the shortest path was calculated for
+     * @param shortestPath shortest path that was calculated
+     */
+
     public void cacheShortestPath(String destination, LinkedList<Point> shortestPath) {
         shortestPathsMap.put(destination, shortestPath);
     }
+
+    /**
+     * Retrieves all shortest paths to nodes in overlay.
+     * @return all shortest paths in overlay.
+     */
 
     public Map<String, LinkedList<Point>> getShortestPathsMap() {
         return shortestPathsMap;
     }
 
+    /**
+     * Method to print shortest paths; unformatted.
+     */
     public void simplePrint() {
         for (String destination : shortestPathsMap.keySet()) {
             for (Point point : shortestPathsMap.get(destination)) {
@@ -31,6 +45,10 @@ public class RoutingCache {
         }
     }
 
+    /**
+     * Prints shortest paths formatted according to assignment requirements
+     * @param thisNodeID node that's printing the shortest paths, excluded from the printed data.
+     */
     public void printMap(String thisNodeID) {
         for (String destination : shortestPathsMap.keySet()) {
             String pathString = thisNodeID;

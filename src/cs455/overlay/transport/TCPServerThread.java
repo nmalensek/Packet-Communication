@@ -22,6 +22,10 @@ public class TCPServerThread extends Thread {
         this.portNum = portNum;
     }
 
+    /**
+     * The program has intermittent BindExceptions when using the department machines, so the afflicted node now
+     * deregisters itself through the first catch statement.
+     */
     public void run() {
         try {
             serverSocket = new ServerSocket(portNum);

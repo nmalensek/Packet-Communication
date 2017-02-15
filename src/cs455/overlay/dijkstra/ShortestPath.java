@@ -85,7 +85,7 @@ public class ShortestPath {
     private int getShortestDistance(Point destination) {
         Integer distance = weight.get(destination);
         if (distance == null) {
-            return Integer.MAX_VALUE; //all nodes start with MAX_VALUE distance
+            return Integer.MAX_VALUE; //all nodes start with MAX_VALUE distance until shortest distance is calculated
         } else {
             return distance;
         }

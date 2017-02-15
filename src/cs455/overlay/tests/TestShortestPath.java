@@ -6,6 +6,10 @@ import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 
+/**
+ * code adapted from http://www.vogella.com/tutorials/JavaAlgorithmsDijkstra/article.html
+ */
+
 public class TestShortestPath {
 
     private List<Point> vertices;

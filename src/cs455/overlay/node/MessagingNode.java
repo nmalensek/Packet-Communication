@@ -10,6 +10,7 @@ import cs455.overlay.wireformats.*;
 import cs455.overlay.wireformats.nodemessages.*;
 import cs455.overlay.wireformats.eventfactory.EventFactory;
 import cs455.overlay.wireformats.nodemessages.Receiving.*;
+import cs455.overlay.wireformats.nodemessages.Sending.BindExceptionHappened;
 import cs455.overlay.wireformats.nodemessages.Sending.Deregister;
 import cs455.overlay.wireformats.nodemessages.Message;
 import cs455.overlay.wireformats.nodemessages.Sending.MessageCreator;
@@ -64,9 +65,7 @@ public class MessagingNode implements Node {
         receiverThread.start();
         createServerThread();
         listenForTextInput();
-        if(receivingSocket.isAlive()) {
-            register();
-        }
+        register();
     }
 
     private void chooseRandomPort() {
@@ -143,6 +142,8 @@ public class MessagingNode implements Node {
         } else if (event instanceof PullTrafficSummary) {
             createAndSendTrafficSummary();
             communicationTracker.resetCounters();
+        } else if (event instanceof BindExceptionHappened) {
+            deregister();
         }
     }
 

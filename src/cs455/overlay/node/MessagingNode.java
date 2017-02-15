@@ -64,7 +64,9 @@ public class MessagingNode implements Node {
         receiverThread.start();
         createServerThread();
         listenForTextInput();
-        register();
+        if(receivingSocket.isAlive()) {
+            register();
+        }
     }
 
     private void chooseRandomPort() {

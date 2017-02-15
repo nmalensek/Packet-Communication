@@ -182,7 +182,7 @@ public class Registry implements Node {
                 Connection reverseConnection = new Connection(end.getId() + start.getId(),
                         end, start, weight);
                 links.add(connection);
-                links.add(reverseConnection);
+                links.add(reverseConnection); //makes links bidirectional
             }
         }
     }

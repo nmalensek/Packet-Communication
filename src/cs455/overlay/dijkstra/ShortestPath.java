@@ -9,8 +9,8 @@ import java.util.*;
 public class ShortestPath {
     private final List<Point> nodes;
     private final List<Connection> connections;
-    private Set<Point> settledNodes;
-    private Set<Point> unSettledNodes;
+    private Set<Point> nodesWithKnownShortestPath;
+    private Set<Point> nodesWithoutShortestPath;
     private Map<Point, Point> predecessors;
     private Map<Point, Integer> weight;
 
@@ -20,16 +20,16 @@ public class ShortestPath {
     }
 
     public void computeShortestPath(Point source) {
-        settledNodes = new HashSet<>();
-        unSettledNodes = new HashSet<>();
+        nodesWithKnownShortestPath = new HashSet<>();
+        nodesWithoutShortestPath = new HashSet<>();
         weight = new HashMap<>();
         predecessors = new HashMap<>();
         weight.put(source, 0);
-        unSettledNodes.add(source);
-        while (unSettledNodes.size() > 0) {
-            Point node = getMinimum(unSettledNodes);
-            settledNodes.add(node);
-            unSettledNodes.remove(node);
+        nodesWithoutShortestPath.add(source);
+        while (nodesWithoutShortestPath.size() > 0) {
+            Point node = getMinimum(nodesWithoutShortestPath);
+            nodesWithKnownShortestPath.add(node);
+            nodesWithoutShortestPath.remove(node);
             findShortestDistances(node);
         }
     }
@@ -42,7 +42,7 @@ public class ShortestPath {
             if(getShortestDistance(target) > getShortestDistance(node) + getLinkWeight(node, target)) {
                 weight.put(target, getShortestDistance(node) + getLinkWeight(node, target));
                 predecessors.put(target, node);
-                unSettledNodes.add(target);
+                nodesWithoutShortestPath.add(target);
             }
         }
     }
@@ -59,7 +59,7 @@ public class ShortestPath {
     private List<Point> getNeighbors(Point node) {
         List<Point> neighbors = new ArrayList<>();
         for (Connection connection : connections) {
-            if (connection.getSource().equals(node) && !isSettled(connection.getDestination())) { //gets next possible nodes in path
+            if (connection.getSource().equals(node) && !shortestPathDetermined(connection.getDestination())) { //gets next possible nodes in path
                 neighbors.add(connection.getDestination());
             }
         }
@@ -78,8 +78,8 @@ public class ShortestPath {
         return minimum;
     }
 
-    private boolean isSettled(Point point) {
-        return settledNodes.contains(point);
+    private boolean shortestPathDetermined(Point point) {
+        return nodesWithKnownShortestPath.contains(point);
     } //shortest path has been determined
 
     private int getShortestDistance(Point destination) {

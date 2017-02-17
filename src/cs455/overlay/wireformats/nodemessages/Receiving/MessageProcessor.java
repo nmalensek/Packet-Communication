@@ -67,7 +67,7 @@ public class MessageProcessor {
      * @param message message containing a random int payload.
      * @throws IOException
      */
-    private void prepareMessageForNextNode(String[] nodeIDArray, Message message) throws IOException {
+    private synchronized void prepareMessageForNextNode(String[] nodeIDArray, Message message) throws IOException {
         String updatedRoute = "";
         nodeIDArray[0] = null; //this node received message, remove from remaining route
         for (String remainingNodes : nodeIDArray) {

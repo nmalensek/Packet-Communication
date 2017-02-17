@@ -112,10 +112,11 @@ public class Registry implements Node {
             case "setup-overlay":
                 if (!overlayEstablished) {
                     connectionRequirement = numberPortion;
-                    verifyConnectionRequirement();
-                    setupOverlay();
-                    mapLinksAndAssignWeights();
-                    sendMessagingNodesList();
+                    if (validConnectionRequirement()) {
+                        setupOverlay();
+                        mapLinksAndAssignWeights();
+                        sendMessagingNodesList();
+                    }
                 } else {
                     System.out.println("Overlay is already established.");
                 }
@@ -161,11 +162,12 @@ public class Registry implements Node {
         }
     }
 
-    private void verifyConnectionRequirement() {
+    private boolean validConnectionRequirement() {
         if (nodeMap.size() < connectionRequirement || nodeMap.size() < 3) {
             System.out.println("Not enough nodes to fulfill connection requirement, please re-enter.");
+            return false;
         } else {
-            overlayEstablished = true;
+            return true;
         }
     }
 

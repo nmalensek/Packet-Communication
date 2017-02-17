@@ -116,7 +116,6 @@ public class Registry implements Node {
                     setupOverlay();
                     mapLinksAndAssignWeights();
                     sendMessagingNodesList();
-                    overlayEstablished = true;
                 } else {
                     System.out.println("Overlay is already established.");
                 }
@@ -165,6 +164,8 @@ public class Registry implements Node {
     private void verifyConnectionRequirement() {
         if (nodeMap.size() < connectionRequirement || nodeMap.size() < 3) {
             System.out.println("Not enough nodes to fulfill connection requirement, please re-enter.");
+        } else {
+            overlayEstablished = true;
         }
     }
 

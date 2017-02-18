@@ -116,6 +116,7 @@ public class Registry implements Node {
                         setupOverlay();
                         mapLinksAndAssignWeights();
                         sendMessagingNodesList();
+                        overlayEstablished = true;
                     }
                 } else {
                     System.out.println("Overlay is already established.");

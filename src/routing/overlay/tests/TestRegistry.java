@@ -43,6 +43,11 @@ public class TestRegistry implements Node {
         }
     }
 
+    @Override
+    public void setServerPort(int port) throws IOException {
+
+    }
+
     public void processText(String command) throws IOException {
         String line = command;
         int numberPortion = 0;

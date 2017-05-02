@@ -1,6 +1,5 @@
 package routing.overlay.tests;
 
-import cs455.overlay.dijkstra.*;
 import routing.overlay.dijkstra.*;
 
 import java.io.IOException;

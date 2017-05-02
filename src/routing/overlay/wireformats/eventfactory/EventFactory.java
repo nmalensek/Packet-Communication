@@ -1,8 +1,5 @@
 package routing.overlay.wireformats.eventfactory;
 
-import cs455.overlay.wireformats.*;
-import cs455.overlay.wireformats.nodemessages.Receiving.*;
-import cs455.overlay.wireformats.nodemessages.*;
 import routing.overlay.wireformats.*;
 import routing.overlay.wireformats.nodemessages.Receiving.LinkWeightsReceive;
 import routing.overlay.wireformats.nodemessages.Receiving.MessagingNodesListReceive;

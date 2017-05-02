@@ -25,6 +25,7 @@ public class HostIPTester {
             String canon = Inet4Address.getLocalHost().getCanonicalHostName(); //should be same as socket.getInetAddress().getHostName()
             String socketIP = socket.getInetAddress().getHostAddress();
             String socketHost = socket.getInetAddress().getHostName();
+            String remote = socket.getInetAddress().getHostName();
 
             System.out.println(ip1);
             System.out.println(hostname1);
@@ -33,6 +34,7 @@ public class HostIPTester {
             System.out.println(socketHost);
             System.out.println(ip1 + ":" + socketIP);
             System.out.println(canon + ":" + socketHost);
+            System.out.println(remote);
 
         } catch (IOException ioe) {
             ioe.printStackTrace();

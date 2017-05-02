@@ -1,16 +1,12 @@
 package routing.overlay.node;
 
-import cs455.overlay.dijkstra.*;
 import routing.overlay.dijkstra.*;
 import routing.overlay.transport.TCPReceiverThread;
 import routing.overlay.transport.TCPSender;
 import routing.overlay.transport.TCPServerThread;
 import routing.overlay.util.CommunicationTracker;
 import routing.overlay.util.TextInputThread;
-import cs455.overlay.wireformats.*;
-import cs455.overlay.wireformats.nodemessages.*;
 import routing.overlay.wireformats.eventfactory.EventFactory;
-import cs455.overlay.wireformats.nodemessages.Receiving.*;
 import routing.overlay.wireformats.nodemessages.Sending.BindExceptionHappened;
 import routing.overlay.wireformats.nodemessages.Sending.Deregister;
 import routing.overlay.wireformats.nodemessages.Message;
@@ -70,21 +66,29 @@ public class MessagingNode implements Node {
      */
 
     private void startUp() throws IOException {
-        chooseRandomPort();
+//        chooseRandomPort();
         TCPReceiverThread receiverThread = new TCPReceiverThread(registrySocket, this);
         receiverThread.start();
         createServerThread();
         listenForTextInput();
+        while (thisNodePort == 0) {
+
+        }
         register();
     }
 
-    private void chooseRandomPort() {
-        thisNodePort = ThreadLocalRandom.current().nextInt(49152, 65535);
+//    private void chooseRandomPort() {
+//        thisNodePort = ThreadLocalRandom.current().nextInt(49152, 65535);
+//    }
+
+    public void setServerPort(int port) {
+        thisNodePort = port;
     }
 
     private void createServerThread() throws IOException {
-        receivingSocket = new TCPServerThread(this, thisNodePort);
+        receivingSocket = new TCPServerThread(this, 0); //node starts listening on random open port
         receivingSocket.start();
+        thisNodePort = receivingSocket.getPortNumber();
     }
 
     private void listenForTextInput() throws IOException {

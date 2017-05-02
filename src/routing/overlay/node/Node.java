@@ -8,5 +8,6 @@ import java.net.Socket;
 public interface Node {
 
     void onEvent(Event event, Socket destinationSocket) throws IOException;
+    void setServerPort(int port) throws IOException;
     void processText(String text) throws IOException;
 }

@@ -4,7 +4,6 @@ import routing.overlay.dijkstra.Connection;
 import routing.overlay.dijkstra.Point;
 import routing.overlay.transport.TCPServerThread;
 import routing.overlay.util.TrafficPrinter;
-import cs455.overlay.wireformats.*;
 import routing.overlay.wireformats.*;
 import routing.overlay.wireformats.registrymessages.receiving.DeregistrationReceiver;
 import routing.overlay.util.OverlayCreator;
@@ -267,6 +266,10 @@ public class Registry implements Node {
         for (NodeRecord nodeRecord : nodeMap.values()) {
             nodeRecord.getSender().sendData(pullTrafficSummary.getBytes());
         }
+    }
+
+    public void setServerPort(int port) throws IOException {
+        //doesn't apply to registry
     }
 
     public static void main(String[] args) throws IOException {

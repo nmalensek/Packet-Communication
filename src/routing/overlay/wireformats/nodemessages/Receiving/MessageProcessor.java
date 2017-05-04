@@ -30,7 +30,7 @@ public class MessageProcessor {
      * @param nodeID Node that needs to be retrieved.
      * @return
      */
-    private synchronized NodeRecord getNextNode(String nodeID) {
+    private NodeRecord getNextNode(String nodeID) {
         NodeRecord nextNode = copyOfDirectConnections.get(nodeID);
         return nextNode;
     }
@@ -41,7 +41,7 @@ public class MessageProcessor {
      * @param message message containing a random int payload.
      * @throws IOException
      */
-    public synchronized void processRoutingPath(Message message) throws IOException {
+    public void processRoutingPath(Message message) throws IOException {
         String route = message.getRoutingPath();
         String[] separateNodes = route.split("\\n");
         if (separateNodes.length == 1) { //this node is destination
@@ -67,7 +67,7 @@ public class MessageProcessor {
      * @param message message containing a random int payload.
      * @throws IOException
      */
-    private synchronized void prepareMessageForNextNode(String[] nodeIDArray, Message message) throws IOException {
+    private void prepareMessageForNextNode(String[] nodeIDArray, Message message) throws IOException {
         String updatedRoute = "";
         nodeIDArray[0] = null; //this node received message, remove from remaining route
         for (String remainingNodes : nodeIDArray) {

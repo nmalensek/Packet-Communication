@@ -24,7 +24,6 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ThreadLocalRandom;
 
 public class MessagingNode implements Node {
     private String registryHostName;
@@ -71,9 +70,6 @@ public class MessagingNode implements Node {
         receiverThread.start();
         createServerThread();
         listenForTextInput();
-        while (thisNodePort == 0) {
-
-        }
         register();
     }
 

@@ -10,6 +10,11 @@ public class PullTrafficSummary implements Protocol, Event<PullTrafficSummary> {
         return this;
     }
 
+    @Override
+    public int getMessageType() {
+        return messageType;
+    }
+
     //marshalls bytes
     public byte[] getBytes() throws IOException {
         byte[] marshalledBytes = null;

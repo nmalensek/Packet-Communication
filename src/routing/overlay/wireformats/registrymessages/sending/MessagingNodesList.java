@@ -20,6 +20,10 @@ public class MessagingNodesList implements Protocol, Event<MessagingNodesList> {
         return this;
     }
 
+    public int getMessageType() {
+        return messageType;
+    }
+
     //marshalls bytes
     public byte[] getBytes() throws IOException {
         byte[] marshalledBytes = null;

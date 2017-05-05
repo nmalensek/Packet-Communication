@@ -37,6 +37,11 @@ public class RegistryResponseReceive implements Protocol, Event {
         return this;
     }
 
+    @Override
+    public int getMessageType() {
+        return messageType;
+    }
+
     public byte[] getBytes() throws IOException {
         return new byte[0];
     }

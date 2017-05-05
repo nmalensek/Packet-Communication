@@ -17,6 +17,11 @@ public class TrafficSummary implements Protocol, Event<TrafficSummary> {
         return this;
     }
 
+    @Override
+    public int getMessageType() {
+        return messageType;
+    }
+
     //marshalls bytes
     public byte[] getBytes() throws IOException {
         byte[] marshalledBytes = null;

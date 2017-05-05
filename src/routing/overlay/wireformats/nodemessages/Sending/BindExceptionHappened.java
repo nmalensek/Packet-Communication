@@ -6,6 +6,11 @@ public class BindExceptionHappened implements Event<BindExceptionHappened> {
 
     public BindExceptionHappened getType() { return this; }
 
+    @Override
+    public int getMessageType() {
+        return 100;
+    }
+
     public byte[] getBytes() {
         byte[] unusedByteArray = null;
         return unusedByteArray;

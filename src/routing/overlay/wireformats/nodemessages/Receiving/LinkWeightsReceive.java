@@ -21,6 +21,11 @@ public class LinkWeightsReceive implements Protocol, Event<LinkWeightsReceive> {
 
     public LinkWeightsReceive getType() { return this; }
 
+    @Override
+    public int getMessageType() {
+        return messageType;
+    }
+
     public LinkWeightsReceive(byte[] marshalledBytes) throws IOException {
         ByteArrayInputStream byteArrayInputStream =
                 new ByteArrayInputStream(marshalledBytes);

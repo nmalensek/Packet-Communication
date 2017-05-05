@@ -37,6 +37,11 @@ public class DeregisterRequestReceive implements Protocol, Event<DeregisterReque
         return this;
     }
 
+    @Override
+    public int getMessageType() {
+        return messageType;
+    }
+
     public byte[] getBytes() {
         //unused, only receiving bytes
         byte[] marshalledBytes = null;

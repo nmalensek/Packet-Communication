@@ -15,6 +15,10 @@ public class RegisterRequestResponse implements Protocol, Event {
         return this;
     }
 
+    public int getMessageType() {
+        return messageType;
+    }
+
     //marshalls bytes
     public byte[] getBytes() throws IOException {
         byte[] marshalledBytes = null;

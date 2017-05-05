@@ -11,6 +11,11 @@ public class TaskInitiate implements Protocol, Event<TaskInitiate> {
         return this;
     }
 
+    @Override
+    public int getMessageType() {
+        return messageType;
+    }
+
     //marshalls bytes
     public byte[] getBytes() throws IOException {
         byte[] marshalledBytes = null;

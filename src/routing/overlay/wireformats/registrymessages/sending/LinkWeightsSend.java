@@ -21,6 +21,10 @@ public class LinkWeightsSend implements Protocol, Event<LinkWeightsSend> {
         return this;
     }
 
+    public int getMessageType() {
+        return messageType;
+    }
+
     //marshalls bytes
     public byte[] getBytes() throws IOException {
         byte[] marshalledBytes = null;

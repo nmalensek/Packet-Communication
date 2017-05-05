@@ -16,6 +16,11 @@ public class Message implements Protocol, Event<Message> {
         return this;
     }
 
+    @Override
+    public int getMessageType() {
+        return messageType;
+    }
+
     //marshalls bytes
     public byte[] getBytes() throws IOException {
         byte[] marshalledBytes = null;

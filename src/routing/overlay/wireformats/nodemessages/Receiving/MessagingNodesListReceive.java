@@ -22,6 +22,11 @@ public class MessagingNodesListReceive implements Protocol, Event<MessagingNodes
 
     public MessagingNodesListReceive getType() { return this; }
 
+    @Override
+    public int getMessageType() {
+        return messageType;
+    }
+
     public MessagingNodesListReceive(byte[] marshalledBytes) throws IOException {
         ByteArrayInputStream byteArrayInputStream =
                 new ByteArrayInputStream(marshalledBytes);

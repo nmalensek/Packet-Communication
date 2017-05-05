@@ -34,6 +34,11 @@ public class RegisterRequestReceive implements Protocol, Event<RegisterRequestRe
         return this;
     }
 
+    @Override
+    public int getMessageType() {
+        return messageType;
+    }
+
     public byte[] getBytes() {
         //unused, only receiving bytes
         byte[] marshalledBytes = null;

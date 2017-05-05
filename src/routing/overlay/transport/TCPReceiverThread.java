@@ -12,10 +12,7 @@ import routing.overlay.wireformats.registrymessages.receiving.RegisterRequestRec
 import routing.overlay.wireformats.nodemessages.Receiving.DeregisterResponseReceive;
 import routing.overlay.wireformats.nodemessages.Receiving.RegistryResponseReceive;
 
-import java.io.BufferedInputStream;
-import java.io.ByteArrayInputStream;
-import java.io.DataInputStream;
-import java.io.IOException;
+import java.io.*;
 import java.net.Socket;
 
 /**
@@ -51,6 +48,8 @@ public class TCPReceiverThread extends Thread implements Protocol {
 
             } catch (IOException ioe) {
                 ioe.getMessage();
+            } catch (ClassNotFoundException e) {
+                e.printStackTrace();
             }
         }
     }
@@ -61,14 +60,16 @@ public class TCPReceiverThread extends Thread implements Protocol {
      * @param marshalledBytes packaged message
      * @throws IOException
      */
-    public synchronized void determineMessageType(byte[] marshalledBytes) throws IOException {
+    public void determineMessageType(byte[] marshalledBytes) throws IOException, ClassNotFoundException {
         ByteArrayInputStream byteArrayInputStream =
                 new ByteArrayInputStream(marshalledBytes);
-        DataInputStream dataInputStream =
-                new DataInputStream(new BufferedInputStream(byteArrayInputStream));
+        ObjectInputStream objectInputStream =
+                new ObjectInputStream(byteArrayInputStream);
 
-        int messageType = dataInputStream.readInt();
-        dataInputStream.close();
+        Event event = (Event) objectInputStream.readObject();
+            int messageType = event.getMessageType();
+//        int messageType = dataInputStream.readInt();
+//        dataInputStream.close();
 
         switch (messageType) {
             case DEREGISTER_REQUEST:

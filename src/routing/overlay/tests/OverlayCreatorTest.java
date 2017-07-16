@@ -63,14 +63,9 @@ public class OverlayCreatorTest {
     }
 
     public void connectToSequentialNodes(List<String> sequentialList) {
-        int loopPreventer = 0;
         boolean somethingChanged = true;
         int nextPosition = 1;
         while (somethingChanged) {
-            if (loopPreventer > 10) {
-                wasSuccessful = false;
-                break;
-            }
             for (ListIterator<String> recordListIterator = sequentialList.listIterator(); recordListIterator.hasNext(); ) {
                 String currentRecord = recordListIterator.next();
                 NodeRecord currentNode = nodeMap.get(currentRecord);
@@ -89,13 +84,13 @@ public class OverlayCreatorTest {
                             || nextNode.getNodesToConnectToList().contains(currentNode)
                             || nextNode.getNumberOfConnections() == requiredConnections
                             || nextNode == currentNode) {
-                        loopPreventer++;
+                        wasSuccessful = false;
                     } else {
                         currentNode.addNodeToConnectTo(nextNode);
                         updateConnections(currentNode, nextNode);
                     }
                 } else {
-
+                    somethingChanged = false;
                 }
             }
             nextPosition++;
@@ -167,7 +162,7 @@ public class OverlayCreatorTest {
         printSequentialConnections();
         while(!wasSuccessful) {
             System.out.println("Impossible to create overlay, please modify the required number of" +
-                    "connections or the number of nodes in overlay.");
+                    " connections or the number of nodes in overlay.");
             break;
         }
     }
@@ -175,8 +170,8 @@ public class OverlayCreatorTest {
     private void testOverlayConstruction() {
         setNodeConnectionRequirement();
         List<String> stringList = new LinkedList<>(putKeysInList());
-        connectToNodesInSequence(stringList);
-        printSequentialConnections();
+//        connectToNodesInSequence(stringList);
+//        printSequentialConnections();
         connectToSequentialNodes(stringList);
         newCheckIfSuccessful();
     }

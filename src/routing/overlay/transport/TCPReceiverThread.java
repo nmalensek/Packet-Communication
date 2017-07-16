@@ -63,13 +63,15 @@ public class TCPReceiverThread extends Thread implements Protocol {
     public void determineMessageType(byte[] marshalledBytes) throws IOException, ClassNotFoundException {
         ByteArrayInputStream byteArrayInputStream =
                 new ByteArrayInputStream(marshalledBytes);
-        ObjectInputStream objectInputStream =
-                new ObjectInputStream(byteArrayInputStream);
+        DataInputStream dataInputStream =
+                new DataInputStream(new BufferedInputStream(byteArrayInputStream));
+//        ObjectInputStream objectInputStream =
+//                new ObjectInputStream(byteArrayInputStream);
 
-        Event event = (Event) objectInputStream.readObject();
-            int messageType = event.getMessageType();
-//        int messageType = dataInputStream.readInt();
-//        dataInputStream.close();
+//        Event event = (Event) objectInputStream.readObject(); //doesn't work, probably because object output stream isn't used when sending
+//            int messageType = event.getMessageType();
+        int messageType = dataInputStream.readInt();
+        dataInputStream.close();
 
         switch (messageType) {
             case DEREGISTER_REQUEST:
